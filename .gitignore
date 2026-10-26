@@ -1,0 +1,27 @@
+# WordPress core: Studio installs it when it creates the site.
+/wp-admin/
+/wp-includes/
+/*.php
+/license.txt
+/readme.html
+
+# Files Studio generates for each machine.
+/STUDIO.md
+/wp-content/db.php
+/wp-content/mu-plugins/
+/wp-content/upgrade/
+/wp-content/index.php
+/wp-content/plugins/
+/wp-content/themes/index.php
+/wp-content/themes/twentytwenty*/
+/wp-content/database/*.sqlite-wal
+/wp-content/database/*.sqlite-shm
+/wp-content/database/*-journal
+
+# Agent scratch files.
+/tmp/
+
+# Video project build output.
+/video/node_modules/
+/video/out/
+.DS_Store

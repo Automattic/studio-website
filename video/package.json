@@ -1,0 +1,19 @@
+{
+  "name": "studio-website-video",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "studio": "remotion studio src/index.ts",
+    "render": "remotion render src/index.ts Main out/studio-video.mp4 --frames=180-1679 --codec=h264 --crf=20 --pixel-format=yuv420p --image-format=jpeg --jpeg-quality=95",
+    "poster": "remotion still src/index.ts Main out/studio-video-poster.jpg --frame=528 --image-format=jpeg --jpeg-quality=90"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.526",
+    "@remotion/media-utils": "^4.0.526",
+    "@types/react": "^19.3.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.526",
+    "typescript": "^7.0.2"
+  }
+}

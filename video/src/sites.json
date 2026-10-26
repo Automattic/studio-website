@@ -1,0 +1,182 @@
+[
+ {
+  "slug": "saltmarsh-coffee-roasters",
+  "name": "Saltmarsh Coffee Roasters",
+  "kind": "Coffee roaster · shop & subscriptions",
+  "model": "Strong"
+ },
+ {
+  "slug": "northlight-architects",
+  "name": "Northlight Architects",
+  "kind": "Architecture studio · portfolio",
+  "model": "Strong"
+ },
+ {
+  "slug": "pixel-tide-games",
+  "name": "Pixel Tide Games",
+  "kind": "Indie game studio · launch site",
+  "model": "Strong"
+ },
+ {
+  "slug": "riverside-jazz-weekend",
+  "name": "Riverside Jazz Weekend",
+  "kind": "Music festival · lineup & tickets",
+  "model": "Strong"
+ },
+ {
+  "slug": "little-molars-pediatric-dentistry",
+  "name": "Little Molars Pediatric Dentistry",
+  "kind": "Children's dentist · local clinic",
+  "model": "Strong"
+ },
+ {
+  "slug": "the-long-way-round",
+  "name": "The Long Way Round",
+  "kind": "Personal travel blog",
+  "model": "Strong"
+ },
+ {
+  "slug": "open-harvest-collective",
+  "name": "Open Harvest Collective",
+  "kind": "Nonprofit · community gardens",
+  "model": "Strong"
+ },
+ {
+  "slug": "quill-margin",
+  "name": "Quill & Margin",
+  "kind": "Literary magazine",
+  "model": "Strong"
+ },
+ {
+  "slug": "kestrel",
+  "name": "Kestrel",
+  "kind": "B2B SaaS · product & pricing",
+  "model": "Strong"
+ },
+ {
+  "slug": "dar-zitoun",
+  "name": "Dar Zitoun",
+  "kind": "Guesthouse in Marrakech · in French",
+  "model": "Strong"
+ },
+ {
+  "slug": "taller-barro-negro",
+  "name": "Taller Barro Negro",
+  "kind": "Ceramics workshop & shop · in Spanish",
+  "model": "Strong"
+ },
+ {
+  "slug": "ironside-strength",
+  "name": "Ironside Strength",
+  "kind": "Strength gym",
+  "model": "Strong"
+ },
+ {
+  "slug": "mei-tanaka-lab",
+  "name": "Mei Tanaka Lab",
+  "kind": "University research lab",
+  "model": "Strong"
+ },
+ {
+  "slug": "hollow-pine-records",
+  "name": "Hollow Pine Records",
+  "kind": "Independent record label",
+  "model": "Strong"
+ },
+ {
+  "slug": "brightside-immigration-law",
+  "name": "Brightside Immigration Law",
+  "kind": "Immigration law firm",
+  "model": "Strong"
+ },
+ {
+  "slug": "amara-jonah",
+  "name": "Amara & Jonah",
+  "kind": "Wedding website · RSVP",
+  "model": "Balanced"
+ },
+ {
+  "slug": "k-ji-ramen",
+  "name": "Kōji Ramen",
+  "kind": "Ramen bar · menu & reservations",
+  "model": "Fast"
+ },
+ {
+  "slug": "dark-sky-hours",
+  "name": "Dark Sky Hours",
+  "kind": "Astronomy podcast",
+  "model": "Fast"
+ },
+ {
+  "slug": "fernwood-montessori",
+  "name": "Fernwood Montessori",
+  "kind": "Montessori school",
+  "model": "Strong"
+ },
+ {
+  "slug": "paper-cities",
+  "name": "Paper Cities",
+  "kind": "Museum exhibition microsite",
+  "model": "Balanced"
+ },
+ {
+  "slug": "vela",
+  "name": "Vela",
+  "kind": "Fintech app · landing page",
+  "model": "Fast"
+ },
+ {
+  "slug": "atelier-noor",
+  "name": "Atelier Noor",
+  "kind": "Fashion label in Dubai · in Arabic",
+  "model": "Fast"
+ },
+ {
+  "slug": "hanami-yoga",
+  "name": "Hanami Yoga",
+  "kind": "Yoga studio in Kyoto · in Japanese",
+  "model": "Balanced"
+ },
+ {
+  "slug": "volt-garage",
+  "name": "Volt Garage",
+  "kind": "EV workshop in Lisbon · in Portuguese",
+  "model": "Strong"
+ },
+ {
+  "slug": "stadtwerk-coworking",
+  "name": "Stadtwerk Coworking",
+  "kind": "Coworking space · in German",
+  "model": "Balanced"
+ },
+ {
+  "slug": "margot-lin-photography",
+  "name": "Margot Lin Photography",
+  "kind": "Wedding photographer · portfolio",
+  "model": "Strong"
+ },
+ {
+  "slug": "hack-the-harbor",
+  "name": "Hack the Harbor",
+  "kind": "Student hackathon",
+  "model": "Strong"
+ },
+ {
+  "slug": "petal-stem",
+  "name": "Petal & Stem",
+  "kind": "Florist · shop & subscriptions",
+  "model": "Balanced"
+ },
+ {
+  "slug": "township-of-greenfield",
+  "name": "Township of Greenfield",
+  "kind": "Town government",
+  "model": "Balanced"
+ },
+ {
+  "slug": "muse-marrow",
+  "name": "Muse & Marrow",
+  "kind": "Children's author & illustrator",
+  "model": "Balanced"
+ }
+]

@@ -1,0 +1,76 @@
+{
+ "totalFrames": 1680,
+ "scenes": [
+  {
+   "id": "intro",
+   "from": 0,
+   "frames": 120
+  },
+  {
+   "id": "typing",
+   "from": 120,
+   "frames": 180
+  },
+  {
+   "id": "agent",
+   "from": 300,
+   "frames": 180
+  },
+  {
+   "id": "reveal",
+   "from": 480,
+   "frames": 240
+  },
+  {
+   "id": "montage",
+   "from": 720,
+   "frames": 360
+  },
+  {
+   "id": "wall",
+   "from": 1080,
+   "frames": 120
+  },
+  {
+   "id": "editor",
+   "from": 1200,
+   "frames": 180
+  },
+  {
+   "id": "end",
+   "from": 1380,
+   "frames": 300
+  }
+ ],
+ "groups": [
+  [
+   "Any business.",
+   [
+    "kestrel",
+    "little-molars-pediatric-dentistry",
+    "brightside-immigration-law",
+    "petal-stem"
+   ]
+  ],
+  [
+   "Any style.",
+   [
+    "ironside-strength",
+    "vela",
+    "hack-the-harbor",
+    "pixel-tide-games"
+   ]
+  ],
+  [
+   "Any language.",
+   [
+    "atelier-noor",
+    "dar-zitoun",
+    "stadtwerk-coworking",
+    "hanami-yoga"
+   ]
+  ]
+ ],
+ "agentSite": "petal-stem",
+ "agentPrompt": "Build a site for my florist in Hackney with WordPress Studio."
+}
