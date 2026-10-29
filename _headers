@@ -1,0 +1,5 @@
+# Let browsers reuse fonts, styles, scripts and media between pages.
+/wp-content/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+/wp-includes/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

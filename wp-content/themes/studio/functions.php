@@ -98,6 +98,23 @@ function studio_seo_plugin_active() {
 	return class_exists( 'Jetpack' ) && method_exists( 'Jetpack', 'is_module_active' ) && Jetpack::is_module_active( 'seo-tools' );
 }
 
+/*
+ * The site is published as static files with relative links, so it works on any host. Search
+ * engines and link previews need absolute URLs, so those always use the production address.
+ */
+const STUDIO_PUBLIC_ORIGIN = 'https://wordpress.studio';
+
+function studio_public_url( $url ) {
+	return STUDIO_PUBLIC_ORIGIN . wp_make_link_relative( $url );
+}
+
+add_filter( 'wp_sitemaps_index_entry', 'studio_public_sitemap_entry' );
+add_filter( 'wp_sitemaps_posts_entry', 'studio_public_sitemap_entry' );
+function studio_public_sitemap_entry( $entry ) {
+	$entry['loc'] = studio_public_url( $entry['loc'] );
+	return $entry;
+}
+
 function studio_seo_description() {
 	if ( is_singular() && has_excerpt() ) {
 		return wp_strip_all_tags( get_the_excerpt() );
@@ -113,18 +130,23 @@ add_action( 'wp_head', function () {
 	if ( studio_seo_plugin_active() ) {
 		return;
 	}
+	remove_action( 'wp_head', 'rel_canonical' );
 
 	$title       = wp_get_document_title();
 	$description = studio_seo_description();
-	$url         = is_singular() ? get_permalink() : ( is_front_page() ? home_url( '/' ) : '' );
-	$image       = array( get_theme_file_uri( 'assets/images/share.png' ), 1200, 630 );
+	$url         = is_singular() ? studio_public_url( get_permalink() ) : ( is_front_page() ? studio_public_url( home_url( '/' ) ) : '' );
+	$image       = array( studio_public_url( get_theme_file_uri( 'assets/images/share.png' ) ), 1200, 630 );
 	$image_alt   = 'WordPress Studio: the app window with a site list, a Studio Code chat and a live site preview.';
 	if ( is_singular() && has_post_thumbnail() ) {
 		$thumb = wp_get_attachment_image_src( get_post_thumbnail_id(), 'large' );
 		if ( $thumb ) {
-			$image     = $thumb;
+			$image     = array( studio_public_url( $thumb[0] ), $thumb[1], $thumb[2] );
 			$image_alt = get_post_meta( get_post_thumbnail_id(), '_wp_attachment_image_alt', true );
 		}
+	}
+
+	if ( $url ) {
+		printf( "<link rel=\"canonical\" href=\"%s\" />\n", esc_url( $url ) );
 	}
 
 	$tags = array(
@@ -159,7 +181,7 @@ add_action( 'wp_head', function () {
 				array(
 					'@type'       => 'WebSite',
 					'name'        => get_bloginfo( 'name' ),
-					'url'         => home_url( '/' ),
+					'url'         => studio_public_url( home_url( '/' ) ),
 					'description' => $description,
 					'publisher'   => $publisher,
 				),
@@ -167,8 +189,8 @@ add_action( 'wp_head', function () {
 					'@type'               => 'SoftwareApplication',
 					'name'                => 'WordPress Studio',
 					'description'         => $description,
-					'url'                 => home_url( '/' ),
-					'downloadUrl'         => home_url( '/download/' ),
+					'url'                 => studio_public_url( home_url( '/' ) ),
+					'downloadUrl'         => studio_public_url( home_url( '/download/' ) ),
 					'image'               => $image[0],
 					'applicationCategory' => 'DeveloperApplication',
 					'operatingSystem'     => 'macOS, Windows, Linux',
