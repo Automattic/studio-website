@@ -42,26 +42,13 @@ export const Typing: React.FC = () => {
 	const frame = useCurrentFrame();
 	const TOTAL = 124;
 	const idx = Math.round( interpolate( frame, [ 16, 150 ], [ 0, TOTAL - 1 ], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' } ) );
-	const zoom = interpolate( frame, [ 0, 60, 180 ], [ 1.5, 1.85, 2.2 ], { extrapolateRight: 'clamp' } );
-	const enter = ramp( frame, 0, 18 );
+	// The homepage frames the video as the app window, so the capture fills it, still.
 	return (
-		<AbsoluteFill style={ { background: C.surface, alignItems: 'center', justifyContent: 'center' } }>
-			<div
-				style={ {
-					width: 1600,
-					height: 1000,
-					borderRadius: 18,
-					overflow: 'hidden',
-					border: `1.5px solid ${ C.ruleStrong }`,
-					boxShadow: '0 50px 100px -40px rgba(15,18,34,0.35)',
-					transform: `scale(${ zoom * 0.95 }) translateY(${ ( 1 - enter ) * 60 }px)`,
-					transformOrigin: '50% 47%',
-					opacity: enter,
-					background: C.white,
-				} }
-			>
-				<Img src={ staticFile( `typing/f${ String( idx ).padStart( 4, '0' ) }.jpg` ) } style={ { width: 1600, height: 1000 } } />
-			</div>
+		<AbsoluteFill style={ { background: C.white } }>
+			<Img
+				src={ staticFile( `typing/f${ String( idx ).padStart( 4, '0' ) }.jpg` ) }
+				style={ { width: '100%', height: '100%', objectFit: 'cover' } }
+			/>
 		</AbsoluteFill>
 	);
 };
