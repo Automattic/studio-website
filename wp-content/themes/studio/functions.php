@@ -83,6 +83,11 @@ remove_filter( 'wp_mail', 'wp_staticize_emoji_for_email' );
 add_filter( 'emoji_svg_url', '__return_false' );
 
 /**
+ * The published site is static, so XML-RPC isn't there to discover.
+ */
+remove_action( 'wp_head', 'rsd_link' );
+
+/**
  * SEO basics: meta description, Open Graph, Twitter card and JSON-LD.
  * Each page's description is its excerpt (Page settings > Excerpt in the editor).
  * Steps aside entirely when a dedicated SEO plugin handles the head.
@@ -148,6 +153,8 @@ add_action( 'wp_head', function () {
 	if ( $url ) {
 		printf( "<link rel=\"canonical\" href=\"%s\" />\n", esc_url( $url ) );
 	}
+	// The static export only follows local links, so this is what gets the share image published.
+	printf( "<link rel=\"image_src\" href=\"%s\" />\n", esc_url( wp_make_link_relative( $image[0] ) ) );
 
 	$tags = array(
 		array( 'name', 'description', $description ),
