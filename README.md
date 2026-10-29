@@ -49,6 +49,22 @@ Ask Studio Code (in the app, or `studio code` in the site's folder) for changes,
 
 The content lives in one SQLite file, `wp-content/database/.ht.sqlite`. Git can version it but not merge it: stop the site before you pull or commit, and when two people change content, the last commit wins.
 
+## Publishing
+
+The site is published as static files to a [Spacefast](https://spacefast.com) Space, which will serve wordpress.studio:
+
+```bash
+studio spacefast login
+studio spacefast publish --space spc_95b3647e99974586b104ab2cf1050dd6
+```
+
+- `--space` is only needed the first time on a machine; Studio remembers the Space for the site afterwards.
+- You need to be a member of the Spacefast team that owns the Space.
+- `_redirects`, `_headers` and `robots.txt` at the site root are published with the export. They keep `/install.sh` and `/install.ps1` working and point search engines at the sitemap.
+- The theme writes `https://wordpress.studio` into canonicals, social tags and the sitemap, so the copy on the Space's own address is never indexed in its place.
+
+Publishing to Spacefast is not in a Studio release yet; until it ships, it needs a Studio CLI built from the branch that adds it.
+
 ## The video
 
 `video/` renders the 50-second homepage video at 2560×1440. You need Node 20 or later.
