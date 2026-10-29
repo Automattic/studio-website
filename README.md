@@ -20,7 +20,7 @@ Studio only adds a folder that is empty or already holds a full WordPress instal
    ```bash
    cd ~/Studio/studio-website
    git init -b main
-   git remote add origin https://github.com/youknowriad/studio-website.git
+   git remote add origin https://github.com/Automattic/studio-website.git
    git fetch origin
    git checkout -f -B main --track origin/main
    ```
@@ -33,7 +33,7 @@ Studio only adds a folder that is empty or already holds a full WordPress instal
 studio site create --path ~/Studio/studio-website --name "WordPress Studio" --start=false
 cd ~/Studio/studio-website
 git init -b main
-git remote add origin https://github.com/youknowriad/studio-website.git
+git remote add origin https://github.com/Automattic/studio-website.git
 git fetch origin
 git checkout -f -B main --track origin/main
 studio site start
