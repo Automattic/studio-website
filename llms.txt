@@ -1,0 +1,32 @@
+# WordPress Studio
+
+> WordPress Studio is a free, open source AI website builder and local WordPress development environment, as an app and a CLI. It runs real WordPress on macOS, Windows and Linux with native PHP and SQLite, with no Docker. AI agents build and edit sites through Studio Code, the built-in agent, or through plugins and an MCP server for Claude Code, Codex, ChatGPT and Cursor.
+
+## Get started
+
+- [Download](https://wordpress.studio/download/): Get the app, the CLI and Studio Code for macOS, Windows or Linux.
+- [App](https://wordpress.studio/app/): All your local WordPress sites in one window, with Studio Code built in.
+- [CLI](https://wordpress.studio/cli/): Create local sites, run WP-CLI, share previews and push live from the terminal, in scripts or in CI.
+
+## WordPress and AI agents
+
+- [Agents](https://wordpress.studio/agents/): Give your agent WordPress tools through plugins and an MCP server.
+- [Claude Code](https://wordpress.studio/agents/claude-code/): Set up the Studio plugin for Claude Code.
+- [Codex](https://wordpress.studio/agents/codex/): Add Studio to Codex as an MCP server.
+- [ChatGPT](https://wordpress.studio/agents/chatgpt/): Connect Studio to the Codex included in your ChatGPT plan.
+- [Cursor](https://wordpress.studio/agents/cursor/): Add Studio to Cursor's MCP servers.
+
+## Moving and publishing sites
+
+- [Liberate](https://wordpress.studio/liberate/): Bring a backup, a live WordPress site or any URL into a local WordPress site.
+- [Ship](https://wordpress.studio/ship/): Share a preview, push to WordPress.com or Pressable, and pull live changes back down.
+
+## Decide
+
+- [Pricing](https://wordpress.studio/pricing/): The app, the CLI and local sites are free. AI is the only part with a meter.
+- [Studio vs Local](https://wordpress.studio/compare/): How Studio compares with Local (LocalWP).
+
+## Reference
+
+- [Documentation](https://developer.wordpress.com/docs/developer-tools/studio/): Full Studio documentation.
+- [Source code](https://github.com/Automattic/studio): The open source repository, under GPLv2 or later.

@@ -1,3 +1,6 @@
 # Branded installer URLs used by the Studio CLI and its install instructions.
 /install.sh   https://public-api.wordpress.com/wpcom/v2/studio-app/install.sh   302
 /install.ps1  https://public-api.wordpress.com/wpcom/v2/studio-app/install.ps1  302
+
+# Tools often look for the sitemap here first.
+/sitemap.xml  https://wordpress.studio/wp-sitemap.xml  301

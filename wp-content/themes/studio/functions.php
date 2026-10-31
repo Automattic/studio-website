@@ -195,6 +195,7 @@ add_action( 'wp_head', function () {
 				array(
 					'@type'               => 'SoftwareApplication',
 					'name'                => 'WordPress Studio',
+					'alternateName'       => array( 'Studio', 'Studio by WordPress.com' ),
 					'description'         => $description,
 					'url'                 => studio_public_url( home_url( '/' ) ),
 					'downloadUrl'         => studio_public_url( home_url( '/download/' ) ),
@@ -205,10 +206,22 @@ add_action( 'wp_head', function () {
 					'isAccessibleForFree' => true,
 					'offers'              => array( '@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'USD' ),
 					'publisher'           => $publisher,
-					'sameAs'              => array( 'https://github.com/Automattic/studio' ),
+					'sameAs'              => array( 'https://github.com/Automattic/studio', 'https://www.npmjs.com/package/wp-studio' ),
 				),
 			),
 		);
+		echo '<script type="application/ld+json">' . wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "</script>\n";
+	} elseif ( is_page() ) {
+		$items = array( array( '@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => studio_public_url( home_url( '/' ) ) ) );
+		foreach ( array_merge( array_reverse( get_post_ancestors( get_the_ID() ) ), array( get_the_ID() ) ) as $id ) {
+			$items[] = array(
+				'@type'    => 'ListItem',
+				'position' => count( $items ) + 1,
+				'name'     => get_the_title( $id ),
+				'item'     => studio_public_url( get_permalink( $id ) ),
+			);
+		}
+		$graph = array( '@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $items );
 		echo '<script type="application/ld+json">' . wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "</script>\n";
 	}
 }, 1 );
