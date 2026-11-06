@@ -1,0 +1,18 @@
+/* Tokens from the Studio app (apps/ui/src/lib/theme/tokens.css) that Blume's config
+   can't set: the system mono stack, the neutral surfaces and borders. */
+:root {
+	--blume-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+	--blume-foreground: oklch(0.275 0 0);
+	--blume-muted: oklch(0.965 0 0);
+	--blume-muted-foreground: oklch(0.55 0 0);
+	--blume-border: rgb(0 0 0 / 10%);
+	--blume-code-background: oklch(0.975 0 0);
+}
+
+:root[data-theme="dark"] {
+	--blume-foreground: oklch(0.83 0 0);
+	--blume-muted: oklch(0.24 0 0);
+	--blume-muted-foreground: oklch(0.6 0 0);
+	--blume-border: rgb(255 255 255 / 8%);
+	--blume-code-background: oklch(0.2 0 0);
+}
