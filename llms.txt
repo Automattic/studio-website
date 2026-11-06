@@ -28,5 +28,5 @@
 
 ## Reference
 
-- [Documentation](https://developer.wordpress.com/docs/developer-tools/studio/): Full Studio documentation.
+- [Documentation](https://wordpress.studio/docs/): Full Studio documentation. Every page has a Markdown copy, e.g. https://wordpress.studio/docs/cli.md, and https://wordpress.studio/docs/llms.txt lists them.
 - [Source code](https://github.com/Automattic/studio): The open source repository, under GPLv2 or later.

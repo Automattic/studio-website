@@ -1,0 +1,21 @@
+{
+  "name": "studio-docs",
+  "private": true,
+  "type": "module",
+  "description": "wordpress.studio/docs: the Studio documentation, rendered with Blume from the markdown in the Automattic/studio repository.",
+  "scripts": {
+    "sync": "node scripts/sync-content.mjs",
+    "dev": "blume dev",
+    "build": "blume build",
+    "preview": "blume preview",
+    "validate": "blume validate",
+    "doctor": "blume doctor"
+  },
+  "dependencies": {
+    "blume": "2.2.6"
+  },
+  "engines": {
+    "node": ">=22.19",
+    "pnpm": ">=10"
+  }
+}

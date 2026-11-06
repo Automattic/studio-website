@@ -1,0 +1,9 @@
+node_modules
+.blume
+.cache
+dist
+
+# Synced from Automattic/studio by `pnpm run sync`. The markdown is not edited here:
+# change it in the Studio repository and sync again.
+content/**/*.md
+public/images

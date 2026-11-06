@@ -49,9 +49,20 @@ Ask Studio Code (in the app, or `studio code` in the site's folder) for changes,
 
 The content lives in one SQLite file, `wp-content/database/.ht.sqlite`. Git can version it but not merge it: stop the site before you pull or commit, and when two people change content, the last commit wins.
 
+## The docs
+
+`docs/` renders the Studio documentation at wordpress.studio/docs with [Blume](https://useblume.dev). The markdown lives in the [Studio repository](https://github.com/Automattic/studio/tree/trunk/docs/user) and is synced in at build time; see [docs/README.md](docs/README.md).
+
+```bash
+cd docs
+pnpm install
+pnpm run sync   # fetch the markdown and screenshots from Automattic/studio
+pnpm run dev    # preview at http://localhost:4321/docs/
+```
+
 ## Publishing
 
-The site is published as static files to a [Spacefast](https://spacefast.com) Space, which will serve wordpress.studio:
+The site is published as static files to a [Spacefast](https://spacefast.com) Space, which will serve wordpress.studio. `scripts/build-site.sh` builds the whole site into `dist/`: the static export of the WordPress site, the docs under `/docs`, and the root files below. Publish `dist/` with the Spacefast CLI (`sf publish dist`), or publish the WordPress site alone with the Studio CLI:
 
 ```bash
 studio spacefast login

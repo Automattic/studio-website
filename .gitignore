@@ -21,6 +21,9 @@
 # Agent scratch files.
 /tmp/
 
+# Output of scripts/build-site.sh.
+/dist/
+
 # Video project build output.
 /video/node_modules/
 /video/out/
