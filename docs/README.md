@@ -8,7 +8,7 @@ The markdown is not edited here. Its source of truth is `docs/user/docs/` in the
 
 `pnpm run sync` checks that folder out together with `docs/user/screenshots/images/`, places each page in the sidebar structure defined in `scripts/sync-content.mjs`, copies the screenshots each page uses into `public/images/`, and rewrites what the markdown carried over from developer.wordpress.com: heading links, linked images, absolute links to the old docs, and command lines that lost their code fences. Nothing is fetched from developer.wordpress.com; a page whose screenshot has no file in the Studio repo fails the sync. `content/**/*.md` and `public/images/` are git-ignored for that reason; only the structure (`meta.ts` files), the config and the theme are versioned here.
 
-The sync reads the `add/docs-kept-images` branch, [Automattic/studio#5772](https://github.com/Automattic/studio/pull/5772), stacked on the 2.0 docs refresh [Automattic/studio#5517](https://github.com/Automattic/studio/pull/5517); that is where the finished pages and their screenshots live until both merge, and then the default moves to `trunk`. Set `STUDIO_DOCS_REF` to sync another branch or commit.
+The sync reads the `ui-refresh-user-docs` branch, the 2.0 docs refresh [Automattic/studio#5517](https://github.com/Automattic/studio/pull/5517), which the screenshot clean-up [Automattic/studio#5772](https://github.com/Automattic/studio/pull/5772) merged into; that is where the finished pages and their screenshots live until it merges, and then the default moves to `trunk`. Set `STUDIO_DOCS_REF` to sync another branch or commit.
 
 ## Work on the docs
 

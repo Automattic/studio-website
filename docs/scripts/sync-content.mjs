@@ -21,9 +21,9 @@ const cacheDir = join(root, ".cache", "studio");
 
 const SOURCE = {
 	repo: "https://github.com/Automattic/studio.git",
-	// The finished 2.0 docs live on Automattic/studio#5772, stacked on the docs refresh
-	// (Automattic/studio#5517); switch the default to "trunk" once both merge.
-	ref: process.env.STUDIO_DOCS_REF || "add/docs-kept-images",
+	// The finished 2.0 docs live on the docs refresh branch (Automattic/studio#5517), which
+	// Automattic/studio#5772 merged into; switch the default to "trunk" once it merges.
+	ref: process.env.STUDIO_DOCS_REF || "ui-refresh-user-docs",
 	path: "docs/user/docs",
 	// Screenshots captured by `npm run screenshots` in the Studio repo (npm there, pnpm here). A page still refers
 	// to the copy that was uploaded to developer.wordpress.com; the repo's file of the same
