@@ -7,11 +7,12 @@ import { defineConfig } from "blume";
 export default defineConfig({
 	title: "WordPress Studio Docs",
 	description: "How to use WordPress Studio: local sites, Studio Code, the CLI, syncing and previews.",
+	// The same app icon and name as the header of wordpress.studio. public/favicon.png and
+	// public/apple-icon.png are the same file; Blume picks them up by name.
 	logo: {
 		href: "/",
-		// The app icon's mark, inlined so it follows the text color in both schemes.
-		image: "/logo.svg",
-		text: "Studio Docs",
+		image: { light: "/logo.png", dark: "/logo.png", alt: "WordPress Studio" },
+		text: "WordPress Studio",
 	},
 	deployment: {
 		site: "https://wordpress.studio",
