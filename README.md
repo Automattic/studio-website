@@ -62,19 +62,30 @@ pnpm run dev    # preview at http://localhost:4321/docs/
 
 ## Publishing
 
-The site is published as static files to a [Spacefast](https://spacefast.com) Space, which will serve wordpress.studio. `scripts/build-site.sh` builds the whole site into `dist/`: the static export of the WordPress site, the docs under `/docs`, and the root files below. Publish `dist/` with the Spacefast CLI (`sf publish dist`), or publish the WordPress site alone with the Studio CLI:
+The site is published as static files to a [Spacefast](https://spacefast.com) Space, which serves wordpress.studio. `scripts/build-site.sh` builds the whole site into `dist/`: the static export of the WordPress site, the docs under `/docs`, and the root files below. Then publish `dist/` with the [Spacefast CLI](https://spacefast.com/docs/cli/):
 
 ```bash
-studio spacefast login
-studio spacefast publish --space spc_95b3647e99974586b104ab2cf1050dd6
+scripts/build-site.sh
+sf publish dist --root-directory . --space spc_95b3647e99974586b104ab2cf1050dd6
 ```
 
-- `--space` is only needed the first time on a machine; Studio remembers the Space for the site afterwards.
-- You need to be a member of the Spacefast team that owns the Space.
-- `_redirects`, `_headers` and `robots.txt` at the site root are published with the export. They keep `/install.sh` and `/install.ps1` working and point search engines at the sitemap.
+- `--root-directory .` makes the CLI publish `dist/` as it is; without it, it picks a folder inside the docs.
+- `--space` is only needed the first time on a machine; the CLI remembers the Space in `dist/.spacefast/`. You need to be a member of the Spacefast team that owns the Space.
+- `_redirects`, `_headers`, `robots.txt` and `llms.txt` at the site root are published with the export. They keep `/install.sh` and `/install.ps1` working and point search engines at the sitemap. `docs/scripts/finalize-site.mjs` adds the docs' rules to them: Spacefast renders a `.md` file as a page, so the Markdown copies of the docs pages are published as `.md.txt` behind a rewrite, and the files Blume writes under `.well-known` (which Spacefast refuses to serve) move up to `/docs/`.
 - The theme writes `https://wordpress.studio` into canonicals, social tags and the sitemap, so the copy on the Space's own address is never indexed in its place.
 
-Publishing to Spacefast is not in a Studio release yet; until it ships, it needs a Studio CLI built from the branch that adds it.
+The build needs `studio export-static`, which is not in a Studio release yet ([Automattic/studio#5567](https://github.com/Automattic/studio/pull/5567)). Until it ships, build the CLI from that branch and run the build with it first on your `PATH`:
+
+```bash
+git clone --branch add-spacefast-publishing https://github.com/Automattic/studio.git ../studio-spacefast
+( cd ../studio-spacefast && npm ci && npm run cli:build )
+mkdir -p ../studio-spacefast/bin && printf '#!/usr/bin/env bash\nexec node "$(dirname "$0")/../apps/cli/dist/cli/main.mjs" "$@"\n' > ../studio-spacefast/bin/studio && chmod +x ../studio-spacefast/bin/studio
+PATH="$PWD/../studio-spacefast/bin:$PATH" scripts/build-site.sh
+```
+
+That build reads the same site list as the Studio app, so the site needs no re-registration.
+
+The WordPress site alone can also be published with the Studio CLI from that branch (`studio spacefast publish`), but that leaves out the docs.
 
 ## The video
 
