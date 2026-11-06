@@ -17,14 +17,9 @@
 	--blume-code-background: oklch(0.2 0 0);
 }
 
-/* Screenshots: a frame with the app's corner radius, so a shot of a light window doesn't
-   dissolve into the page. The zoomed copy (medium-zoom) loses it. */
+/* Screenshots: a hairline frame with the app's corner radius, so a shot of a light window
+   doesn't dissolve into the page. The zoomed copy (medium-zoom) loses it. */
 .prose img:not(.medium-zoom-image--opened) {
 	border: 1px solid var(--blume-border);
 	border-radius: 0.575rem;
-	box-shadow: 0 1px 2px rgb(0 0 0 / 4%), 0 12px 32px -16px rgb(0 0 0 / 20%);
-}
-
-:root[data-theme="dark"] .prose img:not(.medium-zoom-image--opened) {
-	box-shadow: 0 1px 2px rgb(0 0 0 / 30%), 0 12px 32px -16px rgb(0 0 0 / 60%);
 }
