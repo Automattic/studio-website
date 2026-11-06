@@ -27,15 +27,14 @@ export default defineConfig({
 	content: { root: "content" },
 	navigation: {
 		cta: { href: "https://wordpress.studio/download/", label: "Download" },
-		featured: [{ label: "wordpress.studio", href: "https://wordpress.studio" }],
+		featured: [{ label: "WordPress Studio", href: "https://wordpress.studio" }],
 		sidebar: { display: "flat" },
 	},
 	footer: {
 		copyright: `© ${new Date().getFullYear()} Automattic`,
 		links: [
-			{ label: "wordpress.studio", href: "https://wordpress.studio" },
+			{ label: "WordPress Studio", href: "https://wordpress.studio" },
 			{ label: "Download", href: "https://wordpress.studio/download/" },
-			{ label: "Pricing", href: "https://wordpress.studio/pricing/" },
 		],
 		socials: { github: "https://github.com/Automattic/studio" },
 	},

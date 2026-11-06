@@ -3,7 +3,7 @@ node_modules
 .cache
 dist
 
-# Synced from Automattic/studio by `npm run sync`. The markdown is not edited here:
+# Synced from Automattic/studio by `pnpm run sync`. The markdown is not edited here:
 # change it in the Studio repository and sync again.
 content/**/*.md
 public/images

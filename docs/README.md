@@ -19,7 +19,7 @@ pnpm run sync
 pnpm run dev
 ```
 
-Use pnpm (or Bun, as the Spacefast docs do): npm 11 loops forever resolving Blume's peer dependencies.
+Use pnpm (or Bun, as the Spacefast docs do): npm 11 loops forever resolving Blume's peer dependencies. `package.json` requires pnpm 10 or later in `engines`.
 
 `pnpm run build` writes the static site to `dist/`, with every route under `/docs`. `pnpm run validate` checks internal links and anchors.
 
@@ -29,4 +29,4 @@ The theme follows the Studio app rather than the marketing site: Inter, the syst
 
 ## What readers and agents get
 
-Blume gives every page a table of contents, previous and next links, search, a light and dark theme, Copy as Markdown and Open in chat actions, a Markdown copy at the page URL plus `.md`, and an `llms.txt` index at `/docs/llms.txt`.
+Blume gives every page a table of contents, previous and next links, search, a light and dark theme, Copy as Markdown and Open in chat actions, a Markdown copy of each page next to it (`/docs/cli.md` for `/docs/cli/`), and an `llms.txt` index at `/docs/llms.txt`.

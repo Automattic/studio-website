@@ -7,7 +7,7 @@
 // images, absolute links to the old docs, and command lines that lost their code fences.
 // Nothing is fetched from developer.wordpress.com.
 //
-// Usage: npm run sync          (STUDIO_DOCS_REF=branch-or-sha to pin a revision)
+// Usage: pnpm run sync         (STUDIO_DOCS_REF=branch-or-sha to pin a revision)
 
 import { execFileSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -25,7 +25,7 @@ const SOURCE = {
 	// (Automattic/studio#5517); switch the default to "trunk" once both merge.
 	ref: process.env.STUDIO_DOCS_REF || "add/docs-kept-images",
 	path: "docs/user/docs",
-	// Screenshots captured by `npm run screenshots` in the Studio repo. A page still refers
+	// Screenshots captured by `npm run screenshots` in the Studio repo (npm there, pnpm here). A page still refers
 	// to the copy that was uploaded to developer.wordpress.com; the repo's file of the same
 	// name is used instead.
 	images: "docs/user/screenshots/images",
@@ -82,6 +82,7 @@ const slug = (text) =>
 
 const COMMAND = /^(studio|curl|irm|npm|npx|wp|brew|cd|git|composer|php|sudo|export|\$)\b/;
 const COMMENT = /^\\?#\s/;
+const HTML_TAGS = new Set(["br", "hr", "img", "kbd", "sup", "sub", "a", "p", "b", "i", "em", "strong", "code", "pre", "div", "span", "table", "tr", "td", "th", "ul", "ol", "li"]);
 
 function checkout() {
 	rmSync(cacheDir, { recursive: true, force: true });
@@ -109,7 +110,10 @@ function readPage(page) {
 		const end = lines.indexOf("---", 1);
 		for (const l of lines.slice(1, end)) {
 			const m = l.match(/^(title|description):\s*(.+)$/);
-			if (m) (m[1] === "title" ? (title = JSON.parse(m[2].startsWith('"') ? m[2] : JSON.stringify(m[2]))) : (description = JSON.parse(m[2].startsWith('"') ? m[2] : JSON.stringify(m[2]))));
+			if (!m) continue;
+			const value = m[2].startsWith('"') ? JSON.parse(m[2]) : m[2].trim();
+			if (m[1] === "title") title = value;
+			else description = value;
 		}
 		lines = lines.slice(end + 1);
 	}
@@ -228,14 +232,18 @@ function rewrite(text, page, routes) {
 		const path = target === page ? "" : target.route;
 		return `](${path}${anchor})`;
 	});
-	// Placeholders like <host> in prose would be read as HTML. Code is left alone.
+	// Placeholders like <host> in prose would be read as HTML. Code, fenced or inline, is left alone.
 	let fenced = false;
 	text = text
 		.split("\n")
 		.map((line) => {
 			if (line.startsWith("```")) fenced = !fenced;
 			if (fenced || line.startsWith("```")) return line;
-			return line.replace(/(^|[^`\\])<([a-z][a-z0-9-]*)>/g, (m, pre, name) => (/^(br|hr|img|kbd|sup|sub|a|p|b|i|em|strong|code|pre|div|span|table|tr|td|th|ul|ol|li)$/.test(name) ? m : `${pre}\`<${name}>\``));
+			// Split on inline code spans; even segments are prose.
+			return line
+				.split(/(`[^`]*`)/)
+				.map((part, i) => (i % 2 ? part : part.replace(/(^|[^\\])<([a-z][a-z0-9-]*)>/g, (m, pre, name) => (HTML_TAGS.has(name) ? m : `${pre}\`<${name}>\``))))
+				.join("");
 		})
 		.join("\n");
 	return text;
