@@ -348,7 +348,7 @@ function render_page_actions() {
 }
 
 /**
- * Previous and next pages.
+ * Previous and next pages, named by their sidebar heading (the section name for a page with children).
  *
  * @return string
  */
@@ -362,11 +362,11 @@ function render_pagination() {
 	if ( $adjacent['prev'] ) {
 		$html .= '<a class="flex max-w-[48%] flex-1 items-center gap-2 rounded-blume border border-border px-4 py-3 text-foreground transition-colors hover:border-foreground" href="' . esc_url( Render\node_href( $adjacent['prev'] ) ) . '">'
 			. Render\icon( 'arrow-left', 16, 'rtl:-scale-x-100' )
-			. '<span class="min-w-0"><span class="block text-muted-foreground text-xs">Previous</span><span class="block font-medium max-md:line-clamp-2 max-md:wrap-break-word md:truncate">' . esc_html( $adjacent['prev']['label'] ) . '</span></span></a>';
+			. '<span class="min-w-0"><span class="block text-muted-foreground text-xs">Previous</span><span class="block font-medium max-md:line-clamp-2 max-md:wrap-break-word md:truncate">' . esc_html( $adjacent['prev']['heading'] ) . '</span></span></a>';
 	}
 	if ( $adjacent['next'] ) {
 		$html .= '<a class="ms-auto flex max-w-[48%] flex-1 items-center justify-end gap-2 rounded-blume border border-border px-4 py-3 text-end text-foreground transition-colors hover:border-foreground" href="' . esc_url( Render\node_href( $adjacent['next'] ) ) . '">'
-			. '<span class="min-w-0"><span class="block text-muted-foreground text-xs">Next</span><span class="block font-medium max-md:line-clamp-2 max-md:wrap-break-word md:truncate">' . esc_html( $adjacent['next']['label'] ) . '</span></span>'
+			. '<span class="min-w-0"><span class="block text-muted-foreground text-xs">Next</span><span class="block font-medium max-md:line-clamp-2 max-md:wrap-break-word md:truncate">' . esc_html( $adjacent['next']['heading'] ) . '</span></span>'
 			. Render\icon( 'arrow-right', 16, 'rtl:-scale-x-100' ) . '</a>';
 	}
 	return $html . '</nav></div>';
