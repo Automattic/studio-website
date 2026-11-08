@@ -15,6 +15,7 @@ echo "Staging the docs from Automattic/studio…"
 node scripts/build-docs-manifest.mjs
 
 echo "Importing the docs into WordPress…"
+studio wp --path "$site" plugin is-active studio-docs 2>/dev/null || studio wp --path "$site" plugin activate studio-docs
 studio wp --path "$site" wp-docs import --force
 
 # The export refuses an output folder inside the site, so it goes to a temporary folder
