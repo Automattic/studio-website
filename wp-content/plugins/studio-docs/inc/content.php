@@ -17,6 +17,7 @@ defined( 'WPINC' ) || die();
 // block-specific filter, which runs after the generic one).
 add_filter( 'render_block', __NAMESPACE__ . '\plain_markup', 100, 2 );
 add_filter( 'render_block_core/paragraph', __NAMESPACE__ . '\plain_markup', 100, 2 );
+add_filter( 'render_block', __NAMESPACE__ . '\external_links', 101, 2 );
 add_filter( 'render_block_core/heading', __NAMESPACE__ . '\heading_anchor', 110, 2 );
 
 /**
@@ -60,6 +61,32 @@ function plain_markup( $content, $block ) {
 		$content,
 		1
 	);
+}
+
+/**
+ * Links to other sites open in a new tab and get the external-link icon (Blume's `markdown.externalLinks`):
+ * every absolute http(s) link, including the ones to wordpress.studio itself, as Blume did.
+ *
+ * @param string $content Rendered block.
+ * @param array  $block   Block.
+ * @return string
+ */
+function external_links( $content, $block ) {
+	if ( ! in_doc() || false === stripos( $content, '<a ' ) ) {
+		return $content;
+	}
+	$tags = new \WP_HTML_Tag_Processor( $content );
+	while ( $tags->next_tag( 'a' ) ) {
+		$href = $tags->get_attribute( 'href' );
+		if ( ! is_string( $href ) || ! preg_match( '#^https?://#i', $href ) || null !== $tags->get_attribute( 'data-blume-external' ) ) {
+			continue;
+		}
+		$tags->set_attribute( 'target', '_blank' );
+		$tags->set_attribute( 'rel', 'noreferrer' );
+		$tags->set_attribute( 'aria-describedby', 'blume-new-tab-hint' );
+		$tags->set_attribute( 'data-blume-external', '' );
+	}
+	return $tags->get_updated_html();
 }
 
 /**

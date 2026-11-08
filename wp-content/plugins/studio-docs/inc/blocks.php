@@ -426,13 +426,13 @@ function render_code( $attributes, $content ) {
 		$inner = implode( "\n", $lines );
 	}
 
+	// A fence without a language is plain text, labelled like one (Blume's default).
+	$lang  = '' === $lang ? 'plaintext' : $lang;
 	$attrs = ' class="astro-code astro-code-themes github-light github-dark group relative" style="' . esc_attr( $style . '; overflow-x: auto;' ) . '"';
-	if ( '' !== $lang ) {
-		$attrs .= ' data-language="' . esc_attr( Render\language_label( $lang ) ) . '" data-blume-language="' . esc_attr( $lang ) . '"';
-		$icon   = Render\language_icon( $lang );
-		if ( '' !== $icon ) {
-			$attrs .= ' data-icon="' . esc_attr( $icon ) . '"';
-		}
+	$attrs .= ' data-language="' . esc_attr( Render\language_label( $lang ) ) . '" data-blume-language="' . esc_attr( $lang ) . '"';
+	$icon   = Render\language_icon( $lang );
+	if ( '' !== $icon ) {
+		$attrs .= ' data-icon="' . esc_attr( $icon ) . '"';
 	}
 
 	$button = '<button type="button" class="inline-flex size-[1.875rem] select-none items-center justify-center rounded-md text-muted-foreground bg-background transition-colors [&amp;_svg]:pointer-events-none [&amp;_svg]:shrink-0 hover:bg-muted hover:text-foreground absolute right-3 z-[2] top-2" data-blume-copy aria-label="Copy code">'

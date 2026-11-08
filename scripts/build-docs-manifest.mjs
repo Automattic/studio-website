@@ -268,6 +268,8 @@ function rewrite(text, page, pages) {
 		const path = target === page ? "" : relativeTo(target.file);
 		return `](${path}${anchor})`;
 	});
+	// A quote mark wrapped in stray emphasis markers (`*“***Bold**.”`), which no parser agrees on.
+	text = text.replace(/\*“\*\*\*(.+?)\*\*\.”/g, "“**$1**.”");
 	// Placeholders like <host> in prose would be read as HTML. Code, fenced or inline, is left alone.
 	let fenced = false;
 	text = text
