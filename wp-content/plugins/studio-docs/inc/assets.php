@@ -15,6 +15,20 @@ use WP_Docs\Render;
 defined( 'WPINC' ) || die();
 
 add_action( 'wp', __NAMESPACE__ . '\setup' );
+add_action( 'enqueue_block_assets', __NAMESPACE__ . '\editor_canvas' );
+
+/**
+ * The docs stylesheet for the editor canvas, scoped under `.studio-docs-canvas` (assets/js/editor.js
+ * puts that class on the canvas while a doc or a docs template is edited), so the previews look like
+ * the pages and nothing else in the editor is touched.
+ */
+function editor_canvas() {
+	if ( ! is_admin() ) {
+		return;
+	}
+	wp_enqueue_style( 'studio-docs-editor', Render\asset( 'css/docs-editor.css' ), array(), (string) filemtime( \WP_Docs\PLUGIN_DIR . '/assets/css/docs-editor.css' ) );
+	wp_add_inline_style( 'studio-docs-editor', font_faces() );
+}
 
 /**
  * Hook the docs page treatment once the query is known.

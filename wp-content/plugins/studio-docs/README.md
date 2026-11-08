@@ -29,7 +29,9 @@ inc/content.php            render filters: plain markup for core blocks, heading
 inc/assets.php             what a docs page loads, the color scheme script, favicons, the title
 inc/cli.php                `wp wp-docs import|status|convert`
 assets/css/docs.css        Blume's compiled stylesheet, pruned to the utilities the pages use
+assets/css/docs-editor.css the same, scoped under .studio-docs-canvas for the editor canvas
 assets/js/docs.js          theme toggle, drawer, TOC scroll-spy, page actions, copy, zoom, search
+assets/js/editor.js        declares the blocks to the editor (server-side previews, attribute content)
 assets/vendor/             medium-zoom 1.1.2 (MIT)
 assets/images/             the app icon pair (logo and favicon), the touch icon
 vendor/wporg-markdown/     the WordPress.org Markdown importer base class, unchanged
@@ -56,7 +58,10 @@ when the page has children), `group` and `group_title` (the sidebar group), `ord
 
 ## Blocks
 
-All under `studio-docs/`, server-rendered, not in the inserter.
+All under `studio-docs/`, server-rendered, not in the inserter. `assets/js/editor.js` declares them to
+the block editor with server-side previews, so docs posts and the docs templates open cleanly in the
+editor and the Site Editor; while one is edited the canvas gets the scoped docs stylesheet. The editor is
+for looking: the posts are regenerated from the markdown on every build.
 
 | Block | Renders |
 |---|---|
@@ -69,13 +74,15 @@ All under `studio-docs/`, server-rendered, not in the inserter.
 | `page-actions` | Scroll to top, Copy as Markdown, Open in chat (v0, ChatGPT, Claude, T3 Chat, Scira, Cursor) |
 | `pagination` | Previous / Next in sidebar order |
 | `footer` | links, copyright, GitHub; the drawer backdrop and the icon sprite |
-| `code` | the code frame with language label and copy button; the Shiki highlight from `highlights.json` |
-| `image` | a plain image in a paragraph; the script adds the zoom |
-| `table` | a table in a horizontally scrolling frame |
-| `callout` | a GitHub alert (`> [!NOTE]` and friends); none in the current content |
+| `code` | the code frame with language label and copy button; the Shiki highlight from `highlights.json`. Attributes `language`, `code` |
+| `image` | a plain image in a paragraph; the script adds the zoom. Attributes `src`, `alt`, `id`, `title`, `href`, `caption` |
+| `table` | a table in a horizontally scrolling frame. Attribute `html` |
+| `callout` | a GitHub alert (`> [!NOTE]` and friends) with inner blocks; none in the current content |
 
-Core paragraphs, headings, lists, quotes, separators and details render without their `wp-block-*`
-classes; headings wrap their text in a `#` anchor link.
+The content blocks keep their content in attributes (self-closing block comments), so they have no
+saved HTML to validate or lose. Core paragraphs, headings, lists, quotes, separators and details keep
+their `wp-block-*` classes (Blume's stylesheet ignores them); headings wrap their text in a `#` anchor
+link, and links to other sites open in a new tab with the external-link icon.
 
 ## Tests
 

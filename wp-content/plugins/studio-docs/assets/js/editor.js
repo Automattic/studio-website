@@ -89,4 +89,45 @@
 			),
 		save: () => el( InnerBlocks.Content ),
 	} );
+
+	// While a doc or a docs template is edited, the canvas gets the scope class of the docs stylesheet
+	// (assets/css/docs-editor.css) and the content root the article's classes, so the preview looks like
+	// the page. Everything else in the editor stays untouched.
+	const DOCS_TEMPLATES = [ 'studio//single-docs', 'studio//archive-docs' ];
+	const editsDocs = () => {
+		const editor = wp.data.select( 'core/editor' );
+		if ( ! editor ) {
+			return false;
+		}
+		const type = editor.getCurrentPostType();
+		if ( type === 'docs' ) {
+			return true;
+		}
+		if ( type === 'wp_template' ) {
+			return DOCS_TEMPLATES.includes( String( editor.getCurrentPostId() ) );
+		}
+		return false;
+	};
+	const canvasDocument = () => {
+		const frame = document.querySelector( 'iframe[name="editor-canvas"]' );
+		return frame && frame.contentDocument && frame.contentDocument.body ? frame.contentDocument : document;
+	};
+	const applyScope = () => {
+		const doc = canvasDocument();
+		const on = editsDocs();
+		const body = doc.body;
+		if ( ! body ) {
+			return;
+		}
+		body.classList.toggle( 'studio-docs-canvas', on );
+		const root = doc.querySelector( '.is-root-container' );
+		if ( root ) {
+			const isPost = wp.data.select( 'core/editor' ).getCurrentPostType() === 'docs';
+			for ( const c of [ 'prose', 'mx-auto', 'max-w-content' ] ) {
+				root.classList.toggle( c, on && isPost );
+			}
+		}
+	};
+	wp.data.subscribe( applyScope );
+	setInterval( applyScope, 1000 );
 } )( window.wp );
