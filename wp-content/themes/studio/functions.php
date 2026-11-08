@@ -41,11 +41,36 @@ add_action( 'wp_head', function () {
  * or the browser fetches the font twice.
  */
 add_action( 'wp_head', function () {
+	if ( studio_is_docs() ) {
+		return; // The docs set in Inter; the Studio Docs plugin preloads it.
+	}
 	printf(
 		'<link rel="preload" as="font" type="font/woff2" crossorigin href="%s">' . "\n",
 		esc_url( get_theme_file_uri( 'assets/fonts/instrument-sans/instrument-sans-400-600-latin.woff2' ) )
 	);
 }, 1 );
+
+/**
+ * Whether the request is a docs page (the `docs` post type of the Studio Docs plugin, or its archive,
+ * which shows the docs home).
+ */
+function studio_is_docs() {
+	return is_singular( 'docs' ) || is_post_type_archive( 'docs' );
+}
+
+/**
+ * The docs page a request shows, when it is one: the queried page, or the home on /docs/.
+ */
+function studio_docs_post() {
+	if ( is_singular( 'docs' ) ) {
+		return get_post();
+	}
+	if ( is_post_type_archive( 'docs' ) && class_exists( 'WP_Docs\\Permalinks' ) ) {
+		$id = WP_Docs\Permalinks::post_for_path( '' );
+		return $id ? get_post( $id ) : null;
+	}
+	return null;
+}
 
 /**
  * The site has no blog yet: empty author, category, tag and date archives are
@@ -121,6 +146,11 @@ function studio_public_sitemap_entry( $entry ) {
 }
 
 function studio_seo_description() {
+	$doc = studio_docs_post();
+	if ( $doc ) {
+		$excerpt = $doc->post_excerpt;
+		return '' !== $excerpt ? wp_strip_all_tags( $excerpt ) : 'How to use WordPress Studio: local sites, Studio Code, the CLI, syncing and previews.';
+	}
 	if ( is_singular() && has_excerpt() ) {
 		return wp_strip_all_tags( get_the_excerpt() );
 	}
@@ -139,7 +169,11 @@ add_action( 'wp_head', function () {
 
 	$title       = wp_get_document_title();
 	$description = studio_seo_description();
+	$doc         = studio_docs_post();
 	$url         = is_singular() ? studio_public_url( get_permalink() ) : ( is_front_page() ? studio_public_url( home_url( '/' ) ) : '' );
+	if ( $doc ) {
+		$url = studio_public_url( get_permalink( $doc ) );
+	}
 	$image       = array( studio_public_url( get_theme_file_uri( 'assets/images/share.png' ) ), 1200, 630 );
 	$image_alt   = 'WordPress Studio: the app window with a site list, a Studio Code chat and a live site preview.';
 	if ( is_singular() && has_post_thumbnail() ) {
@@ -158,8 +192,8 @@ add_action( 'wp_head', function () {
 
 	$tags = array(
 		array( 'name', 'description', $description ),
-		array( 'property', 'og:type', 'website' ),
-		array( 'property', 'og:site_name', get_bloginfo( 'name' ) ),
+		array( 'property', 'og:type', $doc ? 'article' : 'website' ),
+		array( 'property', 'og:site_name', $doc ? 'WordPress Studio Docs' : get_bloginfo( 'name' ) ),
 		array( 'property', 'og:locale', get_locale() ),
 		array( 'property', 'og:title', $title ),
 		array( 'property', 'og:description', $description ),
@@ -208,6 +242,38 @@ add_action( 'wp_head', function () {
 					'publisher'           => $publisher,
 					'sameAs'              => array( 'https://github.com/Automattic/studio', 'https://www.npmjs.com/package/wp-studio' ),
 				),
+			),
+		);
+		echo '<script type="application/ld+json">' . wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "</script>\n";
+	} elseif ( $doc ) {
+		// A docs page: the article, and the trail Home › Docs › (parents) › page.
+		$items = array( array( '@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => studio_public_url( home_url( '/' ) ) ) );
+		$home  = function_exists( 'wp_docs_get_tree' ) ? (int) wp_docs_get_tree()['home'] : 0;
+		$chain = array_merge( array_reverse( get_post_ancestors( $doc->ID ) ), array( $doc->ID ) );
+		if ( $home && $home !== $doc->ID ) {
+			array_unshift( $chain, $home );
+		}
+		foreach ( $chain as $id ) {
+			$items[] = array(
+				'@type'    => 'ListItem',
+				'position' => count( $items ) + 1,
+				'name'     => html_entity_decode( get_the_title( $id ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
+				'item'     => studio_public_url( get_permalink( $id ) ),
+			);
+		}
+		$graph = array(
+			'@context' => 'https://schema.org',
+			'@graph'   => array(
+				array(
+					'@type'       => 'TechArticle',
+					'headline'    => html_entity_decode( get_the_title( $doc ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
+					'description' => $description,
+					'url'         => $url,
+					'inLanguage'  => get_locale(),
+					'isPartOf'    => array( '@type' => 'WebSite', 'name' => 'WordPress Studio Docs', 'url' => studio_public_url( home_url( '/docs/' ) ) ),
+					'publisher'   => array( '@type' => 'Organization', 'name' => 'Automattic', 'url' => 'https://automattic.com/' ),
+				),
+				array( '@type' => 'BreadcrumbList', 'itemListElement' => $items ),
 			),
 		);
 		echo '<script type="application/ld+json">' . wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "</script>\n";

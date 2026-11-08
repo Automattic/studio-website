@@ -11,7 +11,9 @@
 /wp-content/mu-plugins/
 /wp-content/upgrade/
 /wp-content/index.php
-/wp-content/plugins/
+/wp-content/plugins/*
+!/wp-content/plugins/studio-docs/
+/wp-content/plugins/studio-docs/tests/.deps/
 /wp-content/themes/index.php
 /wp-content/themes/twentytwenty*/
 /wp-content/database/*.sqlite-wal
@@ -21,8 +23,13 @@
 # Agent scratch files.
 /tmp/
 
-# Output of scripts/build-site.sh.
+# Output of scripts/build-site.sh: the staged docs (build/docs) and the static site (dist).
+/build/
 /dist/
+/node_modules/
+
+# Screenshots the docs importer sideloads on every build (scripts/build-docs-manifest.mjs + wp-docs import).
+/wp-content/uploads/docs/
 
 # Video project build output.
 /video/node_modules/
