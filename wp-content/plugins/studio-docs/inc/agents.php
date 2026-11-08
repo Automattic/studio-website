@@ -449,6 +449,32 @@ class Agents {
 	}
 
 	/**
+	 * The text of parsed blocks: their HTML, plus the code, table and image attributes of the docs blocks.
+	 *
+	 * @param array[] $blocks Parsed blocks.
+	 * @return string
+	 */
+	public static function blocks_text( array $blocks ) {
+		$text = '';
+		foreach ( $blocks as $block ) {
+			$name = (string) ( $block['blockName'] ?? '' );
+			if ( 'studio-docs/code' === $name ) {
+				$text .= ' ' . (string) ( $block['attrs']['code'] ?? '' ) . ' ';
+			} elseif ( 'studio-docs/table' === $name ) {
+				$text .= ' ' . preg_replace( '#</(td|th|tr)>#i', ' ', (string) ( $block['attrs']['html'] ?? '' ) ) . ' ';
+			} elseif ( 'studio-docs/image' === $name ) {
+				$text .= ' ' . (string) ( $block['attrs']['alt'] ?? '' ) . ' ';
+			} else {
+				$text .= ' ' . preg_replace( '#</(p|li|h[1-6]|tr|pre|blockquote|div)>#i', ' ', (string) $block['innerHTML'] ) . ' ';
+			}
+			if ( ! empty( $block['innerBlocks'] ) ) {
+				$text .= self::blocks_text( $block['innerBlocks'] );
+			}
+		}
+		return $text;
+	}
+
+	/**
 	 * The search index: one record per page, the home first, in sidebar order, in the shape the Blume
 	 * search used: title, route (under /docs), url, section, breadcrumb (group title, then the headings
 	 * of the ancestors), description, headings (text and anchor of H2 and H3), content (the plain text).
@@ -480,7 +506,7 @@ class Agents {
 							'anchor' => $heading['anchor'],
 						);
 					}
-					$text = self::plain( preg_replace( '#<!--.*?-->#s', ' ', preg_replace( '#</(p|li|h[1-6]|tr|pre|blockquote|div)>#i', ' ', $content ) ) );
+					$text = self::plain( self::blocks_text( parse_blocks( $content ) ) );
 
 					$index[] = array(
 						'title'       => self::plain( $node['title'] ),

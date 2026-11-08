@@ -14,12 +14,12 @@
  * |--------------------------------------|--------------------------------------------------------|
  * | `<p>`, stray inline content          | core/paragraph                                         |
  * | `<h1>`..`<h6>`                       | core/heading (level, id kept as the anchor)            |
- * | `<pre><code class="language-x">`     | studio-docs/code (`language` attribute; rendered with the pre-highlighted Shiki output) |
+ * | `<pre><code class="language-x">`     | studio-docs/code (`language` and `code` attributes; rendered with the Shiki output) |
  * | `<pre>` without `<code>`             | core/preformatted                                      |
  * | `<ul>`, `<ol>`                       | core/list + core/list-item (nested lists as inner blocks) |
- * | `<table>`                            | studio-docs/table (`align` becomes `has-text-align-*`) |
+ * | `<table>`                            | studio-docs/table (`html` attribute, `align` becomes `has-text-align-*`) |
  * | `<blockquote>`                       | core/quote with inner blocks                           |
- * | `<img>` alone, `<figure><img>`       | studio-docs/image (attachment id from `wp-image-<id>`) |
+ * | `<img>` alone, `<figure><img>`       | studio-docs/image (`src`, `alt`, `id` from `wp-image-<id>`, `href`, `caption`) |
  * | `<hr>`                               | core/separator                                         |
  * | alert placeholder (alerts.php)       | studio-docs/callout (default), wporg/notice, wporg/callout or core/group |
  * | `<details>`                          | core/details with inner blocks                         |
@@ -327,13 +327,15 @@ function code( DOMElement $pre ): string {
 		$language = strtolower( $code->getAttribute( 'lang' ) );
 	}
 
-	$code_attrs = '' === $language ? '' : attrs_html( array( 'class' => 'language-' . $language ) );
+	// The parser ends every code block with a newline; the code block does not need it. The code is
+	// stored as text in an attribute (the block has no saved markup), decoded from the parser's entities.
+	$text  = html_entity_decode( preg_replace( '/\n$/', '', inner_html( $code ) ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	$attrs = array( 'code' => $text );
+	if ( '' !== $language ) {
+		$attrs = array( 'language' => $language ) + $attrs;
+	}
 
-	// The parser ends every code block with a newline; the code block does not need it.
-	$inner = preg_replace( '/\n$/', '', inner_html( $code ) );
-	$attrs = '' === $language ? array() : array( 'language' => $language );
-
-	return serialize_block( 'studio-docs/code', $attrs, '<pre class="wp-block-studio-docs-code"><code' . $code_attrs . '>' . $inner . '</code></pre>' );
+	return serialize_void_block( 'studio-docs/code', $attrs );
 }
 
 /**
@@ -449,7 +451,7 @@ function list_item( DOMElement $li ): ?string {
  * @return string
  */
 function table( DOMElement $table ): string {
-	$html = '<figure class="wp-block-studio-docs-table"><table>';
+	$html = '<table>';
 	foreach ( $table->childNodes as $section ) {
 		if ( ! $section instanceof DOMElement ) {
 			continue;
@@ -470,9 +472,9 @@ function table( DOMElement $table ): string {
 		}
 		$html .= '</' . $name . '>';
 	}
-	$html .= '</table></figure>';
+	$html .= '</table>';
 
-	return serialize_block( 'studio-docs/table', array(), $html );
+	return serialize_void_block( 'studio-docs/table', array( 'html' => $html ) );
 }
 
 /**
@@ -557,32 +559,24 @@ function image_from( DOMElement $el ): ?string {
 		$id = (int) $m[1];
 	}
 
-	$attrs  = array();
-	$figure = 'wp-block-studio-docs-image';
+	$attrs = array(
+		'src' => $el->getAttribute( 'src' ),
+		'alt' => $el->getAttribute( 'alt' ),
+	);
 	if ( $id ) {
 		$attrs['id'] = $id;
+	}
+	if ( '' !== $el->getAttribute( 'title' ) ) {
+		$attrs['title'] = $el->getAttribute( 'title' );
 	}
 	if ( null !== $link ) {
 		$attrs['href'] = $link;
 	}
-
-	$img_html = '<img' . attrs_html(
-		array(
-			'src'   => $el->getAttribute( 'src' ),
-			'alt'   => $el->getAttribute( 'alt' ),
-			'class' => $id ? 'wp-image-' . $id : '',
-			'title' => $el->getAttribute( 'title' ),
-		),
-		array( 'alt' )
-	) . '/>';
-	if ( null !== $link ) {
-		$img_html = '<a' . attrs_html( array( 'href' => $link ) ) . '>' . $img_html . '</a>';
-	}
 	if ( '' !== $caption ) {
-		$img_html .= '<figcaption class="wp-element-caption">' . $caption . '</figcaption>';
+		$attrs['caption'] = $caption;
 	}
 
-	return serialize_block( 'studio-docs/image', $attrs, '<figure class="' . $figure . '">' . $img_html . '</figure>' );
+	return serialize_void_block( 'studio-docs/image', $attrs );
 }
 
 /**
@@ -733,6 +727,37 @@ function join_inner( array $blocks ): string {
 }
 
 /**
+ * Serialize a block without saved markup (`<!-- wp:name {…} /-->`): its render reads the attributes.
+ *
+ * @param string $name  Block name.
+ * @param array  $attrs Comment attributes.
+ * @return string
+ */
+function serialize_void_block( string $name, array $attrs ): string {
+	$name = 0 === strpos( $name, 'core/' ) ? substr( $name, 5 ) : $name;
+	return "<!-- wp:{$name}" . attrs_json( $attrs ) . ' /-->';
+}
+
+/**
+ * The attribute JSON of a block comment, with a leading space, or empty.
+ *
+ * @param array $attrs Comment attributes.
+ * @return string
+ */
+function attrs_json( array $attrs ): string {
+	if ( ! $attrs ) {
+		return '';
+	}
+	$json = json_encode( $attrs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+	$json = preg_replace( '/--/', '\\u002d\\u002d', $json );
+	$json = preg_replace( '/</', '\\u003c', $json );
+	$json = preg_replace( '/>/', '\\u003e', $json );
+	$json = preg_replace( '/&/', '\\u0026', $json );
+	$json = preg_replace( '/\\\\"/', '\\u0022', $json );
+	return ' ' . $json;
+}
+
+/**
  * Serialize one block (same comment format and attribute encoding as core's serialize_block()).
  *
  * @param string $name  Block name.
@@ -742,16 +767,7 @@ function join_inner( array $blocks ): string {
  */
 function serialize_block( string $name, array $attrs, string $html ): string {
 	$name = 0 === strpos( $name, 'core/' ) ? substr( $name, 5 ) : $name;
-	$json = '';
-	if ( $attrs ) {
-		$json = json_encode( $attrs, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
-		$json = preg_replace( '/--/', '\\u002d\\u002d', $json );
-		$json = preg_replace( '/</', '\\u003c', $json );
-		$json = preg_replace( '/>/', '\\u003e', $json );
-		$json = preg_replace( '/&/', '\\u0026', $json );
-		$json = preg_replace( '/\\\\"/', '\\u0022', $json );
-		$json = ' ' . $json;
-	}
+	$json = attrs_json( $attrs );
 
 	return "<!-- wp:{$name}{$json} -->\n{$html}\n<!-- /wp:{$name} -->";
 }

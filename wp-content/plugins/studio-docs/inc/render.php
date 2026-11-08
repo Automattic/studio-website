@@ -22,7 +22,12 @@ defined( 'WPINC' ) || die();
  */
 function current_doc() {
 	$id = \WP_Docs\Agents::current_page_id();
-	return $id ? get_post( $id ) : null;
+	if ( $id ) {
+		return get_post( $id );
+	}
+	// Outside a front-end request (the editor's server-side previews), the post being edited.
+	$post = get_post();
+	return $post instanceof WP_Post && \WP_Docs\POST_TYPE === $post->post_type ? $post : null;
 }
 
 /**

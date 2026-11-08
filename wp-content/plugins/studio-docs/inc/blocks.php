@@ -15,12 +15,15 @@ use WP_Docs\Render;
 
 defined( 'WPINC' ) || die();
 
-add_action( 'init', __NAMESPACE__ . '\register' );
+add_action( 'init', __NAMESPACE__ . '\\register' );
 
 /**
- * Register the blocks.
+ * Register the blocks and the editor script that declares them to the block editor.
  */
 function register() {
+	$version = (string) filemtime( \WP_Docs\PLUGIN_DIR . '/assets/js/editor.js' );
+	wp_register_script( 'studio-docs-editor', Render\asset( 'js/editor.js' ), array( 'wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-server-side-render', 'wp-i18n' ), $version, true );
+
 	$template = array(
 		'header'       => array(),
 		'sidebar'      => array(),
@@ -43,31 +46,53 @@ function register() {
 		register_block_type(
 			'studio-docs/' . $name,
 			array(
-				'api_version'     => 3,
-				'title'           => 'Docs: ' . ucwords( str_replace( '-', ' ', $name ) ),
-				'category'        => 'theme',
-				'attributes'      => $attributes,
-				'supports'        => array(
+				'api_version'           => 3,
+				'title'                 => 'Docs: ' . ucwords( str_replace( '-', ' ', $name ) ),
+				'category'              => 'theme',
+				'attributes'            => $attributes,
+				'supports'              => array(
 					'html'     => false,
 					'inserter' => false,
 				),
-				'render_callback' => __NAMESPACE__ . '\render_' . str_replace( '-', '_', $name ),
+				'editor_script_handles' => array( 'studio-docs-editor' ),
+				'render_callback'       => __NAMESPACE__ . '\\render_' . str_replace( '-', '_', $name ),
 			)
 		);
 	}
 
+	// The content blocks the importer writes. Their content lives in attributes (the block comment),
+	// so the editor can show them and save them without a stored HTML form.
 	$content = array(
 		'code'    => array(
 			'language' => array(
 				'type'    => 'string',
 				'default' => '',
 			),
+			'code'     => array(
+				'type'    => 'string',
+				'default' => '',
+			),
 		),
 		'image'   => array(
-			'id'   => array( 'type' => 'integer' ),
-			'href' => array( 'type' => 'string' ),
+			'id'      => array( 'type' => 'integer' ),
+			'src'     => array(
+				'type'    => 'string',
+				'default' => '',
+			),
+			'alt'     => array(
+				'type'    => 'string',
+				'default' => '',
+			),
+			'title'   => array( 'type' => 'string' ),
+			'href'    => array( 'type' => 'string' ),
+			'caption' => array( 'type' => 'string' ),
 		),
-		'table'   => array(),
+		'table'   => array(
+			'html' => array(
+				'type'    => 'string',
+				'default' => '',
+			),
+		),
 		'callout' => array(
 			'type' => array(
 				'type'    => 'string',
@@ -79,15 +104,16 @@ function register() {
 		register_block_type(
 			'studio-docs/' . $name,
 			array(
-				'api_version'     => 3,
-				'title'           => 'Docs: ' . ucfirst( $name ),
-				'category'        => 'text',
-				'attributes'      => $attributes,
-				'supports'        => array(
+				'api_version'           => 3,
+				'title'                 => 'Docs: ' . ucfirst( $name ),
+				'category'              => 'text',
+				'attributes'            => $attributes,
+				'supports'              => array(
 					'html'     => false,
 					'inserter' => false,
 				),
-				'render_callback' => __NAMESPACE__ . '\render_' . $name,
+				'editor_script_handles' => array( 'studio-docs-editor' ),
+				'render_callback'       => __NAMESPACE__ . '\\render_' . $name,
 			)
 		);
 	}
@@ -114,7 +140,7 @@ function render_header() {
 	?>
 <a class="absolute start-[-999px] top-0 z-[100] bg-accent px-4 py-2 text-accent-foreground focus:start-0" href="#blume-content">Skip to content</a>
 <span hidden id="blume-new-tab-hint">Opens in a new tab</span>
-<header class="sticky top-0 z-40 flex h-16 items-center gap-2 bg-background/90 px-4 backdrop-blur sm:gap-3 md:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(max-content,1fr)]" data-blume-header>
+<header class="wp-block-studio-docs-header sticky top-0 z-40 flex h-16 items-center gap-2 bg-background/90 px-4 backdrop-blur sm:gap-3 md:px-6 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(max-content,1fr)]" data-blume-header>
 	<div class="flex min-w-0 items-center gap-2 sm:gap-3 lg:col-start-1">
 		<button aria-controls="blume-nav-drawer" aria-expanded="false" aria-label="Toggle navigation" class="<?php echo esc_attr( $icon_class ); ?> lg:hidden" data-blume-nav-toggle type="button"><?php echo Render\icon( 'menu', 20 ); ?></button>
 		<a class="inline-flex min-w-0 items-center gap-2 font-semibold text-base text-foreground" href="/docs/">
@@ -174,7 +200,7 @@ function render_sidebar() {
 
 	ob_start();
 	?>
-<aside aria-label="Primary" data-blume-nav-drawer id="blume-nav-drawer" class="fixed top-[var(--blume-drawer-top,4rem)] start-0 z-[35] h-[calc(100dvh-var(--blume-drawer-top,4rem))] w-64 max-w-[80vw] -translate-x-[105%] overflow-y-auto border-border border-e bg-background px-5 pt-4 pb-6 transition-transform rtl:translate-x-[105%] [:where([data-blume-nav-open])_&amp;]:translate-x-0! lg:sticky lg:top-16 lg:z-auto lg:h-[calc(100dvh-4rem)] lg:w-auto lg:max-w-none lg:translate-x-0! lg:scrollbar-thin lg:scrollbar-thumb-border lg:scrollbar-track-transparent lg:border-e-0 lg:bg-transparent lg:px-4">
+<aside aria-label="Primary" data-blume-nav-drawer id="blume-nav-drawer" class="wp-block-studio-docs-sidebar fixed top-[var(--blume-drawer-top,4rem)] start-0 z-[35] h-[calc(100dvh-var(--blume-drawer-top,4rem))] w-64 max-w-[80vw] -translate-x-[105%] overflow-y-auto border-border border-e bg-background px-5 pt-4 pb-6 transition-transform rtl:translate-x-[105%] [:where([data-blume-nav-open])_&amp;]:translate-x-0! lg:sticky lg:top-16 lg:z-auto lg:h-[calc(100dvh-4rem)] lg:w-auto lg:max-w-none lg:translate-x-0! lg:scrollbar-thin lg:scrollbar-thumb-border lg:scrollbar-track-transparent lg:border-e-0 lg:bg-transparent lg:px-4">
 	<nav aria-label="Featured" class="mb-4 border-border border-b pb-4">
 		<ul class="m-0 list-none p-0">
 			<li><a class="block rounded-[0.65rem] px-2.5 py-1.5 text-muted-foreground text-sm transition-colors hover:bg-muted hover:text-foreground" href="https://wordpress.studio" aria-describedby="blume-new-tab-hint" rel="noreferrer" target="_blank"><span class="flex items-center gap-2"><span class="flex-1 truncate">WordPress Studio</span><?php echo Render\icon( 'arrow-up-right', 12, 'shrink-0 text-muted-foreground opacity-60' ); ?></span></a></li>
@@ -194,7 +220,7 @@ function render_sidebar() {
  * @return string
  */
 function render_layout( $attributes, $content ) {
-	return '<div class="mx-auto grid grid-cols-1 items-start lg:grid-cols-[17.5rem_minmax(0,1fr)] xl:grid-cols-[17.5rem_minmax(0,1fr)_17.5rem]" data-blume-doc-grid>' . $content . '</div>';
+	return '<div class="wp-block-studio-docs-layout mx-auto grid grid-cols-1 items-start lg:grid-cols-[17.5rem_minmax(0,1fr)] xl:grid-cols-[17.5rem_minmax(0,1fr)_17.5rem]" data-blume-doc-grid>' . $content . '</div>';
 }
 
 /**
@@ -205,7 +231,7 @@ function render_layout( $attributes, $content ) {
  * @return string
  */
 function render_main( $attributes, $content ) {
-	return '<main class="px-6 pt-6 pb-10 lg:px-8 xl:px-10" id="blume-content">' . $content . '</main>';
+	return '<main class="wp-block-studio-docs-main px-6 pt-6 pb-10 lg:px-8 xl:px-10" id="blume-content">' . $content . '</main>';
 }
 
 /**
@@ -216,7 +242,7 @@ function render_main( $attributes, $content ) {
  * @return string
  */
 function render_rail( $attributes, $content ) {
-	return '<aside aria-label="On this page" class="sticky top-16 hidden h-[calc(100dvh-4rem)] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent overflow-y-auto [--blume-rail-inset:1rem] px-(--blume-rail-inset) pt-6 pb-10 text-sm xl:block" data-blume-toc>' . $content . '</aside>';
+	return '<aside aria-label="On this page" class="wp-block-studio-docs-rail sticky top-16 hidden h-[calc(100dvh-4rem)] scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent overflow-y-auto [--blume-rail-inset:1rem] px-(--blume-rail-inset) pt-6 pb-10 text-sm xl:block" data-blume-toc>' . $content . '</aside>';
 }
 
 /**
@@ -235,7 +261,7 @@ function render_breadcrumbs() {
 	$html  = '' !== $crumb['url']
 		? '<a class="hover:text-foreground" href="' . esc_url( wp_make_link_relative( $crumb['url'] ) ) . '">' . esc_html( $crumb['title'] ) . '</a>'
 		: '<span>' . esc_html( $crumb['title'] ) . '</span>';
-	return '<nav aria-label="Breadcrumb" class="mb-2 text-muted-foreground text-sm mx-auto max-w-content">' . $html . '</nav>';
+	return '<nav aria-label="Breadcrumb" class="wp-block-studio-docs-breadcrumbs mb-2 text-muted-foreground text-sm mx-auto max-w-content">' . $html . '</nav>';
 }
 
 /**
@@ -252,9 +278,9 @@ function render_toc( $attributes ) {
 
 	if ( 'mobile' === ( $attributes['variant'] ?? 'rail' ) ) {
 		if ( ! $items ) {
-			return '<div class="mx-auto mb-6 max-w-content xl:hidden" data-blume-page-actions-mount></div>';
+			return '<div class="wp-block-studio-docs-toc mx-auto mb-6 max-w-content xl:hidden" data-blume-page-actions-mount></div>';
 		}
-		return '<details class="group mx-auto mb-6 max-w-content rounded-blume border border-border xl:hidden">'
+		return '<details class="wp-block-studio-docs-toc group mx-auto mb-6 max-w-content rounded-blume border border-border xl:hidden">'
 			. '<summary class="flex cursor-pointer list-none items-center justify-between gap-2 px-4 py-3 font-medium text-foreground text-sm [&amp;::-webkit-details-marker]:hidden"><span>On this page</span>' . Render\icon( 'chevron-down', 16, 'text-muted-foreground transition-transform group-open:rotate-180' ) . '</summary>'
 			. '<blume-toc class="block">' . Render\toc_list( $items, 'm-0 list-none border-border border-t p-2', 'block rounded-md px-2 py-1.5 text-muted-foreground text-sm transition-colors hover:text-foreground aria-[current=location]:font-medium aria-[current=location]:text-foreground' ) . '</blume-toc>'
 			. '<div data-blume-page-actions-mount></div>'
@@ -264,7 +290,7 @@ function render_toc( $attributes ) {
 	if ( ! $items ) {
 		return '';
 	}
-	return '<p class="mb-3 font-semibold text-foreground text-sm">On this page</p>'
+	return '<p class="wp-block-studio-docs-toc mb-3 font-semibold text-foreground text-sm">On this page</p>'
 		. '<blume-toc class="block">' . Render\toc_list( $items, 'm-0 list-none p-0', 'block py-1.5 text-muted-foreground transition-colors hover:text-foreground aria-[current=location]:font-medium aria-[current=location]:text-foreground' ) . '</blume-toc>';
 }
 
@@ -281,7 +307,7 @@ function render_article() {
 	$meta        = wp_docs_get_page_meta( $doc );
 	$description = $meta['description'] ?? '';
 
-	$html  = '<article class="prose mx-auto max-w-content" dir="ltr">';
+	$html  = '<article class="wp-block-studio-docs-article prose mx-auto max-w-content" dir="ltr">';
 	$html .= '<h1>' . esc_html( html_entity_decode( get_the_title( $doc ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ) ) . '</h1>';
 	if ( '' !== $description ) {
 		$html .= '<p class="text-lg text-muted-foreground">' . esc_html( $description ) . '</p>';
@@ -337,7 +363,7 @@ function render_page_actions() {
 			. '<span class="flex-1">' . esc_html( $item[0] ) . '</span>' . $ext . '</a>';
 	}
 
-	return '<div class="space-y-0.5 mt-8 border-border border-t pt-4" data-blume-page-actions data-i18n-chat-prompt="Read {url} so I can ask you questions about this page." data-i18n-copied="Copied!" data-i18n-copy-failed="Copy failed" data-md="' . esc_attr( $md ) . '">'
+	return '<div class="wp-block-studio-docs-page-actions space-y-0.5 mt-8 border-border border-t pt-4" data-blume-page-actions data-i18n-chat-prompt="Read {url} so I can ask you questions about this page." data-i18n-copied="Copied!" data-i18n-copy-failed="Copy failed" data-md="' . esc_attr( $md ) . '">'
 		. '<button class="' . esc_attr( $row_class ) . '" data-blume-scroll-top type="button">' . Render\icon( 'arrow-up', 16 ) . 'Scroll to top</button>'
 		. '<button class="' . esc_attr( $row_class ) . '" data-blume-copy-page type="button">' . Render\icon( 'copy', 16 ) . '<span data-blume-copy-label>Copy as Markdown</span></button>'
 		. '<details class="relative" data-blume-dropdown>'
@@ -358,7 +384,7 @@ function render_pagination() {
 		return '';
 	}
 	$adjacent = Render\adjacent( $post );
-	$html     = '<div data-blume-page-end><nav aria-label="Pagination" class="mx-auto mt-12 flex max-w-content justify-between gap-4 border-border border-t pt-6">';
+	$html     = '<div class="wp-block-studio-docs-pagination" data-blume-page-end><nav aria-label="Pagination" class="mx-auto mt-12 flex max-w-content justify-between gap-4 border-border border-t pt-6">';
 	if ( $adjacent['prev'] ) {
 		$html .= '<a class="flex max-w-[48%] flex-1 items-center gap-2 rounded-blume border border-border px-4 py-3 text-foreground transition-colors hover:border-foreground" href="' . esc_url( Render\node_href( $adjacent['prev'] ) ) . '">'
 			. Render\icon( 'arrow-left', 16, 'rtl:-scale-x-100' )
@@ -379,7 +405,7 @@ function render_pagination() {
  */
 function render_footer() {
 	$link = 'text-muted-foreground transition-colors hover:text-foreground focus-visible:text-foreground';
-	return '<footer class="border-border border-t px-4 md:px-6" data-blume-footer>'
+	return '<footer class="wp-block-studio-docs-footer border-border border-t px-4 md:px-6" data-blume-footer>'
 		. '<div class="flex min-h-16 flex-wrap items-center gap-x-6 gap-y-3 py-3 md:grid md:grid-cols-[1fr_auto_1fr]">'
 		. '<ul class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">'
 		. '<li><a class="' . $link . '" href="https://wordpress.studio" aria-describedby="blume-new-tab-hint" rel="noreferrer" target="_blank">WordPress Studio</a></li>'
@@ -404,16 +430,16 @@ function render_footer() {
  * A code block: Blume's frame with the language label, the copy button and the Shiki highlight
  * pre-rendered at build time (plain lines when the highlight is missing).
  *
- * @param array  $attributes Attributes.
- * @param string $content    Saved HTML (`<pre><code>…</code></pre>`).
+ * @param array  $attributes Attributes (language, code).
+ * @param string $content    Saved HTML, for content written before the attribute form.
  * @return string
  */
 function render_code( $attributes, $content ) {
 	$lang = strtolower( (string) ( $attributes['language'] ?? '' ) );
-	if ( ! preg_match( '#<code[^>]*>(.*)</code>#s', (string) $content, $m ) ) {
-		return $content;
+	$code = (string) ( $attributes['code'] ?? '' );
+	if ( '' === $code && preg_match( '#<code[^>]*>(.*)</code>#s', (string) $content, $m ) ) {
+		$code = html_entity_decode( $m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8' ); // Content written before the attribute form.
 	}
-	$code = html_entity_decode( $m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 	$code = rtrim( $code, "\n" );
 
 	$highlight = Render\highlight( $lang, $code );
@@ -428,7 +454,7 @@ function render_code( $attributes, $content ) {
 
 	// A fence without a language is plain text, labelled like one (Blume's default).
 	$lang  = '' === $lang ? 'plaintext' : $lang;
-	$attrs = ' class="astro-code astro-code-themes github-light github-dark group relative" style="' . esc_attr( $style . '; overflow-x: auto;' ) . '"';
+	$attrs = ' class="wp-block-studio-docs-code astro-code astro-code-themes github-light github-dark group relative" style="' . esc_attr( $style . '; overflow-x: auto;' ) . '"';
 	$attrs .= ' data-language="' . esc_attr( Render\language_label( $lang ) ) . '" data-blume-language="' . esc_attr( $lang ) . '"';
 	$icon   = Render\language_icon( $lang );
 	if ( '' !== $icon ) {
@@ -446,44 +472,55 @@ function render_code( $attributes, $content ) {
 /**
  * An image: a plain `<img>` in a paragraph, as the markdown rendered it; the script adds the zoom.
  *
- * @param array  $attributes Attributes.
- * @param string $content    Saved HTML.
+ * @param array  $attributes Attributes (src, alt, id, title, href, caption).
+ * @param string $content    Saved HTML, for content written before the attribute form.
  * @return string
  */
 function render_image( $attributes, $content ) {
-	if ( ! preg_match( '#<img\b([^>]*)/?>#i', (string) $content, $m ) ) {
-		return $content;
+	$src = (string) ( $attributes['src'] ?? '' );
+	$alt = (string) ( $attributes['alt'] ?? '' );
+	if ( '' === $src && preg_match( '#<img\b([^>]*)/?>#i', (string) $content, $m ) ) {
+		$tags = new \WP_HTML_Tag_Processor( '<img' . $m[1] . '>' ); // Content written before the attribute form.
+		$tags->next_tag( 'img' );
+		$src = (string) $tags->get_attribute( 'src' );
+		$alt = (string) $tags->get_attribute( 'alt' );
 	}
-	$tags = new \WP_HTML_Tag_Processor( '<img' . $m[1] . '>' );
-	$tags->next_tag( 'img' );
-	$src = (string) $tags->get_attribute( 'src' );
-	$alt = $tags->get_attribute( 'alt' );
-	$id  = (int) ( $attributes['id'] ?? 0 );
+	$id = (int) ( $attributes['id'] ?? 0 );
 	if ( $id ) {
 		$url = wp_get_attachment_url( $id );
 		if ( $url ) {
 			$src = $url;
 		}
 	}
-	$img = '<img src="' . esc_url( wp_make_link_relative( $src ) ) . '" alt="' . esc_attr( is_string( $alt ) ? $alt : '' ) . '">';
+	if ( '' === $src ) {
+		return '';
+	}
+	$img = '<img src="' . esc_url( wp_make_link_relative( $src ) ) . '" alt="' . esc_attr( $alt ) . '"' . ( ! empty( $attributes['title'] ) ? ' title="' . esc_attr( $attributes['title'] ) . '"' : '' ) . '>';
 	if ( ! empty( $attributes['href'] ) ) {
 		$img = '<a href="' . esc_url( $attributes['href'] ) . '">' . $img . '</a>';
 	}
-	return '<p>' . $img . '</p>';
+	if ( ! empty( $attributes['caption'] ) ) {
+		return '<figure class="wp-block-studio-docs-image">' . $img . '<figcaption>' . wp_kses_post( $attributes['caption'] ) . '</figcaption></figure>';
+	}
+	return '<p class="wp-block-studio-docs-image">' . $img . '</p>';
 }
 
 /**
  * A table in a scrolling frame.
  *
- * @param array  $attributes Attributes.
- * @param string $content    Saved HTML (`<figure><table>…</table></figure>`).
+ * @param array  $attributes Attributes (html: the `<table>` markup).
+ * @param string $content    Saved HTML, for content written before the attribute form.
  * @return string
  */
 function render_table( $attributes, $content ) {
-	if ( ! preg_match( '#<table\b.*</table>#s', (string) $content, $m ) ) {
-		return $content;
+	$html = (string) ( $attributes['html'] ?? '' );
+	if ( '' === $html && preg_match( '#<table\b.*</table>#s', (string) $content, $m ) ) {
+		$html = $m[0]; // Content written before the attribute form.
 	}
-	return '<div class="blume-table-scroll">' . $m[0] . '</div>';
+	if ( '' === $html ) {
+		return '';
+	}
+	return '<div class="wp-block-studio-docs-table blume-table-scroll">' . wp_kses_post( $html ) . '</div>';
 }
 
 /**
@@ -503,5 +540,5 @@ function render_callout( $attributes, $content ) {
 		'caution'   => 'Caution',
 	);
 	$inner = preg_replace( '#^\s*<div[^>]*>|</div>\s*$#', '', (string) $content );
-	return '<div class="studio-docs-callout is-' . esc_attr( $type ) . '" role="note"><p class="studio-docs-callout__title">' . esc_html( $titles[ $type ] ?? ucfirst( $type ) ) . '</p>' . $inner . '</div>';
+	return '<div class="wp-block-studio-docs-callout studio-docs-callout is-' . esc_attr( $type ) . '" role="note"><p class="studio-docs-callout__title">' . esc_html( $titles[ $type ] ?? ucfirst( $type ) ) . '</p>' . $inner . '</div>';
 }

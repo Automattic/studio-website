@@ -285,7 +285,7 @@ check( 'blocks: freeform found', Blocks\find_freeform( "text\n<!-- wp:paragraph 
 check( 'blocks: bare text wrapped', Blocks\convert( "Bare <em>text</em>\n<h2>H</h2>" ), "<!-- wp:paragraph -->\n<p>Bare <em>text</em></p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">H</h2>\n<!-- /wp:heading -->" );
 check( 'blocks: attribute escaping like core', Blocks\serialize_block( 'core/paragraph', array( 'className' => 'a--b<c>&"' ), '<p>x</p>' ), "<!-- wp:paragraph {\"className\":\"a\\u002d\\u002db\\u003cc\\u003e\\u0026\\u0022\"} -->\n<p>x</p>\n<!-- /wp:paragraph -->" );
 check( 'blocks: ordered list start', strpos( Blocks\convert( '<ol start="3"><li>c</li></ol>' ), '<!-- wp:list {"ordered":true,"start":3} -->' . "\n" . '<ol class="wp-block-list" start="3">' ) === 0, true );
-check( 'blocks: figure with caption', Blocks\convert( '<figure><img src="a.png" alt="A"><figcaption>Cap</figcaption></figure>' ), "<!-- wp:studio-docs/image -->\n<figure class=\"wp-block-studio-docs-image\"><img src=\"a.png\" alt=\"A\"/><figcaption class=\"wp-element-caption\">Cap</figcaption></figure>\n<!-- /wp:studio-docs/image -->" );
+check( 'blocks: figure with caption', Blocks\convert( '<figure><img src="a.png" alt="A"><figcaption>Cap</figcaption></figure>' ), "<!-- wp:studio-docs/image {\"src\":\"a.png\",\"alt\":\"A\",\"caption\":\"Cap\"} /-->" );
 check( 'blocks: pre without code is preformatted', Blocks\convert( '<pre>x</pre>' ), "<!-- wp:preformatted -->\n<pre class=\"wp-block-preformatted\">x</pre>\n<!-- /wp:preformatted -->" );
 check( 'blocks: empty input', Blocks\convert( '' ), '' );
 

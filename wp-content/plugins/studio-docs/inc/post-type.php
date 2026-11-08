@@ -62,7 +62,7 @@ function register_post_type() {
 			'has_archive'  => true,
 			'show_in_rest' => true,
 			'rest_base'    => 'docs',
-			'menu_icon'    => 'none', // Drawn by menu_icon_style(): the admin's painter only recolors filled SVGs.
+			'menu_icon'    => 'dashicons-media-document',
 			'rewrite'      => array(
 				'slug'       => 'docs',
 				'with_front' => false,
@@ -87,25 +87,6 @@ function migrate() {
 		wp_cache_flush();
 	}
 	update_option( 'wp_docs_post_type_version', POST_TYPE_VERSION, false );
-}
-
-add_action( 'admin_enqueue_scripts', __NAMESPACE__ . '\menu_icon_style' );
-
-/**
- * The admin menu icon: the `pages` icon of the Gutenberg icon library (@wordpress/icons), an outline
- * icon. The admin's SVG painter recolors fills only, so the icon is a CSS mask over the menu's text
- * color instead, which follows hover and current states like the Dashicons do.
- */
-function menu_icon_style() {
-	$svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="1.5">'
-		. '<path d="M7.75 20.25H19C19.6904 20.25 20.25 19.6904 20.25 19V5.75"/>'
-		. '<path d="M7.5 6.25H14.5M7.5 9.75H14.5M7.5 13.25H14.5M17.25 16V4C17.25 3.30964 16.6904 2.75 16 2.75H6C5.30964 2.75 4.75 3.30964 4.75 4L4.75 16C4.75 16.6904 5.30964 17.25 6 17.25H16C16.6904 17.25 17.25 16.6904 17.25 16Z"/>'
-		. '</svg>';
-	$url = "url('data:image/svg+xml," . rawurlencode( $svg ) . "')";
-	wp_add_inline_style(
-		'wp-admin',
-		'#adminmenu #menu-posts-' . POST_TYPE . ' .wp-menu-image::before { content: ""; display: block; width: 20px; height: 20px; margin: 7px auto 0; background-color: currentColor; -webkit-mask: ' . $url . ' center / contain no-repeat; mask: ' . $url . ' center / contain no-repeat; }'
-	);
 }
 
 /**
