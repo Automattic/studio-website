@@ -44,6 +44,13 @@
 html[data-theme="dark"] {
 	color-scheme: dark;
 }
+/* Below 600px the admin bar is not fixed: it scrolls away with the page, so the sticky header and the
+   columns sit at the very top once it has gone. */
+@media (max-width: 600px) {
+	.studio-docs {
+		--docs-header-top: 0px;
+	}
+}
 .studio-docs :focus-visible {
 	outline: 2px solid var(--docs-accent);
 	outline-offset: 2px;
