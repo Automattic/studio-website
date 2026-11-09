@@ -54,6 +54,7 @@
 }
 .wp-block-studio-docs-code > code {
 	display: block;
+	box-sizing: border-box;
 	max-height: 24rem;
 	padding: 0 1.25rem 0.375rem;
 	overflow: auto;

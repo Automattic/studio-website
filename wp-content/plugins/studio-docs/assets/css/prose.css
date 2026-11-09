@@ -138,7 +138,8 @@
 	margin-top: 1.5rem;
 }
 
-/* The last list's last item: its bottom margin would otherwise stay inside the flow root. */
+/* The last block's bottom margin (and the last list item's) would otherwise stay inside the flow root. */
+.studio-docs-article .wp-block-post-content > :last-child,
 .studio-docs-article .wp-block-post-content > :is(ul, ol):last-child > li:last-child {
 	margin-bottom: 0;
 }
