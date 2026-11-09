@@ -7,6 +7,8 @@
 // lost their code fences), and writes to build/docs/:
 //
 //   manifest.json     the importer's manifest (pages, titles, labels, groups, order)
+//   source.json       the revision of Automattic/studio the docs came from (the importer records it,
+//                     /docs/index.json publishes it, scripts/check-docs-freshness.mjs compares it)
 //   content/**/*.md   the cleaned markdown, one file per page, linking to each other relatively
 //   images/           the screenshots the pages use
 //   highlights.json   every fenced code block highlighted with Shiki (github-light / github-dark),
@@ -21,7 +23,7 @@
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
-import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, posix } from "node:path";
 import { fileURLToPath } from "node:url";
 import { codeToHtml } from "shiki";
@@ -110,11 +112,11 @@ function checkout() {
 		if (!existsSync(join(dir, SOURCE.path))) {
 			throw new Error(`${dir} has no ${SOURCE.path}`);
 		}
-		let sha = "local";
+		let commit = "";
 		try {
-			sha = execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: dir, stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+			commit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: dir, stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
 		} catch {}
-		return { dir, sha };
+		return { dir, commit, sha: commit ? commit.slice(0, 7) : "local" };
 	}
 	rmSync(cacheDir, { recursive: true, force: true });
 	mkdirSync(cacheDir, { recursive: true });
@@ -124,7 +126,23 @@ function checkout() {
 	git("sparse-checkout", "set", SOURCE.path, SOURCE.images);
 	git("fetch", "-q", "--depth", "1", "--filter=blob:none", "origin", SOURCE.ref);
 	git("checkout", "-q", "FETCH_HEAD");
-	return { dir: cacheDir, sha: execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: cacheDir }).toString().trim() };
+	const commit = execFileSync("git", ["rev-parse", "HEAD"], { cwd: cacheDir }).toString().trim();
+	return { dir: cacheDir, commit, sha: commit.slice(0, 7) };
+}
+
+// Markdown in the source that is not a page (working notes next to the docs), so it gets no warning.
+const NOT_PAGES = new Set(["developer-tools/studio/verification-findings.md"]);
+
+// Markdown files in the source that PAGES does not place: a new upstream page is invisible on the
+// site until it is added to PAGES, so say so at every build.
+function unmappedPages(sourceDir) {
+	const dir = join(sourceDir, SOURCE.path);
+	const mapped = new Set([...PAGES.map((page) => page.src), ...NOT_PAGES]);
+	return readdirSync(dir, { withFileTypes: true, recursive: true })
+		.filter((entry) => entry.isFile() && entry.name.endsWith(".md"))
+		.map((entry) => posix.relative(dir, join(entry.parentPath, entry.name)))
+		.filter((file) => !mapped.has(file))
+		.sort();
 }
 
 // Pass 1: read every page, lift its title, and map the anchors of its old headings
@@ -361,6 +379,10 @@ async function highlight(blocks) {
 
 const source = checkout();
 console.log(`Automattic/studio ${SOURCE.ref} (${source.sha}), ${SOURCE.path}`);
+const unmapped = unmappedPages(source.dir);
+for (const file of unmapped) {
+	console.warn(`  ! ${SOURCE.path}/${file} is not in PAGES, so it is not on the site`);
+}
 
 // The date of the last commit that touched a page (the "Updated" line at the end of the page). The
 // checkout is shallow, so the dates come from the GitHub commits API (GITHUB_TOKEN / GH_TOKEN raises the
@@ -423,7 +445,23 @@ for (const page of pages) {
 	order++;
 }
 writeFileSync(join(out, "manifest.json"), JSON.stringify(manifest, null, "\t") + "\n");
-console.log(`${pages.length} pages written to ${posix.relative(root, contentDir)}/`);
+writeFileSync(
+	join(out, "source.json"),
+	JSON.stringify(
+		{
+			repository: SOURCE.repo.replace(/^https:\/\/github\.com\//, "").replace(/\.git$/, ""),
+			ref: SOURCE.ref,
+			commit: source.commit,
+			paths: [SOURCE.path, SOURCE.images],
+			pages: pages.length,
+			unmapped,
+			staged: new Date().toISOString(),
+		},
+		null,
+		"\t"
+	) + "\n"
+);
+console.log(`${pages.length} pages written to ${posix.relative(root, contentDir)}/${unmapped.length ? `, ${unmapped.length} upstream pages not in PAGES` : ""}`);
 
 const missing = copyImages(source.dir);
 console.log(`${images.size} screenshots copied to ${posix.relative(root, imagesDir)}/${missing ? `, ${missing} missing` : ""}`);

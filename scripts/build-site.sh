@@ -12,6 +12,25 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 site="${STUDIO_SITE:-$PWD}"
 
+# The export needs `studio export-static`, which the released CLI does not have yet (Automattic/studio#5567).
+# Use the `studio` on PATH when it has the command; else the CLI built from that branch next to this
+# checkout (../studio-spacefast, see the README) or at STUDIO_EXPORT_CLI; else stop before changing anything.
+if ! studio --help 2>&1 | grep -q "export-static"; then
+	for candidate in "${STUDIO_EXPORT_CLI:-}" "$PWD/../studio-spacefast/bin/studio"; do
+		if [[ -n "$candidate" && -x "$candidate" ]] && "$candidate" --help 2>&1 | grep -q "export-static"; then
+			echo "Using $candidate for export-static (the installed Studio CLI has no such command yet)."
+			PATH="$(dirname "$candidate"):$PATH"
+			export PATH
+			break
+		fi
+	done
+	if ! studio --help 2>&1 | grep -q "export-static"; then
+		echo "The Studio CLI on PATH has no export-static command, and no CLI built from Automattic/studio#5567 was found." >&2
+		echo "Build it as the README's Publishing section describes (../studio-spacefast), or point STUDIO_EXPORT_CLI at its studio binary." >&2
+		exit 1
+	fi
+fi
+
 echo "Staging the docs from Automattic/studio…"
 node scripts/build-docs-manifest.mjs
 
