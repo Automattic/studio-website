@@ -35,3 +35,7 @@
 /video/node_modules/
 /video/out/
 .DS_Store
+.spacefast/state.json
+/.spacefast-*
+.spacefast/.spacefast-*
+.spacefast/.space-link-*.tmp
