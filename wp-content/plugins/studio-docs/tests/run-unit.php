@@ -327,6 +327,7 @@ $blocks  = Markdown_Out\parse( $convert( $body ) );
 check( 'blocks: alert is a studio-docs callout, fence a studio-docs code block', array( $blocks[3]['blockName'], $blocks[5]['blockName'], $blocks[5]['attrs']['language'] ), array( 'studio-docs/callout', 'studio-docs/code', 'php' ) );
 $noop    = Reverse\merge( $body, $blocks, $convert );
 check( 'merge no-op is identity', $noop['markdown'], $body );
+check( 'merge with prepared chunks gives the same result', Reverse\merge( $body, $blocks, $convert, array(), Reverse\prepare( $body, $convert ) )['markdown'], $body );
 check( 'merge no-op stats', array( $noop['verbatim'], $noop['rewritten'], $noop['added'], $noop['removed'] ), array( 10, 0, 0, 0 ) );
 check( 'merge no-op ops are all keeps', array_unique( array_column( $noop['ops'], 'op' ) ), array( 'keep' ) );
 check( 'merge adjacent chunks keep their spacing', Reverse\merge( "# H\nText", Markdown_Out\parse( $convert( "# H\nText" ) ), $convert )['markdown'], "# H\nText" );
@@ -411,6 +412,29 @@ $replayed = Upstream\apply( rtrim( $up_parts['body'], "\n" ), $staged, $merged['
 check( 'upstream fence edit replaces the run of upstream lines with the fence', array( strpos( $replayed, "## [Install](#0-install)\n\n```bash\n# Comment line\nstudio start\n# Another comment\nstudio stop --all\n```\n\n![Shot]" ) !== false, substr_count( $replayed, 'studio stop' ) ), array( true, 1 ) );
 check( 'upstream description replaced', Upstream\replace_description( $up_parts['body'], 'Short lede that the staging lifts into the description.', 'A new lede.' ), "A new lede.\n\nSee the [CLI](https://developer.wordpress.com/docs/developer-tools/studio/cli/) for details.\n\n## [Install](#0-install)\n\n\\# Comment line\nstudio start\n\n# Another comment\nstudio stop\n\n![Shot](https://developer.wordpress.com/wp-content/uploads/2025/01/shot.webp)\n\nLast paragraph.\n" );
 check( 'upstream description not found', Upstream\replace_description( $up_parts['body'], 'Something else', 'x' ), null );
+
+/*
+ * Drift: the stored-Markdown baseline, reversed with the pure resolvers.
+ */
+$staged_body = "See the [CLI](../cli.md#usage) and [this page](#top), the [home](../index.md).\n\n![A shot](../../images/shot.webp)\n\n```md\n[kept](../cli.md)\n```\n";
+$own         = 'content/blueprints/index.md';
+$routes      = array( '' => 'content/index.md', 'cli' => 'content/cli.md', 'blueprints' => $own );
+$forward     = Agent_Markdown\build(
+	$staged_body,
+	array( 'title' => 'Blueprints', 'description' => 'D', 'label' => 'Blueprints' ),
+	static fn( string $href ): ?string => array( '../cli.md#usage' => '/docs/cli/#usage', '../index.md' => '/docs/' )[ $href ] ?? null,
+	static fn( string $src, string $alt ): ?string => '/wp-content/uploads/docs/' . basename( $src )
+);
+check( 'drift: agent markdown has site links', strpos( $forward, '[CLI](/docs/cli/#usage)' ) !== false && strpos( $forward, '](/wp-content/uploads/docs/shot.webp)' ) !== false, true );
+$back = Agent_Markdown\rewrite(
+	trim( Reverse\split_file( $forward )['body'], "\n" ),
+	static fn( string $href ): ?string => Drift\link_back( $href, $own, static fn( string $route ): ?string => $routes[ $route ] ?? null ),
+	static fn( string $src, string $alt ): ?string => Drift\image_back( $src, $own, static fn( string $s ): ?string => '/wp-content/uploads/docs/shot.webp' === $s ? 'images/shot.webp' : null )
+);
+check( 'drift: stored baseline reverses to the staged body', $back, rtrim( $staged_body, "\n" ) );
+check( 'drift: link back with a host and to the own page', array( Drift\link_back( 'https://wordpress.studio/docs/cli/', 'content/index.md', static fn( $r ) => $routes[ $r ] ?? null ), Drift\link_back( '/docs/blueprints/#x', $own, static fn( $r ) => $routes[ $r ] ?? null ), Drift\link_back( 'https://example.com/docs/', $own, static fn( $r ) => null ) ), array( 'cli.md', '#x', null ) );
+check( 'drift: relative path', array( Drift\relative_path( 'content/a/b.md', 'images/x.webp' ), Drift\relative_path( 'index.md', 'images/x.webp' ) ), array( '../../images/x.webp', 'images/x.webp' ) );
+check( 'drift: staged front matter', Drift\staged_front_matter( 'T "q"', '', 'L' ), "---\ntitle: \"T \\\"q\\\"\"\nlabel: \"L\"\n---\n" );
 
 /*
  * Drift: the content hash.

@@ -70,7 +70,7 @@ npm run docs:drift                      # the pages edited in WordPress: what ch
 npm run docs:drift -- --diff            # each edit as a Markdown diff against the file the page was imported from
 npm run docs:reconcile                  # write the edits back onto Automattic/studio trunk and show the diff (dry run)
 npm run docs:reconcile -- --pr          # the same, then push a branch and open the pull request with gh
-npm run docs:drift -- --reset           # discard the edits: re-import the pages from the staged files
+npm run docs:drift -- --reset           # discard the edits (asks first): re-import the pages from the staged files
 ```
 
 `npm run docs:drift` is `studio wp wp-docs drift`. The reconciliation (`wp wp-docs drift --export`, which `scripts/reconcile-docs.mjs` runs) merges the page's blocks back into the Markdown it was imported from, keeping every unchanged chunk byte for byte, verifies that the result converts to the same blocks, and replays the change onto the upstream file (whose text the staging script transforms), so the diff on the pull request is the editor's change and nothing else. The branch is `docs/site-edits-<date>`; the pull request's body names the pages, who edited them on the site and when. GitHub stays the source of truth: once the pull request merges, the next build imports the pages from `trunk` again. Saving in the editor straight to GitHub is not implemented; the plugin's README has the details of the detection and the merge.

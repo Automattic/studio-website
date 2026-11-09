@@ -606,9 +606,15 @@ class Importer extends Markdown_Importer {
 				}
 			}
 			if ( $post_data ) {
+				// A manifest-only change (a title, with the Markdown unchanged) reaches the post without
+				// the content stage, so the drift hash is renewed here for a page that matched its import.
+				$was_clean       = Drift::is_clean( $post_id );
 				$post_data['ID'] = $post_id;
 				$this->log( "Updated {$post_id} from manifest source" );
 				wp_update_post( $post_data );
+				if ( $was_clean ) {
+					Drift::store_hash( $post_id );
+				}
 			}
 		}
 

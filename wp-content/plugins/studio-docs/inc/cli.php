@@ -207,7 +207,8 @@ class CLI {
 	 * [--export=<dir>]
 	 * : Write the reconciled Markdown files into this directory at their upstream paths
 	 * (docs/user/docs/… in Automattic/studio) when a checkout of the repository is available, else as
-	 * the staged files under content/. A drift.json next to them lists the pages.
+	 * the staged files under content/. A drift.json next to them lists the pages. A relative directory
+	 * is taken from the WordPress root (WP-CLI's working directory), not the shell's.
 	 *
 	 * [--upstream=<dir>]
 	 * : A checkout of Automattic/studio (its root) to replay the edits onto. Default: the checkout the
@@ -218,7 +219,10 @@ class CLI {
 	 * last import recorded.
 	 *
 	 * [--reset]
-	 * : Discard the edits: re-import every page from the staged files (`import --force`).
+	 * : Discard the edits: re-import every page from the staged files (`import --force`). Asks first.
+	 *
+	 * [--yes]
+	 * : Answer yes to the confirmation of --reset.
 	 *
 	 * ## EXAMPLES
 	 *
@@ -238,7 +242,21 @@ class CLI {
 		Drift::use_manifest( $manifest );
 
 		if ( Utils\get_flag_value( $assoc_args, 'reset', false ) ) {
-			$before  = Drift::detect();
+			$before = Drift::detect();
+			if ( ! $before ) {
+				WP_CLI::success( 'No drift: nothing to discard.' );
+				return;
+			}
+			WP_CLI::confirm(
+				sprintf(
+					'Discard the WordPress edits of %d page%s (%s) and re-import every page from %s?',
+					count( $before ),
+					1 === count( $before ) ? '' : 's',
+					implode( ', ', array_column( $before, 'path' ) ),
+					manifest_location()
+				),
+				$assoc_args
+			);
 			$summary = Importer::instance()->run(
 				array(
 					'force'    => true,

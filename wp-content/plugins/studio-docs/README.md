@@ -110,7 +110,8 @@ Such an edit is *drift*, and the plugin makes it visible and recoverable instead
   paragraph. Without a checkout the staged form is written under `content/`. `drift.json` next to the
   files lists the pages, editors, times and warnings; `scripts/reconcile-docs.mjs` (repository root)
   turns it into a branch and a pull request.
-- `wp wp-docs drift --reset` discards the edits: every page is re-imported from the staged files.
+- `wp wp-docs drift --reset` discards the edits (after a confirmation; `--yes` skips it): every page is
+  re-imported from the staged files.
 - `scripts/build-site.sh` runs the drift check before it stages and imports, and stops with these
   options while there is drift (`DOCS_ALLOW_DRIFT=1` builds anyway and the import overwrites the edits).
 

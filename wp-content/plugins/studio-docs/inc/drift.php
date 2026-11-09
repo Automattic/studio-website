@@ -62,6 +62,96 @@ function normalize_text( string $text ): string {
 }
 
 /**
+ * A relative path from one repository file to another, the way the Markdown links are written.
+ *
+ * @param string $from File the link is in.
+ * @param string $to   File linked to.
+ * @return string
+ */
+function relative_path( string $from, string $to ): string {
+	$from_parts = explode( '/', dirname( $from ) );
+	$to_parts   = explode( '/', $to );
+	if ( '.' === $from_parts[0] ) {
+		$from_parts = array();
+	}
+	while ( $from_parts && $to_parts && $from_parts[0] === $to_parts[0] ) {
+		array_shift( $from_parts );
+		array_shift( $to_parts );
+	}
+	return str_repeat( '../', count( $from_parts ) ) . implode( '/', $to_parts );
+}
+
+/**
+ * A site link (`/docs/<route>/#fragment`, with or without a host) back to the relative Markdown link
+ * between the two files: the inverse of the links transform.
+ *
+ * @param string   $href   Link target as written in the page.
+ * @param string   $own    Repository path of the page's own file.
+ * @param callable $target fn( string $route ): ?string. Repository path of the page at a route
+ *                         ('' is the home), or null when there is no such page.
+ * @return string|null The relative link, or null to keep the target as written.
+ */
+function link_back( string $href, string $own, callable $target ): ?string {
+	$href = trim( $href );
+	if ( '' === $href || '#' === $href[0] || '' === $own ) {
+		return null;
+	}
+	$path = (string) parse_url( $href, PHP_URL_PATH ); // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
+	if ( ! preg_match( '#^/docs(?:/|$)#', $path ) ) {
+		return null;
+	}
+	$fragment = (string) parse_url( $href, PHP_URL_FRAGMENT ); // phpcs:ignore WordPress.WP.AlternativeFunctions.parse_url_parse_url
+	$fragment = '' !== $fragment ? '#' . $fragment : '';
+	$route    = trim( substr( $path, strlen( '/docs' ) ), '/' );
+	$to       = $target( $route );
+	if ( null === $to || '' === $to ) {
+		return null;
+	}
+	if ( $to === $own && '' !== $fragment ) {
+		return $fragment;
+	}
+	return relative_path( $own, $to ) . $fragment;
+}
+
+/**
+ * An attachment URL back to the relative image path: the inverse of the images transform.
+ *
+ * @param string   $src       Image source as written in the page.
+ * @param string   $own       Repository path of the page's own file.
+ * @param callable $repo_path fn( string $src ): ?string. Repository path of the image the URL points at.
+ * @return string|null The relative path, or null to keep the source as written.
+ */
+function image_back( string $src, string $own, callable $repo_path ): ?string {
+	if ( '' === $own ) {
+		return null;
+	}
+	$path = $repo_path( $src );
+	return null === $path || '' === $path ? null : relative_path( $own, $path );
+}
+
+/**
+ * The front matter of a staged file (scripts/build-docs-manifest.mjs writes `title`, `description`
+ * and `label`, each double quoted), for a baseline rebuilt from the stored Markdown.
+ *
+ * @param string $title       Title.
+ * @param string $description Description, or empty.
+ * @param string $label       Sidebar label, or empty.
+ * @return string The `---` block with its trailing newline.
+ */
+function staged_front_matter( string $title, string $description, string $label ): string {
+	$quote = static fn( string $value ): string => json_encode( $value, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+	$lines = array( '---', 'title: ' . $quote( $title ) );
+	if ( '' !== $description ) {
+		$lines[] = 'description: ' . $quote( $description );
+	}
+	if ( '' !== $label ) {
+		$lines[] = 'label: ' . $quote( $label );
+	}
+	$lines[] = '---';
+	return implode( "\n", $lines ) . "\n";
+}
+
+/**
  * Which of the three fields differ between the imported state and the current one.
  *
  * The stored hash is one value, so the fields are told apart by recomputing: the content is unchanged

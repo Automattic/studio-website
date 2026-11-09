@@ -81,6 +81,21 @@ class Drift {
 	}
 
 	/**
+	 * Whether a page matches its import right now (a stored hash that equals the current one).
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool
+	 */
+	public static function is_clean( $post_id ) {
+		$post   = get_post( $post_id );
+		$stored = $post ? (string) get_post_meta( $post->ID, self::HASH_META, true ) : '';
+		if ( ! $post || '' === $stored || ! Drift\is_current( $stored ) ) {
+			return false;
+		}
+		return Drift\content_hash( (string) $post->post_content, (string) $post->post_title, (string) $post->post_excerpt ) === $stored;
+	}
+
+	/**
 	 * Read the manifest (and the staged files next to it) from where the pages were last imported,
 	 * unless a location is given or the configured one is already that.
 	 *
@@ -259,6 +274,7 @@ class Drift {
 	 *     @type array|null $verify Null when the result converts back to the page's blocks, else the first difference.
 	 *     @type array  $live      The page's parsed blocks.
 	 *     @type array  $options   Pipeline options used.
+	 *     @type array  $prepared  The baseline chunks converted (Reverse\prepare()), for a second merge.
 	 * }
 	 */
 	public static function reconcile( WP_Post $post ) {
@@ -279,10 +295,11 @@ class Drift {
 			return $baseline;
 		}
 
-		$live    = Markdown_Out\parse( (string) $post->post_content );
-		$convert = static fn( string $markdown ) => Pipeline\convert_body( $markdown, $options );
-		$merge   = Reverse\merge( $baseline['body'], $live, $convert, $resolvers );
-		$verify  = Reverse\verify( $merge['markdown'], $live, $convert );
+		$live     = Markdown_Out\parse( (string) $post->post_content );
+		$convert  = static fn( string $markdown ) => Pipeline\convert_body( $markdown, $options );
+		$prepared = Reverse\prepare( $baseline['body'], $convert );
+		$merge    = Reverse\merge( $baseline['body'], $live, $convert, $resolvers, $prepared );
+		$verify   = Reverse\verify( $merge['markdown'], $live, $convert );
 
 		return array(
 			'info'     => self::inspect( $post ),
@@ -293,6 +310,7 @@ class Drift {
 			'verify'   => $verify,
 			'live'     => $live,
 			'options'  => $options,
+			'prepared' => $prepared,
 		);
 	}
 
@@ -336,7 +354,11 @@ class Drift {
 			static fn( string $href ): ?string => ( $resolvers['link'] )( $href ),
 			static fn( string $src, string $alt ): ?string => ( $resolvers['image'] )( $src )
 		);
-		$raw   = $stored_parts['front_matter'] . "\n" . $body . "\n";
+		// The stored front matter is the agents' (`sidebar.label`); the staged file's is the staging script's.
+		$title = self::imported_title( $post );
+		$label = (string) get_post_meta( $post->ID, '_wp_docs_label', true );
+		$front = Drift\staged_front_matter( $title, self::imported_description( $post ), $label !== $title ? $label : '' );
+		$raw   = $front . "\n" . $body . "\n";
 		$parts = Reverse\split_file( $raw );
 		return array(
 			'body'   => rtrim( $parts['body'], "\n" ),
@@ -391,27 +413,11 @@ class Drift {
 			return (string) ( $doc['_source']['path'] ?? '' );
 		};
 
-		$link = static function ( string $href ) use ( $by_url, $own, $target_of ): ?string {
-			$href = trim( $href );
-			if ( '' === $href || '#' === $href[0] ) {
-				return null;
-			}
-			$path = (string) wp_parse_url( $href, PHP_URL_PATH );
-			if ( ! preg_match( '#^/docs(?:/|$)#', $path ) ) {
-				return null;
-			}
-			$fragment = (string) wp_parse_url( $href, PHP_URL_FRAGMENT );
-			$fragment = '' !== $fragment ? '#' . $fragment : '';
-			$route    = trim( substr( $path, strlen( '/docs' ) ), '/' );
-			if ( ! isset( $by_url[ $route ] ) ) {
-				return null;
-			}
-			$target = $target_of( $by_url[ $route ] );
-			if ( '' === $target || '' === $own ) {
-				return null;
-			}
-			return $target === $own ? ( '' !== $fragment ? $fragment : self::relative_path( $own, $target ) ) : self::relative_path( $own, $target ) . $fragment;
-		};
+		$link = static fn( string $href ): ?string => Drift\link_back(
+			$href,
+			$own,
+			static fn( string $route ): ?string => isset( $by_url[ $route ] ) ? $target_of( $by_url[ $route ] ) : null
+		);
 
 		$image = static function ( string $src ) use ( $own, $form, $upstream, &$warnings ): ?string {
 			$repo_path = self::image_repo_path( $src );
@@ -421,17 +427,14 @@ class Drift {
 				}
 				return null;
 			}
-			if ( '' === $own ) {
-				return null;
-			}
 			if ( 'upstream' === $form ) {
 				$name = basename( $repo_path );
 				if ( '' !== $upstream && preg_match( '#' . preg_quote( self::OLD_UPLOADS, '#' ) . '[^\s)"\']*/' . preg_quote( $name, '#' ) . '#', $upstream, $m ) ) {
 					return $m[0]; // The URL form the upstream page already uses for this screenshot.
 				}
-				return self::relative_path( $own, self::UPSTREAM_IMAGES . '/' . $name );
+				$repo_path = self::UPSTREAM_IMAGES . '/' . $name;
 			}
-			return self::relative_path( $own, $repo_path );
+			return Drift\image_back( $src, $own, static fn(): string => $repo_path );
 		};
 
 		return array(
@@ -474,26 +477,6 @@ class Drift {
 		}
 		$source = Sources\parse( (string) get_post_meta( (int) $ids[0], '_wp_docs_image_source', true ) );
 		return $cache[ $src ] = $source ? $source['path'] : null; // phpcs:ignore Squiz.PHP.DisallowMultipleAssignments.Found
-	}
-
-	/**
-	 * A relative path from one repository file to another, the way the Markdown links are written.
-	 *
-	 * @param string $from File the link is in.
-	 * @param string $to   File linked to.
-	 * @return string
-	 */
-	public static function relative_path( $from, $to ) {
-		$from_parts = explode( '/', dirname( $from ) );
-		$to_parts   = explode( '/', $to );
-		if ( '.' === $from_parts[0] ) {
-			$from_parts = array();
-		}
-		while ( $from_parts && $to_parts && $from_parts[0] === $to_parts[0] ) {
-			array_shift( $from_parts );
-			array_shift( $to_parts );
-		}
-		return str_repeat( '../', count( $from_parts ) ) . implode( '/', $to_parts );
 	}
 
 	/*
@@ -555,7 +538,7 @@ class Drift {
 			$up_parts     = Reverse\split_file( $upstream_raw );
 			$resolvers    = self::resolvers( $post, 'upstream', $upstream_raw, $warnings );
 			$convert      = static fn( string $markdown ) => Pipeline\convert_body( $markdown, $reconciled['options'] );
-			$merge        = Reverse\merge( $reconciled['baseline']['body'], $reconciled['live'], $convert, $resolvers );
+			$merge        = Reverse\merge( $reconciled['baseline']['body'], $reconciled['live'], $convert, $resolvers, $reconciled['prepared'] );
 			$body         = Upstream\apply( rtrim( $up_parts['body'], "\n" ), $reconciled['baseline']['body'], $merge['ops'], $warnings );
 
 			if ( in_array( 'title', $changed, true ) ) {

@@ -31,24 +31,14 @@ use WP_Docs\Transforms\Chunks;
 use WP_Docs\Transforms\Markdown_Out;
 
 /**
- * Merge the live blocks into the baseline Markdown body.
+ * Split the baseline into chunks and convert each on its own: the expensive half of a merge, shared
+ * when the same baseline is merged twice (once per link form).
  *
  * @param string   $baseline Baseline Markdown body (no front matter, no title H1).
- * @param array[]  $live     Live blocks (parsed; Markdown_Out\parse()).
  * @param callable $convert  fn( string $markdown ): string. Block markup for a piece of Markdown.
- * @param array    $options  Markdown_Out options (link, image).
- * @return array {
- *     @type string $markdown   The merged body, no trailing newline.
- *     @type int    $verbatim   Chunks copied unchanged.
- *     @type int    $rewritten  Chunks rewritten from blocks.
- *     @type int    $added      Blocks added outside any chunk.
- *     @type int    $removed    Chunks dropped.
- *     @type array  $warnings   From Markdown_Out.
- *     @type array  $ops        In order: { op: keep, chunks: [i], text, gap } | { op: replace, chunks: [i…], text }
- *                              | { op: insert, after: i|null, text } | { op: delete, chunks: [i…] }.
- * }
+ * @return array { chunks: array[] (each with start and end into base), base: array[] ({ chunk, fp }) }
  */
-function merge( string $baseline, array $live, callable $convert, array $options = array() ): array {
+function prepare( string $baseline, callable $convert ): array {
 	$chunks = Chunks\chunk( $baseline );
 	$base   = array(); // Flat list of baseline blocks, each with its chunk index.
 	foreach ( $chunks as $ci => $chunk ) {
@@ -62,6 +52,35 @@ function merge( string $baseline, array $live, callable $convert, array $options
 		}
 		$chunks[ $ci ]['end'] = count( $base );
 	}
+	return array(
+		'chunks' => $chunks,
+		'base'   => $base,
+	);
+}
+
+/**
+ * Merge the live blocks into the baseline Markdown body.
+ *
+ * @param string     $baseline Baseline Markdown body (no front matter, no title H1).
+ * @param array[]    $live     Live blocks (parsed; Markdown_Out\parse()).
+ * @param callable   $convert  fn( string $markdown ): string. Block markup for a piece of Markdown.
+ * @param array      $options  Markdown_Out options (link, image).
+ * @param array|null $prepared prepare() of the same baseline and converter, to skip converting again.
+ * @return array {
+ *     @type string $markdown   The merged body, no trailing newline.
+ *     @type int    $verbatim   Chunks copied unchanged.
+ *     @type int    $rewritten  Chunks rewritten from blocks.
+ *     @type int    $added      Blocks added outside any chunk.
+ *     @type int    $removed    Chunks dropped.
+ *     @type array  $warnings   From Markdown_Out.
+ *     @type array  $ops        In order: { op: keep, chunks: [i], text, gap } | { op: replace, chunks: [i…], text }
+ *                              | { op: insert, after: i|null, text } | { op: delete, chunks: [i…] }.
+ * }
+ */
+function merge( string $baseline, array $live, callable $convert, array $options = array(), ?array $prepared = null ): array {
+	$prepared = $prepared ?? prepare( $baseline, $convert );
+	$chunks   = $prepared['chunks'];
+	$base     = $prepared['base'];
 
 	$live_fp = array_map( __NAMESPACE__ . '\fingerprint', $live );
 	$pairs   = lcs( array_column( $base, 'fp' ), $live_fp ); // base index => live index.

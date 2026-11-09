@@ -17,18 +17,20 @@
  * Nothing here is clever about formatting the file as a whole: reverse.php keeps every unchanged chunk
  * of the source byte for byte and only asks this module for the blocks that changed.
  *
- * Pure PHP: DOMDocument and core's block parser only.
+ * Pure PHP: the DOM helpers of blocks.php and core's block parser only.
  *
  * @package WP_Docs
  */
 
 namespace WP_Docs\Transforms\Markdown_Out;
 
-use DOMDocument;
 use DOMElement;
 use DOMNode;
-
-const INLINE_TAGS = array( 'a', 'abbr', 'b', 'bdi', 'bdo', 'br', 'cite', 'code', 'data', 'del', 'dfn', 'em', 'i', 'img', 'ins', 'kbd', 'mark', 'q', 's', 'samp', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'time', 'u', 'var', 'wbr' );
+use const WP_Docs\Transforms\Blocks\INLINE_TAGS;
+use function WP_Docs\Transforms\Blocks\inner_html;
+use function WP_Docs\Transforms\Blocks\load;
+use function WP_Docs\Transforms\Blocks\meaningful_children;
+use function WP_Docs\Transforms\Blocks\outer_html;
 
 /** Inline tags written back as HTML (GitHub and the importer both render them). */
 const HTML_INLINE = array( 'abbr', 'bdi', 'bdo', 'cite', 'data', 'del', 'dfn', 'ins', 'kbd', 'mark', 'q', 's', 'samp', 'small', 'span', 'strike', 'sub', 'sup', 'time', 'u', 'var' );
@@ -47,7 +49,6 @@ function defaults(): array {
 	return array(
 		'link'  => static fn( string $href ): ?string => null, // Site URL -> Markdown target, or null to keep.
 		'image' => static fn( string $src ): ?string => null,  // Attachment URL -> Markdown path, or null to keep.
-		'hint'  => '', // Source Markdown of the chunk being replaced (unused today; kept for callers).
 	);
 }
 
@@ -905,78 +906,4 @@ function link_url( string $url ): string {
  */
 function attr( string $value ): string {
 	return htmlspecialchars( $value, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8', false );
-}
-
-/*
- * ---------------------------------------------------------------------------------------------
- * DOM helpers.
- * ---------------------------------------------------------------------------------------------
- */
-
-/**
- * Parse an HTML fragment into a container element.
- *
- * @param string $html HTML fragment.
- * @return DOMElement|null
- */
-function load( string $html ): ?DOMElement {
-	$doc      = new DOMDocument( '1.0', 'UTF-8' );
-	$previous = libxml_use_internal_errors( true );
-	$doc->loadHTML(
-		'<?xml encoding="UTF-8"?><!DOCTYPE html><html><head><meta charset="utf-8"></head><body><div id="wp-docs-root">' . $html . '</div></body></html>',
-		LIBXML_NONET | LIBXML_COMPACT
-	);
-	libxml_clear_errors();
-	libxml_use_internal_errors( $previous );
-
-	foreach ( $doc->getElementsByTagName( 'div' ) as $div ) {
-		if ( 'wp-docs-root' === $div->getAttribute( 'id' ) ) {
-			return $div;
-		}
-	}
-	return null;
-}
-
-/**
- * Children that are not whitespace text or comments.
- *
- * @param DOMNode $el Element.
- * @return DOMNode[]
- */
-function meaningful_children( DOMNode $el ): array {
-	$out = array();
-	foreach ( $el->childNodes as $child ) {
-		if ( XML_COMMENT_NODE === $child->nodeType ) {
-			continue;
-		}
-		if ( XML_TEXT_NODE === $child->nodeType && '' === trim( $child->nodeValue ) ) {
-			continue;
-		}
-		$out[] = $child;
-	}
-	return $out;
-}
-
-/**
- * Inner HTML of a node.
- *
- * @param DOMNode $el Node.
- * @return string
- */
-function inner_html( DOMNode $el ): string {
-	$html = '';
-	foreach ( $el->childNodes as $child ) {
-		$html .= outer_html( $child );
-	}
-	return $html;
-}
-
-/**
- * Outer HTML of a node.
- *
- * @param DOMNode $node Node.
- * @return string
- */
-function outer_html( DOMNode $node ): string {
-	return (string) $node->ownerDocument->saveHTML( $node );
 }

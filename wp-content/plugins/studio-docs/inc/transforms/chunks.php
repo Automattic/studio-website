@@ -21,7 +21,7 @@
 
 namespace WP_Docs\Transforms\Chunks;
 
-const INLINE_TAGS = array( 'a', 'abbr', 'b', 'bdi', 'bdo', 'br', 'cite', 'code', 'data', 'del', 'dfn', 'em', 'i', 'img', 'ins', 'kbd', 'mark', 'q', 's', 'samp', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'time', 'u', 'var', 'wbr' );
+use const WP_Docs\Transforms\Blocks\INLINE_TAGS;
 
 /**
  * Split a Markdown body into chunks.

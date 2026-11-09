@@ -156,7 +156,7 @@ function align( array $staged, array $upstream, array $needed = array(), array &
 			if ( isset( $taken[ $ui ] ) ) {
 				continue;
 			}
-			similar_text( $want, key_text( $b[ $ui ] ), $percent );
+			$percent = similarity( $want, key_text( $b[ $ui ] ) );
 			if ( $percent > $score ) {
 				$score = $percent;
 				$best  = $ui;
@@ -170,6 +170,24 @@ function align( array $staged, array $upstream, array $needed = array(), array &
 	}
 	ksort( $map );
 	return $map;
+}
+
+/**
+ * How similar two keys are, in percent, bounded: lengths too different to reach the threshold are
+ * not compared at all (similar_text() is cubic), and long keys are compared on their first part.
+ *
+ * @param string $a Key text.
+ * @param string $b Key text.
+ * @return float
+ */
+function similarity( string $a, string $b ): float {
+	$la = strlen( $a );
+	$lb = strlen( $b );
+	if ( 0 === $la || 0 === $lb || 200 * min( $la, $lb ) / ( $la + $lb ) < 60 ) {
+		return 0.0;
+	}
+	similar_text( substr( $a, 0, 2000 ), substr( $b, 0, 2000 ), $percent );
+	return (float) $percent;
 }
 
 /**
