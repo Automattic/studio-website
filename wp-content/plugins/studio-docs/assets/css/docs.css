@@ -82,6 +82,10 @@ html[data-theme="dark"] {
 }
 
 /* ---- Header ---- */
+/* The template part wrappers take no space of their own, so the header sticks within the whole page. */
+.studio-docs .wp-site-blocks > .wp-block-template-part {
+	display: contents;
+}
 .studio-docs .studio-docs-header {
 	position: sticky;
 	top: var(--docs-header-top);
