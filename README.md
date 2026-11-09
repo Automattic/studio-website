@@ -59,11 +59,21 @@ node scripts/build-docs-manifest.mjs   # stage the markdown and screenshots into
 studio wp wp-docs import --force       # import them into the docs post type
 ```
 
-`scripts/build-docs-manifest.mjs` checks the Studio repository's `docs/user/docs` and `docs/user/screenshots/images` out (the `ui-refresh-user-docs` branch, the 2.0 docs refresh [Automattic/studio#5517](https://github.com/Automattic/studio/pull/5517), until it merges; set `STUDIO_DOCS_REF` to pin another revision), places each page in the sidebar defined in its `PAGES` list, cleans up what the markdown carried over from developer.wordpress.com (heading links, linked images, absolute links, command lines without code fences), highlights every code block with Shiki (`github-light` / `github-dark`, the same themes as before) and writes `build/docs/manifest.json` for the importer. `wp wp-docs import` turns the pages into blocks, sideloads the screenshots once per content hash into `wp-content/uploads/docs/` (ignored), and keeps each page's Markdown for `/docs/<page>.md`, `/docs/llms.txt`, `/docs/llms-full.txt`, `/docs/index.json` and the search index at `/docs/search-index.json`. `wp wp-docs status` shows what is imported; `wp wp-docs convert <file.md>` prints the blocks for one file. The plugin's README describes the blocks and the pipeline; `php tests/run-fixtures.php` and `php tests/run-unit.php` in the plugin folder test the conversion without a database.
+`scripts/build-docs-manifest.mjs` checks the Studio repository's `docs/user/docs` and `docs/user/screenshots/images` out (the `ui-refresh-user-docs` branch, the 2.0 docs refresh [Automattic/studio#5517](https://github.com/Automattic/studio/pull/5517), until it merges; set `STUDIO_DOCS_REF` to pin another revision), places each page in the sidebar defined in its `PAGES` list (a markdown file upstream that is not in the list is reported at every build and stays off the site until it is added; working notes go in `NOT_PAGES`), records the revision it staged in `build/docs/source.json`, cleans up what the markdown carried over from developer.wordpress.com (heading links, linked images, absolute links, command lines without code fences), highlights every code block with Shiki (`github-light` / `github-dark`, the same themes as before) and writes `build/docs/manifest.json` for the importer. `wp wp-docs import` turns the pages into blocks, sideloads the screenshots once per content hash into `wp-content/uploads/docs/` (ignored), and keeps each page's Markdown for `/docs/<page>.md`, `/docs/llms.txt`, `/docs/llms-full.txt`, `/docs/index.json` and the search index at `/docs/search-index.json`. `wp wp-docs status` shows what is imported and from which revision; `wp wp-docs convert <file.md>` prints the blocks for one file. The plugin's README describes the blocks and the pipeline; `php tests/run-fixtures.php` and `php tests/run-unit.php` in the plugin folder test the conversion without a database.
 
 ## Publishing
 
-The site is published as static files to a [Spacefast](https://spacefast.com) Space, which serves wordpress.studio. `scripts/build-site.sh` builds the whole site into `dist/`: it stages and imports the docs, exports the WordPress site (pages and docs) and adds the root files below. Then publish `dist/` with the [Spacefast CLI](https://spacefast.com/docs/cli/):
+The site is published as static files to a [Spacefast](https://spacefast.com) Space, which serves wordpress.studio. Nothing publishes on its own: a docs change in the Studio repository, or a theme or plugin change here, reaches the site when someone builds and publishes it. Pushing to this repository deploys nothing.
+
+```bash
+npm run docs:check      # is the live site behind the docs in Automattic/studio? (exit 1 when it is)
+npm run deploy          # build and publish to production (asks before publishing)
+npm run deploy:preview  # the same to a preview version, with its own URL, leaving production alone
+```
+
+`npm run docs:check` (`scripts/check-docs-freshness.mjs`) reads the revision the live docs were built from out of `/docs/index.json` and lists the upstream commits since then that touched the docs or their screenshots, so a rebuild is never a guess; `--local` checks the last local staging instead, `--site <url>` another site. `npm run deploy` (`scripts/publish-site.sh`) runs the build below and then `sf publish`; extra arguments go to `sf publish` (`-y` skips the confirmation, `-m` sets the version message), and it ends with the freshness check against the live site.
+
+Under the hood, `scripts/build-site.sh` builds the whole site into `dist/`: it stages and imports the docs, exports the WordPress site (pages and docs) and adds the root files below. Then `dist/` is published with the [Spacefast CLI](https://spacefast.com/docs/cli/):
 
 ```bash
 scripts/build-site.sh
@@ -76,13 +86,13 @@ sf publish dist --root-directory . --space spc_95b3647e99974586b104ab2cf1050dd6
 - The theme writes `https://wordpress.studio` into canonicals, social tags and the sitemap, so the copy on the Space's own address is never indexed in its place.
 - `STUDIO_SITE=<path> scripts/build-site.sh` builds from another Studio site that runs this checkout (a development site whose theme and plugin folders are symlinks into it, with `WP_DOCS_MANIFEST` pointing at this checkout's `build/docs/manifest.json`).
 
-The build needs `studio export-static`, which is not in a Studio release yet ([Automattic/studio#5567](https://github.com/Automattic/studio/pull/5567)). Until it ships, build the CLI from that branch and run the build with it first on your `PATH`:
+The build needs `studio export-static`, which is not in a Studio release yet ([Automattic/studio#5567](https://github.com/Automattic/studio/pull/5567)). Until it ships, build the CLI from that branch next to this checkout; the build script uses it when the installed CLI lacks the command (or set `STUDIO_EXPORT_CLI` to its `studio` binary):
 
 ```bash
 git clone --branch add-spacefast-publishing https://github.com/Automattic/studio.git ../studio-spacefast
 ( cd ../studio-spacefast && npm ci && npm run cli:build )
 mkdir -p ../studio-spacefast/bin && printf '#!/usr/bin/env bash\nexec node "$(dirname "$0")/../apps/cli/dist/cli/main.mjs" "$@"\n' > ../studio-spacefast/bin/studio && chmod +x ../studio-spacefast/bin/studio
-PATH="$PWD/../studio-spacefast/bin:$PATH" scripts/build-site.sh
+npm run deploy
 ```
 
 That build reads the same site list as the Studio app, so the site needs no re-registration.

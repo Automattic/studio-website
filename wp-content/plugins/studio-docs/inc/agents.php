@@ -408,8 +408,10 @@ class Agents {
 					);
 				}
 				$stamp = import_stamp();
+				$last  = get_option( LAST_IMPORT_OPTION );
 				return array(
 					'generated' => '' !== $stamp ? $stamp : gmdate( 'c' ),
+					'source'    => is_array( $last ) && ! empty( $last['source'] ) ? $last['source'] : null,
 					'pages'     => $pages,
 				);
 			}

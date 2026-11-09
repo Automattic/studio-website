@@ -84,6 +84,43 @@ class Local_Sources {
 	}
 
 	/**
+	 * The revision the docs were staged from: `source.json` next to the manifest, written by
+	 * scripts/build-docs-manifest.mjs (repository, ref, commit, paths, staged). Missing or unreadable
+	 * is fine: the import does not depend on it.
+	 *
+	 * @param string $manifest_location The manifest's URL or file path.
+	 * @return array|null
+	 */
+	public static function load_source( $manifest_location ) {
+		$location = preg_replace( '#[^/\\\\]+$#', 'source.json', (string) $manifest_location );
+		if ( ! $location || $location === $manifest_location ) {
+			return null;
+		}
+		if ( preg_match( '#^https?://#i', $location ) ) {
+			$response = wp_remote_get( $location, array( 'timeout' => 15 ) );
+			if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+				return null;
+			}
+			$json = (string) wp_remote_retrieve_body( $response );
+		} elseif ( is_file( $location ) && is_readable( $location ) ) {
+			$json = (string) file_get_contents( $location ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		} else {
+			return null;
+		}
+		$source = json_decode( $json, true );
+		if ( ! is_array( $source ) || empty( $source['commit'] ) ) {
+			return null;
+		}
+		return array(
+			'repository' => sanitize_text_field( (string) ( $source['repository'] ?? '' ) ),
+			'ref'        => sanitize_text_field( (string) ( $source['ref'] ?? '' ) ),
+			'commit'     => preg_match( '/^[0-9a-f]{7,40}$/', (string) $source['commit'] ) ? (string) $source['commit'] : '',
+			'paths'      => array_values( array_map( 'sanitize_text_field', (array) ( $source['paths'] ?? array() ) ) ),
+			'staged'     => sanitize_text_field( (string) ( $source['staged'] ?? '' ) ),
+		);
+	}
+
+	/**
 	 * The content checkout on disk.
 	 *
 	 * @return string Path without trailing slash.

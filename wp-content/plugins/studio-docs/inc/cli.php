@@ -148,6 +148,17 @@ class CLI {
 					$last['warnings']
 				)
 			);
+			if ( ! empty( $last['source']['commit'] ) ) {
+				WP_CLI::log(
+					sprintf(
+						'Docs source: %s@%s (%s), staged %s.',
+						$last['source']['repository'],
+						$last['source']['ref'],
+						substr( $last['source']['commit'], 0, 7 ),
+						$last['source']['staged']
+					)
+				);
+			}
 		} else {
 			WP_CLI::log( 'No import has run yet.' );
 		}

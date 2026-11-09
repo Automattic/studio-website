@@ -5,7 +5,10 @@
 	"description": "wordpress.studio: the build scripts for the static site. The WordPress theme and the docs plugin live in wp-content/; the video in video/.",
 	"scripts": {
 		"build": "scripts/build-site.sh",
-		"docs:manifest": "node scripts/build-docs-manifest.mjs"
+		"deploy": "scripts/publish-site.sh",
+		"deploy:preview": "scripts/publish-site.sh preview",
+		"docs:manifest": "node scripts/build-docs-manifest.mjs",
+		"docs:check": "node scripts/check-docs-freshness.mjs"
 	},
 	"dependencies": {
 		"shiki": "4.6.0"

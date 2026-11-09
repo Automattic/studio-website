@@ -312,6 +312,7 @@ class Importer extends Markdown_Importer {
 			'restored'      => $restored,
 			'removed'       => $removed,
 			'warning_list'  => array_slice( $this->warnings, 0, 200 ),
+			'source'        => Local_Sources::load_source( $location ),
 		);
 		update_option( self::LAST_IMPORT_OPTION, $summary, false );
 
