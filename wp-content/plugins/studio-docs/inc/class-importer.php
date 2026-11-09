@@ -138,7 +138,6 @@ class Importer extends Markdown_Importer {
 		add_filter( 'wporg_markdown_check_etags', array( $this, 'check_etags' ) );
 		add_filter( 'http_response', array( $this, 'filter_markdown_response' ), 10, 3 );
 		add_filter( 'wp_insert_post_data', array( $this, 'filter_post_data' ), 10, 2 );
-		add_filter( 'get_edit_post_link', array( $this, 'filter_edit_link' ), 11, 2 );
 	}
 
 	/**
@@ -785,22 +784,6 @@ class Importer extends Markdown_Importer {
 		// stays empty for a page without one (a generated excerpt would repeat the first paragraph).
 		$data['post_excerpt'] = wp_slash( sanitize_text_field( $this->description_for( $this->current['doc'], (array) $this->current['front_matter'] ) ) );
 		return $data;
-	}
-
-	/**
-	 * Front-end edit link: the GitHub edit URL from the meta (the stock Editor only knows github.com
-	 * sources and would link local sources to the local fetch URL).
-	 *
-	 * @param string $link    Link.
-	 * @param int    $post_id Post ID.
-	 * @return string
-	 */
-	public function filter_edit_link( $link, $post_id ) {
-		if ( is_admin() || get_post_type( $post_id ) !== $this->get_post_type() ) {
-			return $link;
-		}
-		$edit = (string) get_post_meta( $post_id, '_wp_docs_edit_url', true );
-		return '' !== $edit ? $edit : $link;
 	}
 
 	/*

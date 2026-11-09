@@ -60,7 +60,7 @@ tests/                     plain-PHP tests of the pipeline (no database)
 
 The manifest entry fields the blocks read: `title`, `label` (sidebar), `heading` (sub-section heading
 when the page has children), `group` and `group_title` (the sidebar group), `order`, `description`,
-`source_url`.
+`source_url` (the GitHub edit link derives from it), `updated` (YYYY-MM-DD of the page's last commit).
 
 ## Blocks
 
@@ -88,6 +88,7 @@ previews the docs home when no page is in context):
 | `toc` | "On this page" (H2 and H3) with the heading in view marked; the `collapsible` setting renders a closed disclosure above the article, shown only when the rail is hidden, that the page actions move into |
 | `page-actions` | Scroll to top, Copy as Markdown, Open in chat (v0, ChatGPT, Claude, T3 Chat, Scira, Cursor) |
 | `pagination` | Previous / Next in sidebar order, named by the sidebar heading |
+| `page-meta` | at the end of the article: "Edit this page on GitHub" and the date of the page's last commit (the manifest's `updated`, which the staging script reads from the GitHub commits API); each line is a setting |
 
 The docs templates in the theme place them next to core blocks: Site Logo and Site Title in the header
 with a Download button, a constrained `main` group holding Post Title, Post Excerpt (the description)

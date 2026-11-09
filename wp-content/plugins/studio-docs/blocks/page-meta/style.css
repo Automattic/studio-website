@@ -1,0 +1,38 @@
+/* The end of the page: the GitHub edit link at the start, the update date at the end. */
+.wp-block-studio-docs-page-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem 1.5rem;
+	margin-top: 2.5rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--docs-border);
+	color: var(--docs-muted-foreground);
+	font-size: 0.875rem;
+	line-height: 1.4286;
+}
+.wp-block-studio-docs-page-meta .studio-docs-page-meta__edit {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--docs-muted-foreground);
+	font-weight: 400;
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.wp-block-studio-docs-page-meta .studio-docs-page-meta__edit:hover {
+	color: var(--docs-foreground);
+	text-decoration: none;
+}
+.wp-block-studio-docs-page-meta .studio-docs-page-meta__edit svg {
+	flex-shrink: 0;
+}
+.wp-block-studio-docs-page-meta .studio-docs-page-meta__updated {
+	margin-inline-start: auto;
+}
+@media print {
+	.wp-block-studio-docs-page-meta .studio-docs-page-meta__edit {
+		display: none;
+	}
+}

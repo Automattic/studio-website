@@ -364,8 +364,37 @@ async function highlight(blocks) {
 const source = checkout();
 console.log(`Automattic/studio ${SOURCE.ref} (${source.sha}), ${SOURCE.path}`);
 
+// The date of the last commit that touched a page (the "Updated" line at the end of the page). The
+// checkout is shallow, so the dates come from the GitHub commits API (GITHUB_TOKEN / GH_TOKEN raises the
+// rate limit); a local source checkout (STUDIO_DOCS_SOURCE) answers from its own history. A page whose
+// date cannot be found gets none.
+async function lastUpdated(file) {
+	if (process.env.STUDIO_DOCS_SOURCE) {
+		try {
+			return execFileSync("git", ["log", "-1", "--format=%cs", "--", `${SOURCE.path}/${file}`], { cwd: source.dir, stdio: ["ignore", "pipe", "ignore"] }).toString().trim();
+		} catch {
+			return "";
+		}
+	}
+	const repo = SOURCE.repo.replace(/^https:\/\/github\.com\//, "").replace(/\.git$/, "");
+	const url = `https://api.github.com/repos/${repo}/commits?path=${encodeURIComponent(`${SOURCE.path}/${file}`)}&sha=${encodeURIComponent(SOURCE.ref)}&per_page=1`;
+	const token = process.env.GITHUB_TOKEN || process.env.GH_TOKEN;
+	const headers = { Accept: "application/vnd.github+json", "User-Agent": "studio-website-build" };
+	if (token) headers.Authorization = `Bearer ${token}`;
+	try {
+		const response = await fetch(url, { headers });
+		if (!response.ok) throw new Error(`${response.status} ${response.statusText}`);
+		const [commit] = await response.json();
+		return commit?.commit?.committer?.date?.slice(0, 10) ?? "";
+	} catch (error) {
+		console.warn(`warning: no update date for ${file} (${error.message})`);
+		return "";
+	}
+}
+
 rmSync(contentDir, { recursive: true, force: true });
 const pages = PAGES.map((page) => readPage(page, source.dir));
+const updatedDates = new Map(await Promise.all(PAGES.map(async (page) => [page.src, await lastUpdated(page.src)])));
 const manifest = {};
 const allBlocks = [];
 let order = 0;
@@ -391,6 +420,7 @@ for (const page of pages) {
 		group: page.group ?? "",
 		group_title: page.group ? GROUPS[page.group] : "",
 		source_url: `https://github.com/Automattic/studio/blob/${SOURCE.ref}/${SOURCE.path}/${page.src}`,
+		updated: updatedDates.get(page.src) || "",
 	};
 	order++;
 }
