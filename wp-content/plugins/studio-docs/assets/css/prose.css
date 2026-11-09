@@ -30,6 +30,20 @@
 		font-size: 3rem;
 	}
 }
+.studio-docs-article h1 {
+	margin: 0 0 1rem;
+	color: var(--docs-foreground);
+	font-family: inherit;
+	font-size: 2.25rem;
+	font-weight: 500;
+	letter-spacing: -0.05em;
+	line-height: 1.1;
+}
+@media (min-width: 48rem) {
+	.studio-docs-article h1 {
+		font-size: 3rem;
+	}
+}
 .studio-docs-article .wp-block-post-excerpt {
 	margin: 0;
 }
@@ -101,6 +115,34 @@
 	opacity: 1;
 }
 
+/* Core's Post Content is a flow root whose first block loses its top margin; the gap between the title
+   or lede and the content is the wrapper's margin, sized for the kind of block that comes first. */
+.studio-docs-article .wp-block-post-content {
+	margin-top: 1rem;
+}
+.studio-docs-article .wp-block-post-content:has(> h2:first-child) {
+	margin-top: 3rem;
+}
+.studio-docs-article .wp-block-post-content:has(> h3:first-child) {
+	margin-top: 2rem;
+}
+.studio-docs-article .wp-block-post-content:has(> h4:first-child) {
+	margin-top: 1.3125rem;
+}
+.studio-docs-article .wp-block-post-content:has(> .wp-block-image:first-child) {
+	margin-top: 1.75rem;
+}
+.studio-docs-article .wp-block-post-content:has(> .wp-block-table:first-child),
+.studio-docs-article .wp-block-post-content:has(> .wp-block-studio-docs-code:first-child),
+.studio-docs-article .wp-block-post-content:has(> .wp-block-studio-docs-callout:first-child) {
+	margin-top: 1.5rem;
+}
+
+/* The last list's last item: its bottom margin would otherwise stay inside the flow root. */
+.studio-docs-article .wp-block-post-content > :is(ul, ol):last-child > li:last-child {
+	margin-bottom: 0;
+}
+
 /* Text. */
 .studio-docs-article p {
 	margin: 1rem 0;
@@ -167,12 +209,6 @@
 }
 .studio-docs-article li::marker {
 	color: var(--docs-muted-foreground);
-}
-.studio-docs-article ul ul,
-.studio-docs-article ul ol,
-.studio-docs-article ol ul,
-.studio-docs-article ol ol {
-	margin: 0.75em 0;
 }
 
 /* Separator, quote, details, preformatted. */

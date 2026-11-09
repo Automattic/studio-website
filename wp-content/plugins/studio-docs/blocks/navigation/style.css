@@ -5,14 +5,14 @@
 	list-style: none;
 }
 .wp-block-studio-docs-navigation li {
-	margin: 0 0 1px;
+	margin: 0;
 	padding: 0;
 }
-.wp-block-studio-docs-navigation .studio-docs-nav__group {
-	margin-top: 1.5rem;
+.wp-block-studio-docs-navigation li + li {
+	margin-top: 1px;
 }
-.wp-block-studio-docs-navigation .studio-docs-nav__group > ul > li {
-	margin-bottom: 2px;
+.wp-block-studio-docs-navigation li.studio-docs-nav__group {
+	margin-top: 1.5rem;
 }
 .wp-block-studio-docs-navigation .studio-docs-nav__heading {
 	display: flex;
