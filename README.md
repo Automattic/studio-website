@@ -2,7 +2,7 @@
 
 The website for WordPress Studio, built with Studio Code, and the source of its homepage video.
 
-- The repository root is the site's folder: the `studio` block theme, the uploads, the SQLite database and `DESIGN.md`. WordPress core is not tracked, because Studio installs it when it creates a site.
+- The repository root is the site's folder: the `studio` block theme, the `studio-docs` plugin, the uploads, the SQLite database and `DESIGN.md`. WordPress core is not tracked, because Studio installs it when it creates a site.
 - `video/` is the Remotion project behind the homepage video.
 
 ## Load the site in Studio
@@ -51,18 +51,19 @@ The content lives in one SQLite file, `wp-content/database/.ht.sqlite`. Git can 
 
 ## The docs
 
-`docs/` renders the Studio documentation at wordpress.studio/docs with [Blume](https://useblume.dev). The markdown lives in the [Studio repository](https://github.com/Automattic/studio/tree/trunk/docs/user) and is synced in at build time; see [docs/README.md](docs/README.md).
+The Studio documentation at wordpress.studio/docs is WordPress too: the `docs` post type of the `studio-docs` plugin (`wp-content/plugins/studio-docs`), rendered by the theme's `single-docs` template and its docs header and footer parts, built from core blocks and the plugin's blocks (code, callout, navigation, table of contents, search, …), so the pages and the templates open in the block editor and the Site Editor like the rest of the site. The markdown is not edited here. Its source of truth is `docs/user/docs/` in the [Studio repository](https://github.com/Automattic/studio/tree/trunk/docs/user), so the docs evolve with the code and ship with each release; the site imports it at build time and the posts are build output (the database is not committed).
 
 ```bash
-cd docs
-pnpm install
-pnpm run sync   # fetch the markdown and screenshots from Automattic/studio
-pnpm run dev    # preview at http://localhost:4321/docs/
+npm install                            # once: Shiki, for the code highlighting
+node scripts/build-docs-manifest.mjs   # stage the markdown and screenshots into build/docs/
+studio wp wp-docs import --force       # import them into the docs post type
 ```
+
+`scripts/build-docs-manifest.mjs` checks the Studio repository's `docs/user/docs` and `docs/user/screenshots/images` out (the `ui-refresh-user-docs` branch, the 2.0 docs refresh [Automattic/studio#5517](https://github.com/Automattic/studio/pull/5517), until it merges; set `STUDIO_DOCS_REF` to pin another revision), places each page in the sidebar defined in its `PAGES` list, cleans up what the markdown carried over from developer.wordpress.com (heading links, linked images, absolute links, command lines without code fences), highlights every code block with Shiki (`github-light` / `github-dark`, the same themes as before) and writes `build/docs/manifest.json` for the importer. `wp wp-docs import` turns the pages into blocks, sideloads the screenshots once per content hash into `wp-content/uploads/docs/` (ignored), and keeps each page's Markdown for `/docs/<page>.md`, `/docs/llms.txt`, `/docs/llms-full.txt`, `/docs/index.json` and the search index at `/docs/search-index.json`. `wp wp-docs status` shows what is imported; `wp wp-docs convert <file.md>` prints the blocks for one file. The plugin's README describes the blocks and the pipeline; `php tests/run-fixtures.php` and `php tests/run-unit.php` in the plugin folder test the conversion without a database.
 
 ## Publishing
 
-The site is published as static files to a [Spacefast](https://spacefast.com) Space, which serves wordpress.studio. `scripts/build-site.sh` builds the whole site into `dist/`: the static export of the WordPress site, the docs under `/docs`, and the root files below. Then publish `dist/` with the [Spacefast CLI](https://spacefast.com/docs/cli/):
+The site is published as static files to a [Spacefast](https://spacefast.com) Space, which serves wordpress.studio. `scripts/build-site.sh` builds the whole site into `dist/`: it stages and imports the docs, exports the WordPress site (pages and docs) and adds the root files below. Then publish `dist/` with the [Spacefast CLI](https://spacefast.com/docs/cli/):
 
 ```bash
 scripts/build-site.sh
@@ -71,8 +72,9 @@ sf publish dist --root-directory . --space spc_95b3647e99974586b104ab2cf1050dd6
 
 - `--root-directory .` makes the CLI publish `dist/` as it is; without it, it picks a folder inside the docs.
 - `--space` is only needed the first time on a machine; the CLI remembers the Space in `dist/.spacefast/`. You need to be a member of the Spacefast team that owns the Space.
-- `_redirects`, `_headers`, `robots.txt` and `llms.txt` at the site root are published with the export. They keep `/install.sh` and `/install.ps1` working and point search engines at the sitemap. `docs/scripts/finalize-site.mjs` adds the docs' rules to them: Spacefast renders a `.md` file as a page, so the Markdown copies of the docs pages are published as `.md.txt` behind a rewrite, and the files Blume writes under `.well-known` (which Spacefast refuses to serve) move up to `/docs/`.
+- `_redirects`, `_headers`, `robots.txt` and `llms.txt` at the site root are published with the export. They keep `/install.sh` and `/install.ps1` working and point search engines at the sitemap. `scripts/finalize-site.mjs` adds the docs' rules to them: Spacefast renders a `.md` file as a page, so the Markdown copies of the docs pages are published as `.md.txt` behind a rewrite.
 - The theme writes `https://wordpress.studio` into canonicals, social tags and the sitemap, so the copy on the Space's own address is never indexed in its place.
+- `STUDIO_SITE=<path> scripts/build-site.sh` builds from another Studio site that runs this checkout (a development site whose theme and plugin folders are symlinks into it, with `WP_DOCS_MANIFEST` pointing at this checkout's `build/docs/manifest.json`).
 
 The build needs `studio export-static`, which is not in a Studio release yet ([Automattic/studio#5567](https://github.com/Automattic/studio/pull/5567)). Until it ships, build the CLI from that branch and run the build with it first on your `PATH`:
 
@@ -84,8 +86,6 @@ PATH="$PWD/../studio-spacefast/bin:$PATH" scripts/build-site.sh
 ```
 
 That build reads the same site list as the Studio app, so the site needs no re-registration.
-
-The WordPress site alone can also be published with the Studio CLI from that branch (`studio spacefast publish`), but that leaves out the docs.
 
 ## The video
 

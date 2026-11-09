@@ -1,0 +1,42 @@
+/*
+ * The docs design tokens, both color schemes. Registered as `studio-docs-tokens`: the docs stylesheet and
+ * the content blocks (code, callout) depend on it, so the blocks are styled wherever they are inserted,
+ * and the editor has the tokens too. The dark values apply under `data-theme="dark"` on <html>, which
+ * only the docs pages set.
+ */
+:root {
+	--docs-background: #fff;
+	--docs-foreground: oklch(0.275 0 0);
+	--docs-muted: oklch(0.965 0 0);
+	--docs-muted-foreground: oklch(0.55 0 0);
+	--docs-border: rgb(0 0 0 / 0.1);
+	--docs-accent: #3858e9;
+	--docs-accent-foreground: #fff;
+	--docs-code-background: oklch(0.975 0 0);
+	--docs-success: oklch(0.627 0.194 149.214);
+	--docs-radius: 0.5rem;
+	--docs-content-width: 42rem;
+	--docs-header-height: 4rem;
+	--docs-header-top: var(--wp-admin--admin-bar--height, 0px);
+	--docs-font-sans: var(--wp--preset--font-family--inter, Inter, ui-sans-serif, system-ui, sans-serif);
+	--docs-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+:root[data-theme="dark"] {
+	--docs-background: #161616;
+	--docs-foreground: oklch(0.83 0 0);
+	--docs-muted: oklch(0.24 0 0);
+	--docs-muted-foreground: oklch(0.6 0 0);
+	--docs-border: rgb(255 255 255 / 0.08);
+	--docs-accent: oklch(0.72 0.2 268);
+	--docs-accent-foreground: oklch(0.085 0 0);
+	--docs-code-background: oklch(0.2 0 0);
+	--docs-success: oklch(0.723 0.219 149.579);
+	color-scheme: dark;
+}
+/* Below 600px the admin bar is not fixed: it scrolls away with the page, so the sticky header and the
+   columns sit at the very top once it has gone. */
+@media (max-width: 600px) {
+	:root {
+		--docs-header-top: 0px;
+	}
+}

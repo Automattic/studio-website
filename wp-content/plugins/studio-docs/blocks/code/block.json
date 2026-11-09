@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/code",
+	"version": "1.0.0",
+	"title": "Code",
+	"category": "text",
+	"icon": "editor-code",
+	"description": "Code with a language label, syntax highlighting and a copy button.",
+	"keywords": [ "code", "snippet", "terminal", "bash" ],
+	"textdomain": "studio-docs",
+	"attributes": {
+		"content": {
+			"type": "rich-text",
+			"source": "rich-text",
+			"selector": "code",
+			"role": "content"
+		},
+		"language": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"align": false,
+		"spacing": {
+			"margin": [ "top", "bottom" ]
+		}
+	},
+	"example": {
+		"attributes": {
+			"language": "bash",
+			"content": "studio site create --path ~/Studio/my-site"
+		}
+	},
+	"editorScript": "file:./index.js",
+	"style": [ "studio-docs-tokens", "file:./style.css" ],
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
+}

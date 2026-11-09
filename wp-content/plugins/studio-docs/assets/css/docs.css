@@ -1,0 +1,412 @@
+/*
+ * The docs pages: the page frame (header, three-column layout, rail, footer) and the shared controls,
+ * scoped to `.studio-docs`, the body class of a docs page (the block editor maps that class to its
+ * canvas). The design tokens are in tokens.css, the article typography in prose.css, the blocks' own
+ * styles in blocks/<name>/style.css.
+ */
+
+/* ---- The page ---- */
+/* The tokens are in tokens.css (`studio-docs-tokens`, a dependency of this stylesheet). */
+body.studio-docs {
+	background: var(--docs-background);
+	color: var(--docs-foreground);
+	font-family: var(--docs-font-sans);
+	font-size: 1rem;
+	line-height: 1.5;
+	-webkit-font-smoothing: antialiased;
+}
+.studio-docs :focus-visible {
+	outline: 2px solid var(--docs-accent);
+	outline-offset: 2px;
+}
+.studio-docs .screen-reader-text {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	border: 0;
+	white-space: nowrap;
+}
+
+/* The docs typography on the docs' own blocks too, so the Site Editor previews the docs template in it
+   without touching the other templates. */
+.studio-docs .studio-docs-header,
+.studio-docs .studio-docs-layout,
+.studio-docs .studio-docs-footer {
+	color: var(--docs-foreground);
+	font-family: var(--docs-font-sans);
+	font-size: 1rem;
+	line-height: 1.5;
+}
+
+/* ---- Shared controls ---- */
+.studio-docs .studio-docs-icon-button {
+	display: inline-flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	padding: 0;
+	border: 0;
+	border-radius: 9999px;
+	background: transparent;
+	color: var(--docs-muted-foreground);
+	cursor: pointer;
+	transition: color 0.15s, background-color 0.15s;
+}
+.studio-docs .studio-docs-icon-button:hover {
+	background: var(--docs-muted);
+	color: var(--docs-foreground);
+}
+
+/* ---- Header ---- */
+/* The template part wrappers take no space of their own, so the header sticks within the whole page. */
+.studio-docs .wp-site-blocks > .wp-block-template-part {
+	display: contents;
+}
+.studio-docs .studio-docs-header {
+	position: sticky;
+	top: var(--docs-header-top);
+	z-index: 40;
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	height: var(--docs-header-height);
+	padding: 0 1rem;
+	background: color-mix(in oklab, var(--docs-background) 90%, transparent);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+}
+@media (min-width: 40rem) {
+	.studio-docs .studio-docs-header {
+		gap: 0.75rem;
+	}
+}
+@media (min-width: 48rem) {
+	.studio-docs .studio-docs-header {
+		padding: 0 1.5rem;
+	}
+}
+.studio-docs .studio-docs-header__brand {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 0.5rem;
+	min-width: 0;
+}
+@media (min-width: 40rem) {
+	.studio-docs .studio-docs-header__brand {
+		gap: 0.75rem;
+	}
+}
+.studio-docs .studio-docs-header .wp-block-site-logo,
+.studio-docs .studio-docs-header .wp-block-site-logo a {
+	display: flex;
+	flex-shrink: 0;
+	line-height: 0;
+}
+.studio-docs .studio-docs-header .wp-block-site-logo img {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+[data-theme="dark"] .studio-docs .studio-docs-header .wp-block-site-logo img {
+	filter: invert(1);
+}
+.studio-docs .studio-docs-header .studio-docs-header__title {
+	min-width: 0;
+	margin: 0;
+	font-size: 1rem;
+	font-weight: 600;
+	letter-spacing: normal;
+	line-height: 1.5;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.studio-docs .studio-docs-header .studio-docs-header__title a {
+	color: var(--docs-foreground);
+	font-weight: inherit;
+	text-decoration: none;
+}
+.studio-docs .studio-docs-header__actions {
+	display: flex;
+	flex-shrink: 0;
+	flex-wrap: nowrap;
+	align-items: center;
+	gap: 0.25rem;
+}
+.studio-docs .studio-docs-header .wp-block-buttons {
+	display: none;
+	margin: 0;
+}
+@media (min-width: 40rem) {
+	.studio-docs .studio-docs-header .wp-block-buttons {
+		display: flex;
+	}
+}
+.studio-docs .studio-docs-header .wp-block-button > .wp-element-button {
+	box-shadow: none; /* Flat in the docs header; the theme's glow stays on the marketing pages. */
+}
+.studio-docs .studio-docs-header .wp-block-button__link {
+	display: inline-flex;
+	align-items: center;
+	padding: 0.375rem 0.875rem;
+	border-radius: 9999px;
+	background: var(--docs-accent);
+	color: var(--docs-accent-foreground);
+	font-family: inherit;
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.4286;
+	text-decoration: none;
+	transition: opacity 0.15s;
+}
+.studio-docs .studio-docs-header .wp-block-button__link:hover {
+	opacity: 0.9;
+}
+
+/* ---- Layout: sidebar | main | rail ---- */
+.studio-docs .wp-site-blocks > * + *,
+.studio-docs .studio-docs-layout > *,
+.studio-docs .studio-docs-main > *,
+.studio-docs .studio-docs-rail > * {
+	margin-block-start: 0;
+}
+.studio-docs .studio-docs-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	align-items: start;
+}
+@media (min-width: 64rem) {
+	.studio-docs .studio-docs-layout {
+		grid-template-columns: 17.5rem minmax(0, 1fr);
+	}
+}
+@media (min-width: 80rem) {
+	.studio-docs .studio-docs-layout {
+		grid-template-columns: 17.5rem minmax(0, 1fr) 17.5rem;
+	}
+}
+.studio-docs .studio-docs-main {
+	min-width: 0;
+	padding: 1.5rem 1.5rem 2.5rem;
+}
+@media (min-width: 64rem) {
+	.studio-docs .studio-docs-main {
+		padding-inline: 2rem;
+	}
+}
+@media (min-width: 80rem) {
+	.studio-docs .studio-docs-main {
+		padding-inline: 2.5rem;
+	}
+}
+/* Core's layout zeroes the margins of a constrained group's children; the column's own rhythm. */
+.studio-docs .studio-docs-main > .wp-block-studio-docs-breadcrumbs {
+	margin-bottom: 0.5rem;
+}
+.studio-docs .studio-docs-main > .wp-block-studio-docs-pagination {
+	margin-top: 3rem;
+}
+.studio-docs .studio-docs-rail > .wp-block-studio-docs-page-actions {
+	margin-top: 2rem;
+}
+.studio-docs .studio-docs-rail {
+	display: none;
+	position: sticky;
+	top: calc(var(--docs-header-height) + var(--docs-header-top));
+	box-sizing: border-box;
+	height: calc(100dvh - var(--docs-header-height) - var(--docs-header-top));
+	padding: 1.5rem 1rem 2.5rem;
+	overflow-y: auto;
+	font-size: 0.875rem;
+	line-height: 1.4286;
+	scrollbar-width: thin;
+	scrollbar-color: var(--docs-border) transparent;
+}
+@media (min-width: 80rem) {
+	.studio-docs .studio-docs-rail {
+		display: block;
+	}
+}
+/* The drawer starts under the header: --docs-drawer-top is the header's bottom in the viewport (set by
+   the sidebar script when the drawer opens, so it already includes the admin bar), else header + bar. */
+.studio-docs .wp-block-studio-docs-sidebar {
+	top: var(--docs-drawer-top, calc(var(--docs-header-height) + var(--docs-header-top)));
+	height: calc(100dvh - var(--docs-drawer-top, calc(var(--docs-header-height) + var(--docs-header-top))));
+}
+@media (min-width: 64rem) {
+	.studio-docs .wp-block-studio-docs-sidebar {
+		top: calc(var(--docs-header-height) + var(--docs-header-top));
+		height: calc(100dvh - var(--docs-header-height) - var(--docs-header-top));
+	}
+}
+
+/* ---- Footer ---- */
+.studio-docs .studio-docs-footer {
+	padding: 0 1rem;
+	border-top: 1px solid var(--docs-border);
+	font-size: 0.875rem;
+	line-height: 1.4286;
+}
+@media (min-width: 48rem) {
+	.studio-docs .studio-docs-footer {
+		padding: 0 1.5rem;
+	}
+}
+.studio-docs .studio-docs-footer__inner {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.75rem 1.5rem;
+	min-height: 4rem;
+	padding: 0.75rem 0;
+}
+@media (min-width: 48rem) {
+	.studio-docs .studio-docs-footer__inner {
+		display: grid;
+		grid-template-columns: 1fr auto 1fr;
+	}
+}
+.studio-docs .studio-docs-footer .wp-block-list {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.5rem 1.25rem;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.studio-docs .studio-docs-footer .wp-block-list li {
+	margin: 0;
+}
+.studio-docs .studio-docs-footer a {
+	color: var(--docs-muted-foreground);
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.studio-docs .studio-docs-footer a:hover,
+.studio-docs .studio-docs-footer a:focus-visible {
+	color: var(--docs-foreground);
+}
+.studio-docs .studio-docs-footer p {
+	margin: 0;
+	color: var(--docs-muted-foreground);
+}
+.studio-docs .studio-docs-footer .wp-block-social-links {
+	gap: 0.25rem;
+	margin: -0.5625rem -0.5625rem -0.5625rem auto;
+}
+@media (min-width: 48rem) {
+	.studio-docs .studio-docs-footer .wp-block-social-links {
+		justify-self: end;
+	}
+}
+.studio-docs .studio-docs-footer .wp-block-social-links .wp-social-link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.25rem;
+	height: 2.25rem;
+	border-radius: 9999px;
+	color: var(--docs-muted-foreground);
+	transition: color 0.15s, background-color 0.15s;
+}
+.studio-docs .studio-docs-footer .wp-block-social-links .wp-social-link:hover {
+	background: var(--docs-muted);
+	color: var(--docs-foreground);
+}
+.studio-docs .studio-docs-footer .wp-block-social-links .wp-social-link a {
+	display: flex;
+	padding: 0;
+	color: inherit;
+}
+.studio-docs .studio-docs-footer .wp-block-social-links .wp-social-link svg {
+	width: 1.125rem;
+	height: 1.125rem;
+}
+
+/* ---- External links (set by the plugin on every link to another site) ---- */
+.studio-docs a[data-docs-external]:not(:has(img, svg))::after {
+	content: "";
+	display: inline-block;
+	width: 0.75em;
+	height: 0.75em;
+	margin-inline-start: 0.125em;
+	background: currentColor;
+	opacity: 0.6;
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M7 7h10v10M7 17L17 7'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M7 7h10v10M7 17L17 7'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.studio-docs .studio-docs-footer a[data-docs-external]::after,
+.studio-docs .studio-docs-header a[data-docs-external]::after {
+	content: none;
+}
+
+/* ---- Image zoom (medium-zoom) ---- */
+.medium-zoom-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+	opacity: 0;
+	transition: opacity 0.3s;
+	will-change: opacity;
+	-webkit-backdrop-filter: blur(4px);
+	backdrop-filter: blur(4px);
+}
+.medium-zoom--opened .medium-zoom-overlay {
+	opacity: 1;
+	cursor: zoom-out;
+}
+.medium-zoom-image {
+	cursor: zoom-in;
+	transition: transform 0.3s cubic-bezier(0.2, 0, 0.2, 1) !important;
+}
+.medium-zoom-image--hidden {
+	visibility: hidden;
+}
+.medium-zoom-image--opened {
+	position: relative;
+	z-index: 101;
+	cursor: zoom-out;
+	will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+	.medium-zoom-image,
+	.medium-zoom-overlay {
+		transition: none !important;
+	}
+}
+
+/* ---- Editor ---- */
+.editor-styles-wrapper .studio-docs-inline-preview {
+	display: inline-flex;
+}
+.editor-styles-wrapper .studio-docs-header {
+	position: static;
+}
+/* Server-rendered template blocks are previewed inside their editor wrapper, which carries the same
+   block class as the rendered markup: the wrapper stays a plain box, the preview inside is styled. */
+.editor-styles-wrapper .wp-block:is([data-type="studio-docs/pagination"], [data-type="studio-docs/page-actions"], [data-type="studio-docs/toc"], [data-type="studio-docs/breadcrumbs"], [data-type="studio-docs/navigation"]) {
+	display: block;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: inherit;
+	line-height: inherit;
+	color: inherit;
+}
+.editor-styles-wrapper .studio-docs-empty-preview {
+	margin: 0;
+	padding: 0.75rem 1rem;
+	border: 1px dashed var(--docs-border);
+	border-radius: var(--docs-radius);
+	color: var(--docs-muted-foreground);
+	font-size: 0.875rem;
+}

@@ -1,0 +1,346 @@
+/*
+ * The article: the title, the lede (Post Excerpt) and the content's core blocks, inside
+ * `.studio-docs-article` (the article group of the docs templates). In the post editor of a docs
+ * page the plugin applies the same rules to the editor canvas.
+ */
+.studio-docs-article {
+	color: var(--docs-muted-foreground);
+	font-size: 0.875rem;
+	line-height: 1.7;
+	overflow-wrap: break-word;
+}
+.studio-docs-article > * {
+	margin-block: 1rem;
+}
+.studio-docs-article > :first-child {
+	margin-block-start: 0;
+}
+.studio-docs-article > .wp-block-studio-docs-page-meta {
+	margin-block-start: 3.5rem;
+}
+/* The collapsible table of contents between the lede and the content, on screens without the rail. */
+.studio-docs-article > .wp-block-studio-docs-toc {
+	margin-block: 1.5rem;
+}
+
+/* Title and lede. */
+.studio-docs-article .wp-block-post-title {
+	margin: 0 0 1rem;
+	color: var(--docs-foreground);
+	font-family: inherit;
+	font-size: 2.25rem;
+	font-weight: 500;
+	letter-spacing: -0.05em;
+	line-height: 1.1;
+}
+@media (min-width: 48rem) {
+	.studio-docs-article .wp-block-post-title {
+		font-size: 3rem;
+	}
+}
+.studio-docs-article h1 {
+	margin: 0 0 1rem;
+	color: var(--docs-foreground);
+	font-family: inherit;
+	font-size: 2.25rem;
+	font-weight: 500;
+	letter-spacing: -0.05em;
+	line-height: 1.1;
+}
+@media (min-width: 48rem) {
+	.studio-docs-article h1 {
+		font-size: 3rem;
+	}
+}
+.studio-docs-article .wp-block-post-excerpt {
+	margin: 0;
+}
+.studio-docs-article .wp-block-post-excerpt__excerpt {
+	margin: 1rem 0;
+	color: var(--docs-muted-foreground);
+	font-size: 1.125rem;
+	line-height: 1.5556;
+}
+
+/* Headings. */
+.studio-docs-article h2,
+.studio-docs-article h3,
+.studio-docs-article h4,
+.studio-docs-article h5,
+.studio-docs-article h6 {
+	color: var(--docs-foreground);
+	font-family: inherit;
+	font-weight: 500;
+	letter-spacing: -0.05em;
+}
+.studio-docs-article h2 {
+	margin: 3rem 0 1em;
+	font-size: 1.625rem;
+	line-height: 1.2;
+}
+@media (min-width: 48rem) {
+	.studio-docs-article h2 {
+		font-size: 1.875rem;
+	}
+}
+.studio-docs-article h3 {
+	margin: 1.6em 0 0.6em;
+	font-size: 1.25rem;
+	line-height: 1.35;
+}
+.studio-docs-article h4 {
+	margin: 1.5em 0 0.5em;
+	color: var(--docs-muted-foreground);
+	font-size: 0.875rem;
+	line-height: 1.4;
+}
+.studio-docs-article h5,
+.studio-docs-article h6 {
+	margin: 1.5em 0 0.5em;
+	font-size: 0.875rem;
+	line-height: 1.4;
+}
+.studio-docs-article h2 + *,
+.studio-docs-article h3 + *,
+.studio-docs-article h4 + *,
+.studio-docs-article hr + * {
+	margin-top: 0;
+}
+.studio-docs-article .studio-docs-heading-anchor {
+	color: inherit;
+	font-weight: inherit;
+	text-decoration: none;
+}
+.studio-docs-article .studio-docs-heading-anchor::after {
+	content: "#";
+	margin-inline-start: 0.35em;
+	color: var(--docs-muted-foreground);
+	opacity: 0;
+	transition: opacity 0.15s;
+}
+.studio-docs-article .studio-docs-heading-anchor:hover::after,
+.studio-docs-article .studio-docs-heading-anchor:focus-visible::after {
+	opacity: 1;
+}
+
+/* Core's Post Content is a flow root whose first block loses its top margin; the gap between the title
+   or lede and the content is the wrapper's margin, sized for the kind of block that comes first. */
+.studio-docs-article .wp-block-post-content {
+	margin-top: 1rem;
+}
+.studio-docs-article .wp-block-post-content:has(> h2:first-child) {
+	margin-top: 3rem;
+}
+.studio-docs-article .wp-block-post-content:has(> h3:first-child) {
+	margin-top: 2rem;
+}
+.studio-docs-article .wp-block-post-content:has(> h4:first-child) {
+	margin-top: 1.3125rem;
+}
+.studio-docs-article .wp-block-post-content:has(> .wp-block-image:first-child) {
+	margin-top: 1.75rem;
+}
+.studio-docs-article .wp-block-post-content:has(> .wp-block-table:first-child),
+.studio-docs-article .wp-block-post-content:has(> .wp-block-studio-docs-code:first-child),
+.studio-docs-article .wp-block-post-content:has(> .wp-block-studio-docs-callout:first-child) {
+	margin-top: 1.5rem;
+}
+
+/* The last block's bottom margin (and the last list item's) would otherwise stay inside the flow root. */
+.studio-docs-article .wp-block-post-content > :last-child,
+.studio-docs-article .wp-block-post-content > :is(ul, ol):last-child > li:last-child {
+	margin-bottom: 0;
+}
+
+/* Text. */
+.studio-docs-article p {
+	margin: 1rem 0;
+}
+.studio-docs-article a {
+	color: var(--docs-foreground);
+	font-weight: 500;
+	text-decoration: underline dotted 1px;
+	text-underline-offset: 0.2em;
+}
+.studio-docs-article a:hover {
+	color: var(--docs-foreground);
+	text-decoration-style: solid;
+}
+.studio-docs-article strong {
+	color: var(--docs-foreground);
+	font-weight: 600;
+}
+.studio-docs-article :not(pre) > code {
+	padding: 0.15em 0.35em;
+	border: 0;
+	border-radius: 0.3rem;
+	background: var(--docs-code-background);
+	color: var(--docs-foreground);
+	font-family: var(--docs-font-mono);
+	font-size: 0.875em;
+	font-weight: 500;
+}
+.studio-docs-article a code,
+.studio-docs-article h1 code,
+.studio-docs-article h2 code,
+.studio-docs-article h3 code {
+	color: inherit;
+}
+.studio-docs-article td code,
+.studio-docs-article th code {
+	white-space: normal;
+}
+.studio-docs-article kbd {
+	padding: 0.1875em 0.375em;
+	border-radius: 0.3125rem;
+	box-shadow: 0 0 0 1px var(--docs-border), 0 3px 0 var(--docs-border);
+	color: var(--docs-foreground);
+	font-family: inherit;
+	font-size: 0.875em;
+	font-weight: 500;
+}
+
+/* Lists. */
+.studio-docs-article ul,
+.studio-docs-article ol {
+	margin: 1rem 0;
+	padding-inline-start: 1.625em;
+}
+.studio-docs-article ul {
+	list-style-type: disc;
+}
+.studio-docs-article ol {
+	list-style-type: decimal;
+}
+.studio-docs-article li {
+	margin: 0.5em 0;
+	padding-inline-start: 0.375em;
+}
+.studio-docs-article li::marker {
+	color: var(--docs-muted-foreground);
+}
+
+/* Separator, quote, details, preformatted. */
+.studio-docs-article .wp-block-separator {
+	width: auto;
+	margin: 2.5rem 0;
+	border: 0;
+	border-top: 1px solid var(--docs-border);
+	opacity: 1;
+}
+.studio-docs-article .wp-block-quote {
+	margin: 1.6em 0;
+	padding: 0 0 0 1em;
+	border: 0;
+	border-inline-start: 0.25rem solid var(--docs-border);
+	color: var(--docs-muted-foreground);
+	font-style: italic;
+	font-weight: 500;
+}
+.studio-docs-article .wp-block-quote p {
+	font-size: inherit;
+	line-height: inherit;
+}
+.studio-docs-article .wp-block-details {
+	margin: 1.5rem 0;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--docs-border);
+	border-radius: var(--docs-radius);
+}
+.studio-docs-article .wp-block-details summary {
+	color: var(--docs-foreground);
+	font-weight: 500;
+	cursor: pointer;
+}
+.studio-docs-article .wp-block-preformatted {
+	margin: 1.5rem 0;
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--docs-border);
+	border-radius: var(--docs-radius);
+	background: transparent;
+	color: var(--docs-foreground);
+	font-family: var(--docs-font-mono);
+	font-size: 0.8125rem;
+	line-height: 1.55;
+	overflow-x: auto;
+}
+
+/* Images. */
+.studio-docs-article .wp-block-image {
+	margin: 1.75rem 0;
+}
+.studio-docs-article .wp-block-image img {
+	max-width: 100%;
+	height: auto;
+	border: 1px solid var(--docs-border);
+	border-radius: 0.575rem;
+	vertical-align: middle;
+}
+.studio-docs-article .wp-block-image img.medium-zoom-image--opened {
+	border: 0;
+	border-radius: 0;
+}
+.studio-docs-article .wp-block-image figcaption {
+	margin: 0.857em 0 0;
+	color: var(--docs-muted-foreground);
+	font-size: 0.875em;
+	line-height: 1.4286;
+	text-align: start;
+}
+
+/* Tables. */
+.studio-docs-article .wp-block-table {
+	margin: 1.5rem 0;
+	border: 1px solid var(--docs-border);
+	border-radius: var(--docs-radius);
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+.studio-docs-article .wp-block-table table {
+	width: 100%;
+	margin: 0;
+	border: 0;
+	border-collapse: collapse;
+	table-layout: auto;
+	font-size: 0.8125rem;
+	line-height: 1.7143;
+}
+.studio-docs-article .wp-block-table th,
+.studio-docs-article .wp-block-table td {
+	padding: 0.75rem;
+	border: 0;
+	text-align: start;
+	vertical-align: baseline;
+}
+.studio-docs-article .wp-block-table th {
+	color: var(--docs-foreground);
+	font-weight: 600;
+	vertical-align: bottom;
+	white-space: nowrap;
+}
+.studio-docs-article .wp-block-table thead {
+	border-bottom: 1px solid var(--docs-border);
+}
+.studio-docs-article .wp-block-table tbody tr {
+	border-bottom: 1px solid var(--docs-border);
+}
+.studio-docs-article .wp-block-table tbody tr:last-child {
+	border-bottom: 0;
+}
+.studio-docs-article .wp-block-table .has-text-align-center {
+	text-align: center;
+}
+.studio-docs-article .wp-block-table .has-text-align-right {
+	text-align: right;
+}
+.studio-docs-article .wp-block-table figcaption {
+	padding: 0.5rem 0.75rem;
+	color: var(--docs-muted-foreground);
+	font-size: 0.875em;
+}
+
+/* The docs blocks' vertical rhythm inside the article (core's flow layout zeroes block margins). */
+.studio-docs-article .wp-block-studio-docs-code,
+.studio-docs-article .wp-block-studio-docs-callout {
+	margin: 1.5rem 0;
+}

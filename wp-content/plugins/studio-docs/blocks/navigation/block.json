@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/navigation",
+	"version": "1.0.0",
+	"title": "Docs Navigation",
+	"category": "studio-docs",
+	"icon": "networking",
+	"description": "The tree of docs pages, grouped as in the docs manifest, with the current page marked.",
+	"textdomain": "studio-docs",
+	"usesContext": [ "postId", "postType" ],
+	"supports": {
+		"html": false,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

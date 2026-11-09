@@ -1,0 +1,29 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/page-meta",
+	"version": "1.0.0",
+	"title": "Docs Page Meta",
+	"category": "studio-docs",
+	"icon": "info",
+	"description": "When the docs page was last updated in its source repository, and a link to edit it on GitHub.",
+	"textdomain": "studio-docs",
+	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"showUpdated": {
+			"type": "boolean",
+			"default": true
+		},
+		"showEditLink": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"html": false,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

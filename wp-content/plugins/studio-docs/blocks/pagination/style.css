@@ -1,0 +1,67 @@
+/* Previous / next cards under the article. */
+.wp-block-studio-docs-pagination {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	margin-top: 3rem;
+	padding-top: 1.5rem;
+	border-top: 1px solid var(--docs-border);
+}
+.wp-block-studio-docs-pagination .studio-docs-pagination__link {
+	display: flex;
+	flex: 1;
+	align-items: center;
+	gap: 0.5rem;
+	max-width: 48%;
+	padding: 0.75rem 1rem;
+	border: 1px solid var(--docs-border);
+	border-radius: var(--docs-radius);
+	color: var(--docs-foreground);
+	text-decoration: none;
+	transition: border-color 0.15s;
+}
+.wp-block-studio-docs-pagination .studio-docs-pagination__link:hover {
+	border-color: var(--docs-foreground);
+}
+.wp-block-studio-docs-pagination .is-next {
+	justify-content: flex-end;
+	margin-inline-start: auto;
+	text-align: end;
+}
+.wp-block-studio-docs-pagination svg {
+	flex-shrink: 0;
+}
+[dir="rtl"] .wp-block-studio-docs-pagination svg {
+	transform: scaleX(-1);
+}
+.wp-block-studio-docs-pagination .studio-docs-pagination__text {
+	min-width: 0;
+}
+.wp-block-studio-docs-pagination .studio-docs-pagination__label {
+	display: block;
+	color: var(--docs-muted-foreground);
+	font-size: 0.75rem;
+	line-height: 1.3334;
+}
+.wp-block-studio-docs-pagination .studio-docs-pagination__title {
+	display: block;
+	font-weight: 500;
+	line-height: 1.5;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+@media (max-width: 47.9375rem) {
+	.wp-block-studio-docs-pagination .studio-docs-pagination__title {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		overflow-wrap: anywhere;
+		white-space: normal;
+	}
+}
+@media print {
+	.wp-block-studio-docs-pagination {
+		display: none;
+	}
+}

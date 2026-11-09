@@ -134,6 +134,31 @@
 							"unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
 						}
 					]
+				},
+				{
+					"slug": "inter",
+					"name": "Inter",
+					"fontFamily": "Inter, \"Inter fallback: Arial\", ui-sans-serif, system-ui, sans-serif",
+					"fontFace": [
+						{
+							"fontFamily": "Inter",
+							"fontStyle": "normal",
+							"fontWeight": "400 700",
+							"src": [
+								"file:./assets/fonts/inter/inter-400-700-latin.woff2"
+							],
+							"unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+						},
+						{
+							"fontFamily": "Inter",
+							"fontStyle": "italic",
+							"fontWeight": "400 700",
+							"src": [
+								"file:./assets/fonts/inter/inter-400-700-latin-italic.woff2"
+							],
+							"unicodeRange": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+						}
+					]
 				}
 			],
 			"fontSizes": [
@@ -198,6 +223,14 @@
 				"sm": "8px",
 				"md": "14px",
 				"pill": "999px"
+			}
+		},
+		"blocks": {
+			"core/image": {
+				"lightbox": {
+					"enabled": false,
+					"allowEditing": false
+				}
 			}
 		}
 	},
@@ -371,6 +404,18 @@
 			"postTypes": [
 				"page"
 			]
+		}
+	],
+	"templateParts": [
+		{
+			"name": "docs-header",
+			"title": "Docs header",
+			"area": "header"
+		},
+		{
+			"name": "docs-footer",
+			"title": "Docs footer",
+			"area": "footer"
 		}
 	]
 }

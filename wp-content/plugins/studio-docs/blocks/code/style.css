@@ -1,0 +1,136 @@
+/* Code block: a framed `<pre>` with the language label on top (the `::before` reads data-language),
+   the Shiki colors of the current scheme and the copy button in the frame's corner. */
+.wp-block-studio-docs-code {
+	position: relative;
+	margin: 1.5rem 0;
+	padding: 3.75rem 0 0.625rem;
+	border: 1px solid var(--docs-border);
+	border-radius: var(--docs-radius);
+	background: transparent;
+	color: var(--shiki-light, var(--docs-foreground));
+	font-family: var(--docs-font-mono);
+	font-size: 0.8125rem;
+	line-height: 1.55;
+	overflow-x: auto;
+	white-space: pre;
+	tab-size: 4;
+}
+.wp-block-studio-docs-code::before {
+	content: attr(data-language);
+	position: absolute;
+	top: 0;
+	right: 0;
+	left: 0;
+	display: flex;
+	align-items: center;
+	height: 2.75rem;
+	padding: 0 3.25rem 0 1rem;
+	border-bottom: 1px solid var(--docs-border);
+	color: var(--docs-muted-foreground);
+	font-family: var(--docs-font-sans);
+	font-size: 0.75rem;
+	font-weight: 500;
+	line-height: 1.55;
+}
+.wp-block-studio-docs-code[data-icon]::before {
+	padding-left: 2.5rem;
+}
+.wp-block-studio-docs-code[data-icon]::after {
+	content: "";
+	position: absolute;
+	top: 0.9375rem;
+	left: 1rem;
+	width: 0.875rem;
+	height: 0.875rem;
+	background-color: var(--docs-muted-foreground);
+	-webkit-mask: var(--docs-code-icon) center / contain no-repeat;
+	mask: var(--docs-code-icon) center / contain no-repeat;
+}
+.wp-block-studio-docs-code[data-icon="gnubash"] {
+	--docs-code-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21.038 4.9l-7.577-4.498C13.009.134 12.505 0 12 0s-1.009.134-1.462.403L2.961 4.9C2.057 5.437 1.5 6.429 1.5 7.503v8.995c0 1.073.557 2.066 1.462 2.603l7.577 4.497c.452.269.956.403 1.461.403s1.009-.134 1.461-.402l7.577-4.497c.904-.537 1.462-1.529 1.462-2.603V7.503c0-1.074-.557-2.066-1.462-2.603zM15.17 18.946l.013.646c.001.078-.05.167-.111.198l-.383.22c-.061.031-.111-.007-.112-.085l-.007-.635c-.328.136-.66.169-.872.084-.04-.016-.057-.075-.041-.142l.139-.584c.011-.046.036-.092.069-.121.012-.011.024-.02.036-.026.022-.011.043-.014.062-.006.229.077.521.041.802-.101.357-.181.596-.545.592-.907-.003-.328-.181-.465-.613-.468-.55.001-1.064-.107-1.072-.917-.007-.667.34-1.361.889-1.8l-.007-.655c-.001-.08.048-.168.11-.2l.37-.236c.061-.031.111.007.112.087l.006.654c.273-.109.511-.138.726-.088.047.012.067.074.048.146l-.129.579c-.01.044-.033.088-.063.117-.013.013-.026.023-.039.03-.019.01-.038.013-.055.009-.098-.022-.332-.073-.699.113-.385.195-.521.531-.518.779.004.297.155.387.68.396.701.012 1.004.318 1.011 1.024.007.692-.361 1.432-.959 1.898zm4.182-6.265l-1.479.868c-.072.045-.154.052-.154-.028v-.585c0-.052.03-.094.072-.123l1.514-.886c.057-.035.098.014.098.078v.589c0 .036-.03.058-.051.087z'/%3E%3C/svg%3E");
+}
+.wp-block-studio-docs-code[data-icon="json"] {
+	--docs-code-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12.043 23.968c.479-.004.953-.029 1.426-.094a11.805 11.805 0 003.146-.863 12.404 12.404 0 003.793-2.542 11.977 11.977 0 002.44-3.427 11.794 11.794 0 001.02-3.476c.149-1.16.135-2.346-.045-3.499a11.96 11.96 0 00-.793-2.788 11.197 11.197 0 00-.854-1.617c-1.168-1.837-2.861-3.314-4.81-4.3a12.835 12.835 0 00-2.172-.87h-.005c.119.063.24.132.345.201.12.074.239.146.351.225a8.93 8.93 0 011.559 1.33c1.063 1.145 1.797 2.548 2.218 4.041.284.982.434 1.998.495 3.017.044.743.044 1.491-.047 2.229-.149 1.27-.554 2.51-1.228 3.596a7.475 7.475 0 01-1.903 2.084c-1.244.928-2.877 1.482-4.436 1.114a3.916 3.916 0 01-.748-.258 4.692 4.692 0 01-.779-.45 6.08 6.08 0 01-1.244-1.105 6.507 6.507 0 01-1.049-1.747 7.366 7.366 0 01-.494-2.54c-.03-1.273.225-2.553.854-3.67a6.43 6.43 0 011.663-1.918c.225-.178.464-.333.704-.479l.016-.007a5.121 5.121 0 00-1.141.278 5.738 5.738 0 00-1.03.516 6.58 6.58 0 00-2.062 2.08 7.14 7.14 0 00-.988 2.802c-.135.998-.09 2.024.154 3.001.284 1.142.823 2.212 1.562 3.108.772.936 1.735 1.713 2.819 2.273a8.898 8.898 0 002.908.877c.27.03.54.047.81.058.09.004.179.007.27.007zm-.102-23.936c-.479.004-.953.029-1.426.094a11.805 11.805 0 00-3.146.863 12.404 12.404 0 00-3.793 2.542 11.977 11.977 0 00-2.44 3.427 11.794 11.794 0 00-1.02 3.476c-.149 1.16-.135 2.346.045 3.499.149.966.42 1.908.793 2.788.254.57.539 1.112.854 1.617 1.168 1.837 2.861 3.314 4.81 4.3.69.35 1.419.642 2.172.87h.005a4.736 4.736 0 01-.345-.201 5.25 5.25 0 01-.351-.225 8.93 8.93 0 01-1.559-1.33c-1.063-1.145-1.797-2.548-2.218-4.041a13.137 13.137 0 01-.495-3.017 13.78 13.78 0 01.047-2.229c.149-1.27.554-2.51 1.228-3.596a7.475 7.475 0 011.903-2.084c1.244-.928 2.877-1.482 4.436-1.114.258.06.508.146.748.258.27.124.532.277.779.45.464.325.88.7 1.244 1.105.42.47.773 1.05 1.049 1.747.284.74.45 1.584.494 2.54.03 1.273-.225 2.553-.854 3.67a6.43 6.43 0 01-1.663 1.918 7.55 7.55 0 01-.704.479l-.016.007c.39-.05.774-.145 1.141-.278a5.738 5.738 0 001.03-.516 6.58 6.58 0 002.062-2.08c.51-.86.84-1.82.988-2.802.135-.998.09-2.024-.154-3.001a8.55 8.55 0 00-1.562-3.108 9.566 9.566 0 00-2.819-2.273 8.898 8.898 0 00-2.908-.877 9.44 9.44 0 00-.81-.058 9.62 9.62 0 00-.27-.007z'/%3E%3C/svg%3E");
+}
+.wp-block-studio-docs-code > code {
+	display: block;
+	box-sizing: border-box;
+	max-height: 24rem;
+	padding: 0 1.25rem 0.375rem;
+	overflow: auto;
+	scrollbar-width: thin;
+	scrollbar-color: var(--docs-border) transparent;
+	background: transparent;
+	border: 0;
+	border-radius: 0;
+	color: inherit;
+	font: inherit;
+	white-space: pre;
+}
+.wp-block-studio-docs-code span {
+	color: var(--shiki-light, inherit);
+	font-style: var(--shiki-light-font-style, inherit);
+	font-weight: var(--shiki-light-font-weight, inherit);
+	text-decoration: var(--shiki-light-text-decoration, inherit);
+}
+[data-theme="dark"] .wp-block-studio-docs-code {
+	color: var(--shiki-dark, var(--docs-foreground));
+}
+[data-theme="dark"] .wp-block-studio-docs-code span {
+	color: var(--shiki-dark, inherit);
+	font-style: var(--shiki-dark-font-style, inherit);
+	font-weight: var(--shiki-dark-font-weight, inherit);
+	text-decoration: var(--shiki-dark-text-decoration, inherit);
+}
+.wp-block-studio-docs-code .studio-docs-code__copy {
+	position: absolute;
+	top: 0.5rem;
+	right: 0.75rem;
+	z-index: 2;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1.875rem;
+	height: 1.875rem;
+	padding: 0;
+	border: 0;
+	border-radius: 0.375rem;
+	background: var(--docs-background);
+	color: var(--docs-muted-foreground);
+	cursor: pointer;
+	transition: color 0.15s, background-color 0.15s;
+}
+.wp-block-studio-docs-code .studio-docs-code__copy:hover {
+	background: var(--docs-muted);
+	color: var(--docs-foreground);
+}
+.wp-block-studio-docs-code .studio-docs-code__copy svg {
+	position: absolute;
+	pointer-events: none;
+	transition: transform 0.15s;
+}
+.wp-block-studio-docs-code .studio-docs-code__check-icon {
+	color: var(--docs-success);
+	transform: scale(0);
+}
+.wp-block-studio-docs-code .studio-docs-code__copy[data-copied] .studio-docs-code__check-icon {
+	transform: scale(1);
+}
+.wp-block-studio-docs-code .studio-docs-code__copy[data-copied] .studio-docs-code__copy-icon {
+	transform: scale(0);
+}
+@media print {
+	.wp-block-studio-docs-code .studio-docs-code__copy {
+		display: none;
+	}
+}
+
+/* In the editor the language label comes from the block's own data attribute and the code is typed
+   into the rich-text `<code>`; no copy button. */
+.editor-styles-wrapper .wp-block-studio-docs-code {
+	padding-top: 3.75rem;
+}
+.editor-styles-wrapper .wp-block-studio-docs-code > code {
+	min-height: 1.5rem;
+	outline: none;
+}

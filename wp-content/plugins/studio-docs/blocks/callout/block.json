@@ -1,0 +1,39 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/callout",
+	"version": "1.0.0",
+	"title": "Callout",
+	"category": "text",
+	"icon": "info-outline",
+	"description": "A note, tip, important, warning or caution box, with blocks inside.",
+	"keywords": [ "note", "tip", "warning", "alert", "admonition" ],
+	"textdomain": "studio-docs",
+	"attributes": {
+		"type": {
+			"type": "string",
+			"enum": [ "note", "tip", "important", "warning", "caution" ],
+			"default": "note"
+		},
+		"title": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"anchor": true,
+		"spacing": {
+			"margin": [ "top", "bottom" ]
+		}
+	},
+	"example": {
+		"attributes": { "type": "tip" },
+		"innerBlocks": [
+			{ "name": "core/paragraph", "attributes": { "content": "Run <code>studio --help</code> to list every command." } }
+		]
+	},
+	"editorScript": "file:./index.js",
+	"style": [ "studio-docs-tokens", "file:./style.css" ],
+	"render": "file:./render.php"
+}
