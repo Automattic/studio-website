@@ -175,6 +175,9 @@ html[data-theme="dark"] {
 		display: flex;
 	}
 }
+.studio-docs .studio-docs-header .wp-block-button > .wp-element-button {
+	box-shadow: none; /* Flat in the docs header; the theme's glow stays on the marketing pages. */
+}
 .studio-docs .studio-docs-header .wp-block-button__link {
 	display: inline-flex;
 	align-items: center;
