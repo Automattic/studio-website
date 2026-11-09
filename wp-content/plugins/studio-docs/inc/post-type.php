@@ -114,6 +114,7 @@ function meta_keys() {
 		'_wp_docs_commit'            => 'Commit SHA of the imported revision; empty when unknown.',
 		'_wp_docs_imported'          => 'ISO 8601 time of the last content import.',
 		'_wp_docs_markdown'          => 'The page as Markdown for agents: front matter, then the body with absolute links.',
+		'_wp_docs_content_hash'      => 'Hash of the title, description and block fingerprints the import wrote; a page whose hash differs was edited in WordPress (`wp wp-docs drift`).',
 		'_wp_docs_redirect_from'     => 'JSON list of root-relative paths that 301 here.',
 		// Bookkeeping.
 		'_wp_docs_manifest'          => 'Manifest location the page was last imported from.',

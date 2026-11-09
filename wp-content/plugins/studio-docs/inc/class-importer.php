@@ -362,6 +362,47 @@ class Importer extends Markdown_Importer {
 	}
 
 	/**
+	 * The normalised manifest entries, keyed by path (loaded on first use).
+	 *
+	 * @return array<string,array>
+	 */
+	public function entries() {
+		$this->load_entries();
+		return $this->entries;
+	}
+
+	/**
+	 * The pipeline options a page would be converted with outside an import: the same lookups as the
+	 * import, with images looked up in the media library instead of fetched. The reverse sync converts
+	 * chunks of the page's Markdown with these (class-drift.php).
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array
+	 */
+	public function options_for_post( $post_id ) {
+		$this->load_entries();
+		$source   = $this->get_markdown_source( $post_id );
+		$previous = $this->current;
+		$lookup   = $this->lookup_images_only;
+
+		$this->current            = array(
+			'post_id'      => (int) $post_id,
+			'doc'          => $this->entry_for_post( $post_id ) ?? array(),
+			'source'       => is_string( $source ) ? Sources\parse( $source ) : null,
+			'fetch_url'    => '',
+			'front_matter' => null,
+			'report'       => array(),
+		);
+		$this->lookup_images_only = true;
+		try {
+			return $this->pipeline_options();
+		} finally {
+			$this->current            = $previous;
+			$this->lookup_images_only = $lookup;
+		}
+	}
+
+	/**
 	 * The manifest entry of a post, by its page id.
 	 *
 	 * @param int $post_id Post ID.
@@ -943,6 +984,9 @@ class Importer extends Markdown_Importer {
 		$this->write_manifest_meta( $post_id, $this->current['doc'] );
 
 		update_post_meta( $post_id, '_wp_docs_markdown', wp_slash( $this->agent_markdown( $post_id ) ) );
+
+		// The state the import wrote, so an edit made in WordPress afterwards is detected (class-drift.php).
+		Drift::store_hash( $post_id );
 
 		// A page with an image that could not be imported is fetched again on the next run.
 		if ( ! empty( $this->current['report']['failed_images'] ) ) {

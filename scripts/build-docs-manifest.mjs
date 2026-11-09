@@ -239,6 +239,15 @@ function fenceCommands(lines) {
 
 const images = new Map();
 
+// The file name of a screenshot reference: an upload URL (the basename), or a relative path that
+// resolves into the screenshots folder of the repository. Anything else is not a screenshot.
+function screenshotName(src, page) {
+	if (src.startsWith(OLD_UPLOADS)) return basename(src.replace(/[?#].*$/, ""));
+	if (/^([a-z][a-z0-9+.-]*:|\/)/i.test(src)) return null;
+	const resolved = posix.normalize(posix.join(posix.dirname(posix.join(SOURCE.path, page.src)), src.replace(/[?#].*$/, "")));
+	return resolved.startsWith(SOURCE.images + "/") ? posix.basename(resolved) : null;
+}
+
 function rewrite(text, page, pages) {
 	const dir = posix.dirname(page.file);
 	const relativeTo = (file) => posix.relative(dir, file);
@@ -246,11 +255,12 @@ function rewrite(text, page, pages) {
 	text = text.replace(/\[(!\[[^\]]*\]\([^)]+\))\]\([^)]+\)/g, "$1");
 	// Empty links (not the empty alt of an image).
 	text = text.replace(/(^|[^!])\[\]\([^)]*\)/g, "$1");
-	// Screenshots: an upload URL becomes the repo's file of the same name under images/, which the
-	// importer sideloads into the media library.
+	// Screenshots: an upload URL, or a relative path into docs/user/screenshots/images (what
+	// scripts/reconcile-docs.mjs writes for an image added on the site), becomes the repo's file of the
+	// same name under images/, which the importer sideloads into the media library.
 	text = text.replace(/!\[([^\]]*)\]\(([^)\s]+)\)/g, (m, alt, src) => {
-		if (!src.startsWith(OLD_UPLOADS)) return m;
-		const name = basename(src.replace(/\?.*$/, ""));
+		const name = screenshotName(src, page);
+		if (!name) return m;
 		images.set(name, page.route || "index");
 		return `![${alt}](${relativeTo("images/" + name)})`;
 	});

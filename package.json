@@ -8,7 +8,9 @@
 		"deploy": "scripts/publish-site.sh",
 		"deploy:preview": "scripts/publish-site.sh preview",
 		"docs:manifest": "node scripts/build-docs-manifest.mjs",
-		"docs:check": "node scripts/check-docs-freshness.mjs"
+		"docs:check": "node scripts/check-docs-freshness.mjs",
+		"docs:drift": "studio wp wp-docs drift",
+		"docs:reconcile": "node scripts/reconcile-docs.mjs"
 	},
 	"dependencies": {
 		"shiki": "4.6.0"

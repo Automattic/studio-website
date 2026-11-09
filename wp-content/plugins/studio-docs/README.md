@@ -19,7 +19,12 @@ inc/local-sources.php      serves the staged files to the importer through `pre_
 inc/sources.php            source URL parsing and resolution
 inc/pipeline.php           the conversion steps the importer runs
 inc/transforms/            front matter, GitHub alerts, heading ids, links, images, HTML → blocks,
-                           the Markdown served to agents
+                           the Markdown served to agents; and the way back: chunks.php (a Markdown
+                           body split into chunks), markdown-out.php (blocks → Markdown), reverse.php
+                           (the merge of edited blocks into the Markdown, verified), upstream.php
+                           (the merge replayed onto the file in Automattic/studio)
+inc/drift.php              the hash the importer stores per page, so an edit made in WordPress shows
+inc/class-drift.php        drift detection, reconciliation and export (`wp wp-docs drift`)
 inc/permalinks.php         `/docs/<path>/` from the manifest path; `/docs/` is the home page
 inc/tree.php               the documentation tree (one query, cached per import)
 inc/template-tags.php      helpers the blocks and the theme read
@@ -30,7 +35,7 @@ inc/blocks.php             registers blocks/*; the Post Excerpt block shows only
 inc/content.php            render filters: heading anchors, external links in a new tab
 inc/assets.php             the stylesheets and shared script on docs pages and in the editor, the
                            color scheme script, favicons, the document title
-inc/cli.php                `wp wp-docs import|status|convert`
+inc/cli.php                `wp wp-docs import|status|drift|convert`
 blocks/<name>/             one folder per block: block.json, index.js (editor), render.php,
                            style.css, view.js (front end)
 assets/css/tokens.css      the design tokens, both schemes (`studio-docs-tokens`, a dependency of the rest)
@@ -41,7 +46,7 @@ assets/vendor/             medium-zoom 1.1.2 (MIT)
 assets/images/             the favicon pair and the touch icon
 vendor/wporg-markdown/     the WordPress.org Markdown importer base class, unchanged
 vendor/jetpack-markdown/   Jetpack's Markdown parser (16.3.1, GPL), unchanged
-tests/                     plain-PHP tests of the pipeline (no database)
+tests/                     plain-PHP tests of the pipeline and the reverse sync (no database)
 ```
 
 ## The pipeline
@@ -58,10 +63,59 @@ tests/                     plain-PHP tests of the pipeline (no database)
    `studio-docs/callout`. The description becomes the excerpt.
 3. The page's Markdown (front matter `title`, `description`, `sidebar.label`; links and images made
    root-relative) is stored for `/docs/<path>.md`.
+4. A hash of what was written (title, description and the fingerprints of the blocks) is stored in
+   `_wp_docs_content_hash`, so a page edited in WordPress afterwards can be told apart (see below).
 
 The manifest entry fields the blocks read: `title`, `label` (sidebar), `heading` (sub-section heading
 when the page has children), `group` and `group_title` (the sidebar group), `order`, `description`,
 `source_url` (the GitHub edit link derives from it), `updated` (YYYY-MM-DD of the page's last commit).
+
+## Editing in WordPress: drift
+
+GitHub is the source of truth and every import rewrites every page, so an edit made in the block
+editor is live on the next deploy (the static export reads the database) and gone on the next import.
+Such an edit is *drift*, and the plugin makes it visible and recoverable instead of silent:
+
+- The importer stores `_wp_docs_content_hash` with every page it writes (`inc/drift.php`): a sha256 of
+  the title, the description and the fingerprints of the top-level blocks (block name, the attributes
+  that matter, the saved HTML normalised). Saving a page in the editor without a change re-serialises
+  every block but leaves the fingerprints alone, so that is not drift; a changed word, a new block or a
+  removed one is. `post_modified` later than `_wp_docs_imported` is kept as a hint for pages imported
+  before hashes existed (reported as `unknown`).
+- `wp wp-docs drift` lists the drifted pages: post, path, what changed (content, title, description),
+  who last edited the page (`_edit_last`, else the author) and when. `--format=table|json|count`; exit
+  code 1 when there is drift, 0 when every page matches its import. `wp wp-docs status` prints a
+  one-line summary.
+- `wp wp-docs drift --diff` shows each page's edit as Markdown: the page's blocks are merged back into
+  the Markdown it was imported from (`inc/transforms/reverse.php`). The baseline body is split into
+  chunks (one paragraph, list, fence, table, alert…), each chunk is converted on its own so its blocks
+  are known, baseline and live blocks are matched by fingerprint (longest common subsequence), unchanged
+  chunks are copied byte for byte and only the changed blocks are written with `markdown-out.php`
+  (the inverse of `blocks.php`: `-` bullets, `1.` steps, fences with the `language` attribute,
+  `> [!NOTE]` alerts for `studio-docs/callout`, GFM tables, `<details>` and inline HTML kept). Site
+  links (`/docs/<route>/`) go back to relative links between the Markdown files, attachment URLs to
+  the repository image paths (`_wp_docs_image_source`). The result is converted again and compared
+  with the page's blocks; a block that does not survive the round trip (a callout title, a group) is
+  named, and that part of the export needs a look. The baseline is the staged file in
+  `build/docs/content/` when it is from the revision the last import recorded, else `_wp_docs_markdown`
+  with its absolute links made relative again.
+- `wp wp-docs drift --export=<dir>` writes the reconciled files. The staged page is not the upstream
+  file (scripts/build-docs-manifest.mjs lifts the first paragraph into the description, strips heading
+  anchors, fences command lines, rewrites links), so with a checkout of Automattic/studio at hand
+  (`--upstream=<dir>`, default: the one the staging script left in `build/docs/.cache/studio`) the edit is
+  replayed onto the upstream file (`inc/transforms/upstream.php`: both bodies chunked and aligned by a
+  key that ignores what the staging changes, a changed chunk's upstream counterpart replaced, an added
+  block inserted after its predecessor's counterpart) and written at `docs/user/docs/<src>`; a changed
+  title updates the `# ` line or the front matter, a changed description the front matter or the lifted
+  paragraph. Without a checkout the staged form is written under `content/`. `drift.json` next to the
+  files lists the pages, editors, times and warnings; `scripts/reconcile-docs.mjs` (repository root)
+  turns it into a branch and a pull request.
+- `wp wp-docs drift --reset` discards the edits: every page is re-imported from the staged files.
+- `scripts/build-site.sh` runs the drift check before it stages and imports, and stops with these
+  options while there is drift (`DOCS_ALLOW_DRIFT=1` builds anyway and the import overwrites the edits).
+
+Saving in the editor straight to GitHub (the proof of concept's sync class and GitHub client) is not
+part of this plugin yet; the export and the pull request are the way back for now.
 
 ## Blocks
 
@@ -111,8 +165,14 @@ is edited (`block_editor_settings_all`), so the previews look like the pages.
 ```bash
 WP_DOCS_TEST_WORDPRESS=/path/to/a/wordpress php tests/run-unit.php
 WP_DOCS_TEST_WORDPRESS=/path/to/a/wordpress php tests/run-fixtures.php      # --update rewrites the expected files
+WP_DOCS_TEST_WORDPRESS=/path/to/a/wordpress php tests/run-roundtrip.php     # needs build/docs (node scripts/build-docs-manifest.mjs)
 ```
 
 Any WordPress install works (a Studio site, for example); `tests/fetch-deps.sh` downloads one into
 `tests/.deps/` otherwise. The fixtures cover paragraphs and headings, alerts, code, lists, tables, images
-and links, details and raw HTML, in blocks and classic mode and as the Markdown served to agents.
+and links, details and raw HTML, in blocks and classic mode and as the Markdown served to agents. The
+unit tests also cover the reverse sync (chunks, Markdown out, merge, verify, the upstream replay) and
+the drift hash. The round-trip test runs over every staged page: every block written back as Markdown
+converts to the same blocks, a merge without an edit returns the staged body byte for byte, one edited
+paragraph changes exactly one chunk and verifies, and (with the staging's checkout in
+`build/docs/.cache/studio`) the replay onto the upstream file is exact (`-v` prints the upstream edits).
