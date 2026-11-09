@@ -36,7 +36,7 @@
 		}
 	},
 	"editorScript": "file:./index.js",
-	"style": "file:./style.css",
+	"style": [ "studio-docs-tokens", "file:./style.css" ],
 	"viewScript": "file:./view.js",
 	"render": "file:./render.php"
 }

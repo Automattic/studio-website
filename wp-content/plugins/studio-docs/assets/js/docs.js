@@ -57,7 +57,20 @@
 	const icon = ( name, size = 16 ) =>
 		`<svg xmlns="http://www.w3.org/2000/svg" width="${ size }" height="${ size }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ ICONS[ name ] ?? '' }</svg>`;
 
-	window.studioDocs = { announce, copyText, flashLabel, escapeHtml, icon };
+	const readStorage = ( key ) => {
+		try {
+			return localStorage.getItem( key );
+		} catch {
+			return null;
+		}
+	};
+	const saveStorage = ( key, value ) => {
+		try {
+			localStorage.setItem( key, value );
+		} catch {}
+	};
+
+	window.studioDocs = { announce, copyText, flashLabel, escapeHtml, icon, readStorage, saveStorage };
 
 	// Image zoom (medium-zoom) on the article's images that are not links.
 	if ( typeof mediumZoom === 'function' ) {

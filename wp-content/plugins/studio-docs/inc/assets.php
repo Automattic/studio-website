@@ -1,6 +1,6 @@
 <?php
 /**
- * What a docs page loads on top of the theme and core: the docs stylesheets (layout, article
+ * What a docs page loads on top of the theme and core: the docs stylesheets (tokens, layout, article
  * typography), the shared script (clipboard helpers, image zoom), the color scheme set before the
  * first paint, the favicons, and the document title in the docs' form. The block editor gets the
  * same stylesheets while a docs page or a docs template is edited.
@@ -25,7 +25,8 @@ add_filter( 'block_editor_settings_all', __NAMESPACE__ . '\\editor_styles', 10, 
 function register() {
 	$version = static fn( $file ) => (string) filemtime( \WP_Docs\PLUGIN_DIR . '/assets/' . $file );
 
-	wp_register_style( 'studio-docs', Render\asset( 'css/docs.css' ), array( 'wp-block-library', 'global-styles' ), $version( 'css/docs.css' ) );
+	wp_register_style( 'studio-docs-tokens', Render\asset( 'css/tokens.css' ), array(), $version( 'css/tokens.css' ) );
+	wp_register_style( 'studio-docs', Render\asset( 'css/docs.css' ), array( 'studio-docs-tokens', 'wp-block-library', 'global-styles' ), $version( 'css/docs.css' ) );
 	wp_register_style( 'studio-docs-prose', Render\asset( 'css/prose.css' ), array( 'studio-docs' ), $version( 'css/prose.css' ) );
 	wp_register_script( 'studio-docs-medium-zoom', Render\asset( 'vendor/medium-zoom.js' ), array(), $version( 'vendor/medium-zoom.js' ), array( 'strategy' => 'defer' ) );
 	wp_register_script( 'studio-docs', Render\asset( 'js/docs.js' ), array( 'studio-docs-medium-zoom' ), $version( 'js/docs.js' ), array( 'strategy' => 'defer' ) );
@@ -77,10 +78,15 @@ function editor_styles( $settings, $context ) {
 	$docs  = $read( 'docs.css' );
 	$prose = $read( 'prose.css' );
 
-	// `.studio-docs` is the body class of a docs page: in the editor, the canvas root.
-	$settings['styles'][] = array( 'css' => str_replace( '.studio-docs ', '.editor-styles-wrapper ', $docs ) );
+	// `.studio-docs` is the body class of a docs page: in the editor, the canvas root. Only the descendant
+	// selectors are mapped; the body rule itself (`body.studio-docs`: Inter, the docs colors) applies to
+	// the canvas of a docs page alone, so the Site Editor previews the other templates as they are.
+	$body                 = preg_match( '/body\.studio-docs \{[^}]*\}/', $docs, $m ) ? $m[0] : '';
+	$frame                = str_replace( $body, '', $docs ); // The body rule stays out of the mapping below.
+	$settings['styles'][] = array( 'css' => str_replace( '.studio-docs ', '.editor-styles-wrapper ', $frame ) );
 	$settings['styles'][] = array( 'css' => $prose );
 	if ( $is_doc ) {
+		$settings['styles'][] = array( 'css' => str_replace( 'body.studio-docs', '.editor-styles-wrapper', $body ) );
 		$settings['styles'][] = array( 'css' => str_replace( '.studio-docs-article', '.editor-styles-wrapper', $prose ) );
 	}
 	return $settings;

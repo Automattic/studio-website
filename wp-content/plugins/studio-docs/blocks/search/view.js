@@ -4,19 +4,7 @@
  * Shortcuts: ⌘K / Ctrl K and "/" open it, ⌘J / Ctrl J toggles the preview pane.
  */
 ( () => {
-	const { escapeHtml, icon } = window.studioDocs;
-	const read = ( key ) => {
-		try {
-			return localStorage.getItem( key );
-		} catch {
-			return null;
-		}
-	};
-	const save = ( key, value ) => {
-		try {
-			localStorage.setItem( key, value );
-		} catch {}
-	};
+	const { escapeHtml, icon, readStorage: read, saveStorage: save } = window.studioDocs;
 
 	class Search {
 		records = null;

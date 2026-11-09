@@ -33,7 +33,8 @@ inc/assets.php             the stylesheets and shared script on docs pages and i
 inc/cli.php                `wp wp-docs import|status|convert`
 blocks/<name>/             one folder per block: block.json, index.js (editor), render.php,
                            style.css, view.js (front end)
-assets/css/docs.css        tokens for both schemes, the page frame (header, columns, footer)
+assets/css/tokens.css      the design tokens, both schemes (`studio-docs-tokens`, a dependency of the rest)
+assets/css/docs.css        the page frame (header, columns, footer) and shared controls
 assets/css/prose.css       the article: title, lede and the content's core blocks
 assets/js/docs.js          shared helpers for the block scripts (clipboard, live region), image zoom
 assets/vendor/             medium-zoom 1.1.2 (MIT)
@@ -98,9 +99,9 @@ with the external-link icon.
 
 ## Styling
 
-`docs.css` defines the tokens (`--docs-background`, `--docs-foreground`, `--docs-muted`, `--docs-border`,
-`--docs-accent`, …) on the `studio-docs` body class, with the dark values under `[data-theme="dark"]`,
-and lays out the page frame; `prose.css` sets the article typography; every block's `style.css` styles
+`tokens.css` defines the tokens (`--docs-background`, `--docs-foreground`, `--docs-muted`, `--docs-border`,
+`--docs-accent`, …) on `:root`, with the dark values under `[data-theme="dark"]`; the content blocks list it
+as a dependency so they are styled wherever they are inserted. `docs.css` lays out the page frame; `prose.css` sets the article typography; every block's `style.css` styles
 that block. The theme's stylesheet and core's block styles stay loaded; the docs rules override them
 where the docs differ. The block editor gets the same stylesheets while a docs page or a docs template
 is edited (`block_editor_settings_all`), so the previews look like the pages.

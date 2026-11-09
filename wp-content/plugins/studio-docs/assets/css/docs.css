@@ -1,55 +1,19 @@
 /*
- * The docs pages: design tokens (both color schemes), the page frame (header, three-column layout,
- * rail, footer) and the shared controls. Scoped to `.studio-docs`, the body class of a docs page;
- * the block editor maps that class to its canvas. The article typography is in prose.css, the
- * blocks' own styles in blocks/<name>/style.css.
+ * The docs pages: the page frame (header, three-column layout, rail, footer) and the shared controls,
+ * scoped to `.studio-docs`, the body class of a docs page (the block editor maps that class to its
+ * canvas). The design tokens are in tokens.css, the article typography in prose.css, the blocks' own
+ * styles in blocks/<name>/style.css.
  */
 
-/* ---- Tokens ---- */
-.studio-docs {
-	--docs-background: #fff;
-	--docs-foreground: oklch(0.275 0 0);
-	--docs-muted: oklch(0.965 0 0);
-	--docs-muted-foreground: oklch(0.55 0 0);
-	--docs-border: rgb(0 0 0 / 0.1);
-	--docs-accent: #3858e9;
-	--docs-accent-foreground: #fff;
-	--docs-code-background: oklch(0.975 0 0);
-	--docs-success: oklch(0.627 0.194 149.214);
-	--docs-radius: 0.5rem;
-	--docs-content-width: 42rem;
-	--docs-header-height: 4rem;
-	--docs-header-top: var(--wp-admin--admin-bar--height, 0px);
-	--docs-font-sans: var(--wp--preset--font-family--inter, Inter, ui-sans-serif, system-ui, sans-serif);
-	--docs-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-
+/* ---- The page ---- */
+/* The tokens are in tokens.css (`studio-docs-tokens`, a dependency of this stylesheet). */
+body.studio-docs {
 	background: var(--docs-background);
 	color: var(--docs-foreground);
 	font-family: var(--docs-font-sans);
 	font-size: 1rem;
 	line-height: 1.5;
 	-webkit-font-smoothing: antialiased;
-}
-[data-theme="dark"] .studio-docs {
-	--docs-background: #161616;
-	--docs-foreground: oklch(0.83 0 0);
-	--docs-muted: oklch(0.24 0 0);
-	--docs-muted-foreground: oklch(0.6 0 0);
-	--docs-border: rgb(255 255 255 / 0.08);
-	--docs-accent: oklch(0.72 0.2 268);
-	--docs-accent-foreground: oklch(0.085 0 0);
-	--docs-code-background: oklch(0.2 0 0);
-	--docs-success: oklch(0.723 0.219 149.579);
-}
-html[data-theme="dark"] {
-	color-scheme: dark;
-}
-/* Below 600px the admin bar is not fixed: it scrolls away with the page, so the sticky header and the
-   columns sit at the very top once it has gone. */
-@media (max-width: 600px) {
-	.studio-docs {
-		--docs-header-top: 0px;
-	}
 }
 .studio-docs :focus-visible {
 	outline: 2px solid var(--docs-accent);
@@ -65,6 +29,17 @@ html[data-theme="dark"] {
 	clip: rect(0 0 0 0);
 	border: 0;
 	white-space: nowrap;
+}
+
+/* The docs typography on the docs' own blocks too, so the Site Editor previews the docs template in it
+   without touching the other templates. */
+.studio-docs .studio-docs-header,
+.studio-docs .studio-docs-layout,
+.studio-docs .studio-docs-footer {
+	color: var(--docs-foreground);
+	font-family: var(--docs-font-sans);
+	font-size: 1rem;
+	line-height: 1.5;
 }
 
 /* ---- Shared controls ---- */

@@ -66,6 +66,8 @@ imagery:
 
 Studio as a modern product: white space, a contemporary grotesk in tight lowercase headlines, and a block mosaic (a field of wireframe blocks, as if looking down on the block editor, with a few tiles in solid WordPress blue) fading in behind the hero and once more near the close. WordPress blue is the single confident accent, on the primary button and active states. Cards carry a 1px gray border and no shadow. Code blocks are dark rounded panels in JetBrains Mono with a copy button. Placeholders for app captures sit over the mosaic with a thin border.
 
+The documentation at `/docs/` is the one exception to the rules below: it keeps the design of the Blume docs site it was migrated from (Inter, a light and a dark scheme, a three-column reading layout), so the docs look the same as before. Its styles live with the `studio-docs` plugin; the marketing pages follow this document.
+
 ## Colors
 
 - `background` #ffffff is the ground of every section. The page is light from top to bottom.

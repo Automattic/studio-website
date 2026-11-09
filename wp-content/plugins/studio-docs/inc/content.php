@@ -73,7 +73,12 @@ function heading_anchor( $content, $block ) {
 	}
 	return (string) preg_replace_callback(
 		'#<h([2-6])([^>]*)\sid="([^"]+)"([^>]*)>(.*?)</h\1>#is',
-		static fn( $m ) => '<h' . $m[1] . $m[2] . ' id="' . $m[3] . '"' . $m[4] . '><a class="studio-docs-heading-anchor" href="#' . $m[3] . '">' . $m[5] . '</a></h' . $m[1] . '>',
+		static function ( $m ) {
+			if ( false !== stripos( $m[5], '<a ' ) ) {
+				return $m[0]; // A heading that is (or holds) a link keeps it; anchors do not nest.
+			}
+			return '<h' . $m[1] . $m[2] . ' id="' . $m[3] . '"' . $m[4] . '><a class="studio-docs-heading-anchor" href="#' . $m[3] . '">' . $m[5] . '</a></h' . $m[1] . '>';
+		},
 		$content,
 		1
 	);

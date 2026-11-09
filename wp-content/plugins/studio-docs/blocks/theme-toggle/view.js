@@ -17,8 +17,6 @@
 		root.dataset.theme = next;
 		window.getComputedStyle( root ).opacity;
 		setTimeout( () => style.remove(), 1 );
-		try {
-			localStorage.setItem( 'studio-docs-theme', next );
-		} catch {}
+		window.studioDocs.saveStorage( 'studio-docs-theme', next );
 	} );
 } )();

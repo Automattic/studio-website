@@ -18,7 +18,7 @@ defined( 'WPINC' ) || die();
 
 add_action( 'init', __NAMESPACE__ . '\\register' );
 add_filter( 'block_categories_all', __NAMESPACE__ . '\\category' );
-add_filter( 'render_block_core/post-excerpt', __NAMESPACE__ . '\\excerpt_only_when_written', 10, 2 );
+add_filter( 'render_block_core/post-excerpt', __NAMESPACE__ . '\\excerpt_only_when_written', 10, 3 );
 
 /**
  * Register every block from its block.json.
@@ -47,12 +47,13 @@ function category( $categories ) {
  * The Post Excerpt block shows a docs page's description (its written excerpt) as the lede; a page
  * without one gets nothing, not core's generated excerpt of the first words.
  *
- * @param string $content Rendered block.
- * @param array  $block   Block.
+ * @param string    $content  Rendered block.
+ * @param array     $block    Block.
+ * @param \WP_Block $instance Block instance, with the post in its context.
  * @return string
  */
-function excerpt_only_when_written( $content, $block ) {
-	$post = get_post();
+function excerpt_only_when_written( $content, $block, $instance = null ) {
+	$post = $instance instanceof \WP_Block && ! empty( $instance->context['postId'] ) ? get_post( (int) $instance->context['postId'] ) : get_post();
 	if ( $post instanceof \WP_Post && \WP_Docs\POST_TYPE === $post->post_type && ! has_excerpt( $post ) ) {
 		return '';
 	}

@@ -7,6 +7,7 @@
 # Needs the Studio CLI with `export-static` (Automattic/studio#5567) and Node 22 or later with the
 # dependencies installed (`npm install` in the repository root). The site is the repository root; set
 # STUDIO_SITE to build from another Studio site that runs this checkout (a dev site with symlinks).
+# GITHUB_TOKEN (or GH_TOKEN) raises the GitHub API limit the staging script hits for the pages' update dates.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 site="${STUDIO_SITE:-$PWD}"
@@ -16,7 +17,7 @@ node scripts/build-docs-manifest.mjs
 
 echo "Importing the docs into WordPress…"
 studio wp --path "$site" plugin is-active studio-docs 2>/dev/null || studio wp --path "$site" plugin activate studio-docs
-studio wp --path "$site" wp-docs import --force
+studio wp --path "$site" wp-docs import --force --manifest="$PWD/build/docs/manifest.json"
 
 # The export refuses an output folder inside the site, so it goes to a temporary folder
 # first and becomes dist/ afterwards.
