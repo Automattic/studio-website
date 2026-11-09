@@ -45,6 +45,8 @@ const SOURCE = {
 
 // The old docs lived under this prefix; links to it become links between pages.
 const OLD_DOCS = "https://developer.wordpress.com/docs/developer-tools/studio";
+// Links between pages are written as full URLs on the site; they become links between pages too.
+const NEW_DOCS = "https://wordpress.studio/docs";
 const OLD_UPLOADS = "https://developer.wordpress.com/wp-content/uploads/";
 
 // Sidebar groups, in order. Pages name their group; a group has no page of its own.
@@ -278,6 +280,11 @@ function rewrite(text, page, pages) {
 			rest = OLD_ALIASES[rest] ?? rest;
 			target = pages.find((p) => p.old === rest) ?? null;
 		}
+		const isNewUrl = url === NEW_DOCS || url.startsWith(`${NEW_DOCS}/`);
+		if (!target && isNewUrl) {
+			const route = url.slice(NEW_DOCS.length).replace(/^\/|\/$/g, "");
+			target = pages.find((p) => p.route === route) ?? null;
+		}
 		if (url === "" && hash !== undefined) target = page;
 		if (!target) {
 			if (url.startsWith("https://developer.wordpress.com/studio")) {
@@ -288,7 +295,8 @@ function rewrite(text, page, pages) {
 		// Carry an anchor over when it names a heading on the target page; drop a stray one.
 		if (hash !== undefined) {
 			const ids = new Set(Object.values(target.anchors));
-			const id = target.anchors[hash] ?? (ids.has(slug(hash)) ? slug(hash) : null);
+			// A full URL names the heading's real id, which plain Markdown headings don't list in `anchors`.
+			const id = isNewUrl ? hash : (target.anchors[hash] ?? (ids.has(slug(hash)) ? slug(hash) : null));
 			if (id) anchor = "#" + id;
 		}
 		const path = target === page ? "" : relativeTo(target.file);
