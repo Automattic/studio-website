@@ -31,7 +31,12 @@ require_once __DIR__ . '/inc/transforms/links.php';
 require_once __DIR__ . '/inc/transforms/images.php';
 require_once __DIR__ . '/inc/transforms/blocks.php';
 require_once __DIR__ . '/inc/transforms/agent-markdown.php';
+require_once __DIR__ . '/inc/transforms/chunks.php';
+require_once __DIR__ . '/inc/transforms/markdown-out.php';
+require_once __DIR__ . '/inc/transforms/reverse.php';
+require_once __DIR__ . '/inc/transforms/upstream.php';
 require_once __DIR__ . '/inc/pipeline.php';
+require_once __DIR__ . '/inc/drift.php';
 
 // WordPress integration.
 require_once __DIR__ . '/inc/functions.php';
@@ -80,6 +85,7 @@ function load_importer() {
 		require_once __DIR__ . '/vendor/wporg-markdown/class-importer.php';
 	}
 	require_once __DIR__ . '/inc/class-importer.php';
+	require_once __DIR__ . '/inc/class-drift.php';
 
 	Importer::instance()->init();
 

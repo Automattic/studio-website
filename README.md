@@ -59,7 +59,21 @@ node scripts/build-docs-manifest.mjs   # stage the markdown and screenshots into
 studio wp wp-docs import --force       # import them into the docs post type
 ```
 
-`scripts/build-docs-manifest.mjs` checks the Studio repository's `docs/user/docs` and `docs/user/screenshots/images` out (from `trunk`; set `STUDIO_DOCS_REF` to pin another revision), places each page in the sidebar defined in its `PAGES` list (a markdown file upstream that is not in the list is reported at every build and stays off the site until it is added; working notes go in `NOT_PAGES`), records the revision it staged in `build/docs/source.json`, cleans up what the markdown carried over from developer.wordpress.com (heading links, linked images, absolute links, command lines without code fences), highlights every code block with Shiki (`github-light` / `github-dark`, the same themes as before) and writes `build/docs/manifest.json` for the importer. `wp wp-docs import` turns the pages into blocks, sideloads the screenshots once per content hash into `wp-content/uploads/docs/` (ignored), and keeps each page's Markdown for `/docs/<page>.md`, `/docs/llms.txt`, `/docs/llms-full.txt`, `/docs/index.json` and the search index at `/docs/search-index.json`. `wp wp-docs status` shows what is imported and from which revision; `wp wp-docs convert <file.md>` prints the blocks for one file. The plugin's README describes the blocks and the pipeline; `php tests/run-fixtures.php` and `php tests/run-unit.php` in the plugin folder test the conversion without a database.
+`scripts/build-docs-manifest.mjs` checks the Studio repository's `docs/user/docs` and `docs/user/screenshots/images` out (from `trunk`; set `STUDIO_DOCS_REF` to pin another revision), places each page in the sidebar defined in its `PAGES` list (a markdown file upstream that is not in the list is reported at every build and stays off the site until it is added; working notes go in `NOT_PAGES`), records the revision it staged in `build/docs/source.json`, cleans up what the markdown carried over from developer.wordpress.com (heading links, linked images, absolute links, command lines without code fences), highlights every code block with Shiki (`github-light` / `github-dark`, the same themes as before) and writes `build/docs/manifest.json` for the importer. `wp wp-docs import` turns the pages into blocks, sideloads the screenshots once per content hash into `wp-content/uploads/docs/` (ignored), and keeps each page's Markdown for `/docs/<page>.md`, `/docs/llms.txt`, `/docs/llms-full.txt`, `/docs/index.json` and the search index at `/docs/search-index.json`. `wp wp-docs status` shows what is imported and from which revision, and whether any page was edited in WordPress since; `wp wp-docs convert <file.md>` prints the blocks for one file. The plugin's README describes the blocks and the pipeline; `php tests/run-fixtures.php` and `php tests/run-unit.php` in the plugin folder test the conversion without a database.
+
+### Edits made in WordPress
+
+The pages open in the block editor like any post, but the import rewrites every page, so an edit made there is live on the next deploy and gone on the one after the next import. The importer records a hash of every page it writes; a page that no longer matches has *drifted*:
+
+```bash
+npm run docs:drift                      # the pages edited in WordPress: what changed, by whom, when (exit 1 when any)
+npm run docs:drift -- --diff            # each edit as a Markdown diff against the file the page was imported from
+npm run docs:reconcile                  # write the edits back onto Automattic/studio trunk and show the diff (dry run)
+npm run docs:reconcile -- --pr          # the same, then push a branch and open the pull request with gh
+npm run docs:drift -- --reset           # discard the edits (asks first): re-import the pages from the staged files
+```
+
+`npm run docs:drift` is `studio wp wp-docs drift`. The reconciliation (`wp wp-docs drift --export`, which `scripts/reconcile-docs.mjs` runs) merges the page's blocks back into the Markdown it was imported from, keeping every unchanged chunk byte for byte, verifies that the result converts to the same blocks, and replays the change onto the upstream file (whose text the staging script transforms), so the diff on the pull request is the editor's change and nothing else. The branch is `docs/site-edits-<date>`; the pull request's body names the pages, who edited them on the site and when. GitHub stays the source of truth: once the pull request merges, the next build imports the pages from `trunk` again. Saving in the editor straight to GitHub is not implemented; the plugin's README has the details of the detection and the merge.
 
 ## Publishing
 
@@ -71,9 +85,9 @@ npm run deploy          # build and publish to production (asks before publishin
 npm run deploy:preview  # the same to a preview version, with its own URL, leaving production alone
 ```
 
-`npm run docs:check` (`scripts/check-docs-freshness.mjs`) reads the revision the live docs were built from out of `/docs/index.json` and lists the upstream commits since then that touched the docs or their screenshots, so a rebuild is never a guess; `--local` checks the last local staging instead, `--site <url>` another site. `npm run deploy` (`scripts/publish-site.sh`) runs the build below and then `sf publish`; extra arguments go to `sf publish` (`-y` skips the confirmation, `-m` sets the version message), and it ends with the freshness check against the live site.
+`npm run docs:check` (`scripts/check-docs-freshness.mjs`) reads the revision the live docs were built from out of `/docs/index.json` and lists the upstream commits since then that touched the docs or their screenshots, so a rebuild is never a guess; `--local` checks the last local staging instead, `--site <url>` another site. The build refuses to run while a docs page was edited in WordPress (see "Edits made in WordPress" above): reconcile or discard the edits first, or set `DOCS_ALLOW_DRIFT=1` to let the import overwrite them. `npm run deploy` (`scripts/publish-site.sh`) runs the build below and then `sf publish`; extra arguments go to `sf publish` (`-y` skips the confirmation, `-m` sets the version message), and it ends with the freshness check against the live site.
 
-Under the hood, `scripts/build-site.sh` builds the whole site into `dist/`: it stages and imports the docs, exports the WordPress site (pages and docs) and adds the root files below. Then `dist/` is published with the [Spacefast CLI](https://spacefast.com/docs/cli/):
+Under the hood, `scripts/build-site.sh` builds the whole site into `dist/`: it checks for docs edited in WordPress, stages and imports the docs, exports the WordPress site (pages and docs) and adds the root files below. Then `dist/` is published with the [Spacefast CLI](https://spacefast.com/docs/cli/):
 
 ```bash
 scripts/build-site.sh

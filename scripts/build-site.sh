@@ -8,6 +8,7 @@
 # dependencies installed (`npm install` in the repository root). The site is the repository root; set
 # STUDIO_SITE to build from another Studio site that runs this checkout (a dev site with symlinks).
 # GITHUB_TOKEN (or GH_TOKEN) raises the GitHub API limit the staging script hits for the pages' update dates.
+# DOCS_ALLOW_DRIFT=1 builds even when docs pages were edited in WordPress (the import overwrites them).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 site="${STUDIO_SITE:-$PWD}"
@@ -31,11 +32,39 @@ if ! studio --help 2>&1 | grep -q "export-static"; then
 	fi
 fi
 
+studio wp --path "$site" plugin is-active studio-docs 2>/dev/null || studio wp --path "$site" plugin activate studio-docs
+
+# A docs page edited in the WordPress editor is live on the next deploy and overwritten by the import
+# below. Stop while there is such an edit (checked against the staged files of the last import, so
+# before restaging), unless DOCS_ALLOW_DRIFT=1 says to overwrite the edits on purpose.
+echo "Checking for docs edited in WordPress…"
+drift_count="$(studio wp --path "$site" wp-docs drift --format=count 2>/dev/null || true)"
+if [[ ! "$drift_count" =~ ^[0-9]+$ ]]; then
+	echo "The drift check did not run (studio wp wp-docs drift --format=count printed: ${drift_count:-nothing})." >&2
+	exit 1
+fi
+if [[ "$drift_count" != "0" ]]; then
+	studio wp --path "$site" wp-docs drift || true
+	if [[ "${DOCS_ALLOW_DRIFT:-}" == "1" ]]; then
+		echo "DOCS_ALLOW_DRIFT=1: building anyway; the import overwrites the edits listed above."
+	else
+		cat >&2 <<'DRIFT'
+
+The docs pages listed above were edited in WordPress since their import, and the import would overwrite
+those edits. Decide first:
+  Keep them:        node scripts/reconcile-docs.mjs     writes them back as Markdown and shows the diff
+                                                        against Automattic/studio; --pr opens the pull request
+  Discard them:     studio wp wp-docs drift --reset     re-imports the staged pages over the edits
+  Overwrite anyway: DOCS_ALLOW_DRIFT=1 scripts/build-site.sh
+DRIFT
+		exit 1
+	fi
+fi
+
 echo "Staging the docs from Automattic/studio…"
 node scripts/build-docs-manifest.mjs
 
 echo "Importing the docs into WordPress…"
-studio wp --path "$site" plugin is-active studio-docs 2>/dev/null || studio wp --path "$site" plugin activate studio-docs
 studio wp --path "$site" wp-docs import --force --manifest="$PWD/build/docs/manifest.json"
 
 # The export refuses an output folder inside the site, so it goes to a temporary folder

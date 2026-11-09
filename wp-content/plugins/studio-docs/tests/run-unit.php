@@ -1,7 +1,8 @@
 <?php
 /**
  * Unit tests for the pure modules: front matter, alerts, sources and link resolution, manifests,
- * the block scanner. Plain PHP: `php tests/run-unit.php`.
+ * the block scanner, the reverse sync (chunks, Markdown out, merge, upstream replay) and the drift
+ * hash. Plain PHP: `php tests/run-unit.php`.
  *
  * @package WP_Docs
  */
@@ -303,6 +304,151 @@ foreach ( glob( __DIR__ . '/fixtures/svg/*.svg' ) as $svg_file ) {
 	check( "svg: {$svg_name}", Images\svg_is_safe( (string) file_get_contents( $svg_file ) ), 0 !== strpos( $svg_name, 'unsafe-' ) );
 }
 check( 'svg: the content repository diagram passes', Images\svg_is_safe( '<svg xmlns="http://www.w3.org/2000/svg"><g fill="none"><path d="M0 0h1"/></g></svg>' ), true );
+
+/*
+ * Reverse sync: chunks, Markdown out, merge, verify.
+ */
+use WP_Docs\Transforms\Chunks;
+use WP_Docs\Transforms\Markdown_Out;
+use WP_Docs\Transforms\Reverse;
+use WP_Docs\Transforms\Upstream;
+use WP_Docs\Drift;
+
+$body   = "Para one.\n\n## Heading\n\n- a\n- b\n\n  - nested\n\n> [!NOTE]\n> Careful.\n\n> quoted\n\n> still quoted\n\n```php\n<?php echo 1;\n```\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n<!-- a comment -->\n\n<details>\n<summary>More</summary>\n\nInside.\n\n</details>\n\n---\n\nLast.";
+$chunks = Chunks\chunk( $body );
+check( 'chunk kinds', array_column( $chunks, 'kind' ), array( 'paragraph', 'heading', 'list', 'alert', 'quote', 'fence', 'table', 'comment', 'details', 'hr', 'paragraph' ) );
+check( 'chunk list text', $chunks[2]['text'], "- a\n- b\n\n  - nested" );
+check( 'chunk quote merges', $chunks[4]['text'], "> quoted\n\n> still quoted" );
+check( 'chunk gap', $chunks[1]['gap'], "\n" );
+check( 'chunk adjacent heading and paragraph', array_column( Chunks\chunk( "# Not a comment\n\\*.log" ), 'gap' ), array( '', '' ) );
+
+$convert = static fn( string $md ) => WP_Docs\Pipeline\convert_body( $md, array( 'mode' => 'blocks' ) );
+$blocks  = Markdown_Out\parse( $convert( $body ) );
+check( 'blocks: alert is a studio-docs callout, fence a studio-docs code block', array( $blocks[3]['blockName'], $blocks[5]['blockName'], $blocks[5]['attrs']['language'] ), array( 'studio-docs/callout', 'studio-docs/code', 'php' ) );
+$noop    = Reverse\merge( $body, $blocks, $convert );
+check( 'merge no-op is identity', $noop['markdown'], $body );
+check( 'merge with prepared chunks gives the same result', Reverse\merge( $body, $blocks, $convert, array(), Reverse\prepare( $body, $convert ) )['markdown'], $body );
+check( 'merge no-op stats', array( $noop['verbatim'], $noop['rewritten'], $noop['added'], $noop['removed'] ), array( 10, 0, 0, 0 ) );
+check( 'merge no-op ops are all keeps', array_unique( array_column( $noop['ops'], 'op' ) ), array( 'keep' ) );
+check( 'merge adjacent chunks keep their spacing', Reverse\merge( "# H\nText", Markdown_Out\parse( $convert( "# H\nText" ) ), $convert )['markdown'], "# H\nText" );
+
+$edited                        = $blocks;
+$edited[0]['innerHTML']        = '<p>Para <strong>one</strong>, edited.</p>';
+$edited[0]['innerContent'][0]  = $edited[0]['innerHTML'];
+$merged                        = Reverse\merge( $body, $edited, $convert );
+check( 'merge rewrites one chunk', array( $merged['rewritten'], $merged['verbatim'] ), array( 1, 9 ) );
+check( 'merge keeps the rest', substr( $merged['markdown'], strlen( 'Para **one**, edited.' ) ), substr( $body, strlen( 'Para one.' ) ) );
+check( 'merge verifies', Reverse\verify( $merged['markdown'], $edited, $convert ), null );
+check( 'merge op names the chunk', array( $merged['ops'][0]['op'], $merged['ops'][0]['chunks'] ), array( 'replace', array( 0 ) ) );
+
+$removed = array_slice( $blocks, 1 );
+$merged  = Reverse\merge( $body, $removed, $convert );
+check( 'merge drops a removed chunk', substr( $merged['markdown'], 0, 10 ), '## Heading' );
+check( 'merge delete op', $merged['ops'][0], array( 'op' => 'delete', 'chunks' => array( 0 ) ) );
+
+$added  = array_merge( array_slice( $blocks, 0, 1 ), Markdown_Out\parse( $convert( 'New paragraph.' ) ), array_slice( $blocks, 1 ) );
+$merged = Reverse\merge( $body, $added, $convert );
+check( 'merge inserts', substr( $merged['markdown'], 0, 27 ), "Para one.\n\nNew paragraph.\n\n" );
+check( 'merge insert stats', array( $merged['added'], $merged['verbatim'] ), array( 1, 10 ) );
+check( 'merge insert op follows chunk 0', array( $merged['ops'][1]['op'], $merged['ops'][1]['after'] ), array( 'insert', 0 ) );
+
+// A new callout and a new code block from the editor (no wrapper div, default type omitted).
+$editor_blocks = Markdown_Out\parse( "<!-- wp:studio-docs/callout -->\n<!-- wp:paragraph -->\n<p>Mind the gap.</p>\n<!-- /wp:paragraph -->\n<!-- /wp:studio-docs/callout -->\n\n<!-- wp:studio-docs/callout {\"type\":\"warning\",\"title\":\"Careful\"} -->\n<!-- wp:paragraph -->\n<p>Hot.</p>\n<!-- /wp:paragraph -->\n<!-- /wp:studio-docs/callout -->\n\n<!-- wp:studio-docs/code {\"language\":\"bash\"} -->\n<pre class=\"wp-block-studio-docs-code\"><code>studio start &#91;--path]</code></pre>\n<!-- /wp:studio-docs/code -->\n\n<!-- wp:code -->\n<pre class=\"wp-block-code\"><code>plain</code></pre>\n<!-- /wp:code -->" );
+$warnings      = array();
+$out           = Markdown_Out\blocks_to_markdown( $editor_blocks, array(), $warnings );
+check( 'markdown out: editor callout without wrapper', 0 === strpos( $out, "> [!NOTE]\n> Mind the gap." ), true );
+check( 'markdown out: callout title becomes a bold line, with a warning', array( strpos( $out, "> [!WARNING]\n> **Careful**\n>\n> Hot." ) !== false, count( $warnings ) ), array( true, 1 ) );
+check( 'markdown out: code block language from the attribute, brackets unescaped', strpos( $out, "```bash\nstudio start [--path]\n```" ) !== false, true );
+check( 'markdown out: core code block is a plain fence', strpos( $out, "```\nplain\n```" ) !== false, true );
+check( 'fingerprint: editor callout equals imported callout', Reverse\fingerprint( $editor_blocks[0] ), Reverse\fingerprint( Markdown_Out\parse( $convert( "> [!NOTE]\n> Mind the gap." ) )[0] ) );
+check( 'fingerprint: core code equals studio-docs code', Reverse\fingerprint( $editor_blocks[3] ), Reverse\fingerprint( Markdown_Out\parse( $convert( "```\nplain\n```" ) )[0] ) );
+check( 'verify: the callout title does not round-trip', Reverse\verify( $out, $editor_blocks, $convert )['index'], 1 );
+
+$out = Markdown_Out\blocks_to_markdown( $blocks );
+check( 'markdown out alert', strpos( $out, "> [!NOTE]\n> Careful." ) !== false, true );
+check( 'markdown out table', strpos( $out, "| a | b |\n|---|---|\n| 1 | 2 |" ) !== false, true );
+check( 'markdown out fence', strpos( $out, "```php\n<?php echo 1;\n```" ) !== false, true );
+check( 'markdown out nested list', strpos( $out, "- b\n    - nested" ) !== false, true );
+check( 'markdown out details', strpos( $out, "<details>\n<summary>More</summary>\n\nInside.\n\n</details>" ) !== false, true );
+check( 'markdown out hard break', Markdown_Out\html_to_markdown( '<p>one<br>two</p>' ), 'one<br>two' );
+check( 'markdown out links and images through the resolvers', Markdown_Out\html_to_markdown( '<p><a href="/docs/cli/#usage">CLI</a> <img src="/wp-content/uploads/docs/a.webp" alt="A"></p>', array( 'link' => static fn( $h ) => 0 === strpos( $h, '/docs/cli/' ) ? 'cli.md' . substr( $h, 10 ) : null, 'image' => static fn( $s ) => 'images/' . basename( $s ) ) ), '[CLI](cli.md#usage) ![A](images/a.webp)' );
+check( 'escape text', Markdown_Out\escape_text( 'a *b* [c] snake_case _x <tag> & &amp;' ), 'a \\*b\\* \\[c\\] snake_case \\_x &lt;tag> & &amp;amp;' );
+check( 'escape url text raw', Markdown_Out\escape_text( 'see https://x.y/*z*' ), 'see https://x.y/*z*' );
+
+$parts = Reverse\split_file( "---\ntitle: T\ndescription: D\n---\n\n# T\n\nBody.\n" );
+check( 'split file', array( $parts['title'], $parts['body'] ), array( 'T', "Body.\n" ) );
+check( 'join file', Reverse\join_file( $parts, 'Body.' ), "---\ntitle: T\ndescription: D\n---\n\n# T\n\nBody.\n" );
+check( 'join file keeps a missing final newline', Reverse\join_file( Reverse\split_file( "# T\n\nBody." ), 'Body.' ), "# T\n\nBody." );
+check( 'join file without a title', Reverse\join_file( Reverse\split_file( "---\ntitle: T\n---\n\nBody.\n" ), 'Body.' ), "---\ntitle: T\n---\n\nBody.\n" );
+check( 'front matter set', Reverse\set_front_matter_field( $parts['front_matter'], 'title', 'New: title' ), "---\ntitle: \"New: title\"\ndescription: D\n---\n" );
+check( 'front matter add', Reverse\set_front_matter_field( "---\ntitle: T\n---\n", 'description', 'D' ), "---\ntitle: T\ndescription: D\n---\n" );
+
+/*
+ * Upstream: the staged body against the file in Automattic/studio.
+ */
+$upstream = "# Page\n\nShort lede that the staging lifts into the description.\n\nSee the [CLI](https://developer.wordpress.com/docs/developer-tools/studio/cli/) for details.\n\n## [Install](#0-install)\n\n\\# Comment line\nstudio start\n\n# Another comment\nstudio stop\n\n![Shot](https://developer.wordpress.com/wp-content/uploads/2025/01/shot.webp)\n\nLast paragraph.\n";
+$staged   = "See the [CLI](cli.md) for details.\n\n## Install\n\n```bash\n# Comment line\nstudio start\n# Another comment\nstudio stop\n```\n\n![Shot](images/shot.webp)\n\nLast paragraph.";
+$up_parts = Reverse\split_file( $upstream );
+check( 'upstream key ignores targets, tags, fences and case', Upstream\key( "## [Install](#0-install)" ), Upstream\key( '## Install' ) );
+check( 'upstream key keeps image file names', Upstream\key( '![Shot](https://x/2025/01/shot.webp)' ), Upstream\key( '![Shot](images/shot.webp)' ) );
+$aligned = Upstream\align( Chunks\chunk( $staged ), Chunks\chunk( $up_parts['body'] ), array( 2 ) );
+check( 'upstream align: exact keys and a fence onto its run of lines', $aligned, array( 0 => array( 1 ), 1 => array( 2 ), 2 => array( 3, 4, 5 ), 3 => array( 6 ), 4 => array( 7 ) ) );
+$sblocks = Markdown_Out\parse( $convert( $staged ) );
+$noop    = Reverse\merge( $staged, $sblocks, $convert );
+check( 'upstream no-op replay is the upstream body', Upstream\apply( rtrim( $up_parts['body'], "\n" ), $staged, $noop['ops'] ), rtrim( $up_parts['body'], "\n" ) );
+$sedited                       = $sblocks;
+$sedited[0]['innerHTML']       = '<p>See the <a href="/docs/cli/">CLI</a> for all details.</p>';
+$sedited[0]['innerContent'][0] = $sedited[0]['innerHTML'];
+$up_resolvers = array( 'link' => static fn( $h ) => '/docs/cli/' === $h ? 'cli.md' : null );
+$merged       = Reverse\merge( $staged, $sedited, $convert, $up_resolvers );
+$warn         = array();
+$replayed     = Upstream\apply( rtrim( $up_parts['body'], "\n" ), $staged, $merged['ops'], $warn );
+check( 'upstream edit replay changes the one paragraph and keeps the lifted lede', array( strpos( $replayed, "Short lede that the staging lifts into the description.\n\nSee the [CLI](cli.md) for all details.\n\n## [Install](#0-install)" ), $warn ), array( 0, array() ) );
+$fence_edit = $sblocks;
+$fence_edit[2]['innerHTML']       = str_replace( 'studio stop', 'studio stop --all', $fence_edit[2]['innerHTML'] );
+$fence_edit[2]['innerContent'][0] = $fence_edit[2]['innerHTML'];
+$merged   = Reverse\merge( $staged, $fence_edit, $convert );
+$replayed = Upstream\apply( rtrim( $up_parts['body'], "\n" ), $staged, $merged['ops'], $warn );
+check( 'upstream fence edit replaces the run of upstream lines with the fence', array( strpos( $replayed, "## [Install](#0-install)\n\n```bash\n# Comment line\nstudio start\n# Another comment\nstudio stop --all\n```\n\n![Shot]" ) !== false, substr_count( $replayed, 'studio stop' ) ), array( true, 1 ) );
+check( 'upstream description replaced', Upstream\replace_description( $up_parts['body'], 'Short lede that the staging lifts into the description.', 'A new lede.' ), "A new lede.\n\nSee the [CLI](https://developer.wordpress.com/docs/developer-tools/studio/cli/) for details.\n\n## [Install](#0-install)\n\n\\# Comment line\nstudio start\n\n# Another comment\nstudio stop\n\n![Shot](https://developer.wordpress.com/wp-content/uploads/2025/01/shot.webp)\n\nLast paragraph.\n" );
+check( 'upstream description not found', Upstream\replace_description( $up_parts['body'], 'Something else', 'x' ), null );
+
+/*
+ * Drift: the stored-Markdown baseline, reversed with the pure resolvers.
+ */
+$staged_body = "See the [CLI](../cli.md#usage) and [this page](#top), the [home](../index.md).\n\n![A shot](../../images/shot.webp)\n\n```md\n[kept](../cli.md)\n```\n";
+$own         = 'content/blueprints/index.md';
+$routes      = array( '' => 'content/index.md', 'cli' => 'content/cli.md', 'blueprints' => $own );
+$forward     = Agent_Markdown\build(
+	$staged_body,
+	array( 'title' => 'Blueprints', 'description' => 'D', 'label' => 'Blueprints' ),
+	static fn( string $href ): ?string => array( '../cli.md#usage' => '/docs/cli/#usage', '../index.md' => '/docs/' )[ $href ] ?? null,
+	static fn( string $src, string $alt ): ?string => '/wp-content/uploads/docs/' . basename( $src )
+);
+check( 'drift: agent markdown has site links', strpos( $forward, '[CLI](/docs/cli/#usage)' ) !== false && strpos( $forward, '](/wp-content/uploads/docs/shot.webp)' ) !== false, true );
+$back = Agent_Markdown\rewrite(
+	trim( Reverse\split_file( $forward )['body'], "\n" ),
+	static fn( string $href ): ?string => Drift\link_back( $href, $own, static fn( string $route ): ?string => $routes[ $route ] ?? null ),
+	static fn( string $src, string $alt ): ?string => Drift\image_back( $src, $own, static fn( string $s ): ?string => '/wp-content/uploads/docs/shot.webp' === $s ? 'images/shot.webp' : null )
+);
+check( 'drift: stored baseline reverses to the staged body', $back, rtrim( $staged_body, "\n" ) );
+check( 'drift: link back with a host and to the own page', array( Drift\link_back( 'https://wordpress.studio/docs/cli/', 'content/index.md', static fn( $r ) => $routes[ $r ] ?? null ), Drift\link_back( '/docs/blueprints/#x', $own, static fn( $r ) => $routes[ $r ] ?? null ), Drift\link_back( 'https://example.com/docs/', $own, static fn( $r ) => null ) ), array( 'cli.md', '#x', null ) );
+check( 'drift: relative path', array( Drift\relative_path( 'content/a/b.md', 'images/x.webp' ), Drift\relative_path( 'index.md', 'images/x.webp' ) ), array( '../../images/x.webp', 'images/x.webp' ) );
+check( 'drift: staged front matter', Drift\staged_front_matter( 'T "q"', '', 'L' ), "---\ntitle: \"T \\\"q\\\"\"\nlabel: \"L\"\n---\n" );
+
+/*
+ * Drift: the content hash.
+ */
+$imported = $convert( $body );
+$hash     = Drift\content_hash( $imported, 'Title', 'Desc' );
+check( 'hash is versioned sha256', (bool) preg_match( '/^v1:[0-9a-f]{64}$/', $hash ), true );
+check( 'hash is stable', Drift\content_hash( $imported, 'Title', 'Desc' ), $hash );
+check( 'hash ignores a re-serialised page', Drift\content_hash( str_replace( '<!-- wp:heading -->', '<!-- wp:heading {"level":2,"className":""} -->', $imported ), ' Title ', 'Desc' ), $hash );
+check( 'hash sees a content change', Drift\content_hash( str_replace( 'Para one.', 'Para two.', $imported ), 'Title', 'Desc' ) === $hash, false );
+check( 'hash sees a title change', Drift\content_hash( $imported, 'Other', 'Desc' ) === $hash, false );
+check( 'changed fields', Drift\changed_fields( $hash, str_replace( 'Para one.', 'Para two.', $imported ), 'Title', 'New desc', 'Title', 'Desc' ), array( 'content', 'description' ) );
+check( 'changed fields: clean', Drift\changed_fields( $hash, $imported, 'Title', 'Desc', 'Title', 'Desc' ), array() );
+check( 'hash version check', array( Drift\is_current( $hash ), Drift\is_current( 'v0:abc' ) ), array( true, false ) );
 
 echo "\n{$GLOBALS['wdt_passed']} passed, {$GLOBALS['wdt_failed']} failed\n";
 exit( $GLOBALS['wdt_failed'] ? 1 : 0 );
