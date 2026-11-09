@@ -15,7 +15,7 @@
 // Then `studio wp wp-docs import --force` imports it (scripts/build-site.sh runs both).
 //
 // Usage: node scripts/build-docs-manifest.mjs
-//   STUDIO_DOCS_REF=<branch-or-sha>   pin a revision (default: ui-refresh-user-docs)
+//   STUDIO_DOCS_REF=<branch-or-sha>   pin a revision (default: trunk)
 //   STUDIO_DOCS_SOURCE=<path>         use a local checkout of Automattic/studio instead of cloning
 //   DOCS_BUILD_DIR=<path>             output folder (default: build/docs)
 
@@ -34,9 +34,7 @@ const cacheDir = join(out, ".cache", "studio");
 
 const SOURCE = {
 	repo: "https://github.com/Automattic/studio.git",
-	// The finished 2.0 docs live on the docs refresh branch (Automattic/studio#5517), which
-	// Automattic/studio#5772 merged into; switch the default to "trunk" once it merges.
-	ref: process.env.STUDIO_DOCS_REF || "ui-refresh-user-docs",
+	ref: process.env.STUDIO_DOCS_REF || "trunk",
 	path: "docs/user/docs",
 	// Screenshots captured by `npm run screenshots` in the Studio repo. A page still refers to the
 	// copy that was uploaded to developer.wordpress.com; the repo's file of the same name is used.
