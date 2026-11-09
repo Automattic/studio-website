@@ -143,7 +143,7 @@ html[data-theme="dark"] {
 [data-theme="dark"] .studio-docs .studio-docs-header .wp-block-site-logo img {
 	filter: invert(1);
 }
-.studio-docs .studio-docs-header .wp-block-site-title {
+.studio-docs .studio-docs-header .studio-docs-header__title {
 	min-width: 0;
 	margin: 0;
 	font-size: 1rem;
@@ -154,8 +154,9 @@ html[data-theme="dark"] {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
-.studio-docs .studio-docs-header .wp-block-site-title a {
+.studio-docs .studio-docs-header .studio-docs-header__title a {
 	color: var(--docs-foreground);
+	font-weight: inherit;
 	text-decoration: none;
 }
 .studio-docs .studio-docs-header__actions {
@@ -231,9 +232,6 @@ html[data-theme="dark"] {
 /* Core's layout zeroes the margins of a constrained group's children; the column's own rhythm. */
 .studio-docs .studio-docs-main > .wp-block-studio-docs-breadcrumbs {
 	margin-bottom: 0.5rem;
-}
-.studio-docs .studio-docs-main > .wp-block-studio-docs-toc {
-	margin-bottom: 1.5rem;
 }
 .studio-docs .studio-docs-main > .wp-block-studio-docs-pagination {
 	margin-top: 3rem;

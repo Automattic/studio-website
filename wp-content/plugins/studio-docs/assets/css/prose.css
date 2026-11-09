@@ -18,6 +18,10 @@
 .studio-docs-article > .wp-block-studio-docs-page-meta {
 	margin-block-start: 3.5rem;
 }
+/* The collapsible table of contents between the lede and the content, on screens without the rail. */
+.studio-docs-article > .wp-block-studio-docs-toc {
+	margin-block: 1.5rem;
+}
 
 /* Title and lede. */
 .studio-docs-article .wp-block-post-title {
