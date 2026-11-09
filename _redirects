@@ -4,3 +4,7 @@
 
 # Tools often look for the sitemap here first.
 /sitemap.xml  https://wordpress.studio/wp-sitemap.xml  301
+
+# The changelog lives in the docs; this address has been linked from the app and release notes.
+/changelog   https://wordpress.studio/docs/changelog/  301
+/changelog/  https://wordpress.studio/docs/changelog/  301
