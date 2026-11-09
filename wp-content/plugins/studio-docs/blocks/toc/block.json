@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/toc",
+	"version": "1.0.0",
+	"title": "Docs Table of Contents",
+	"category": "studio-docs",
+	"icon": "list-view",
+	"description": "\"On this page\": the headings of the current docs page, highlighting the one in view.",
+	"textdomain": "studio-docs",
+	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"collapsible": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
+}

@@ -1,0 +1,25 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/search",
+	"version": "1.0.0",
+	"title": "Docs Search",
+	"category": "studio-docs",
+	"icon": "search",
+	"description": "The docs search button and its dialog (⌘K), searching the docs index in the browser.",
+	"textdomain": "studio-docs",
+	"attributes": {
+		"placeholder": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"supports": {
+		"html": false,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
+}

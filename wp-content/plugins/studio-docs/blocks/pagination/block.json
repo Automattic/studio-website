@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/pagination",
+	"version": "1.0.0",
+	"title": "Docs Previous and Next",
+	"category": "studio-docs",
+	"icon": "leftright",
+	"description": "Links to the previous and the next docs page, in sidebar order.",
+	"textdomain": "studio-docs",
+	"usesContext": [ "postId", "postType" ],
+	"supports": {
+		"html": false,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

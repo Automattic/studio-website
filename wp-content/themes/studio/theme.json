@@ -410,7 +410,12 @@
 		{
 			"name": "docs-header",
 			"title": "Docs header",
-			"area": "uncategorized"
+			"area": "header"
+		},
+		{
+			"name": "docs-footer",
+			"title": "Docs footer",
+			"area": "footer"
 		}
 	]
 }

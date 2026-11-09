@@ -1,23 +1,39 @@
-<!-- wp:template-part {"slug":"docs-header","tagName":"div"} /-->
+<!-- wp:template-part {"slug":"docs-header"} /-->
 
-<!-- wp:studio-docs/layout -->
-<!-- wp:studio-docs/sidebar /-->
+<!-- wp:group {"className":"studio-docs-layout","layout":{"type":"default"}} -->
+<div class="wp-block-group studio-docs-layout"><!-- wp:studio-docs/sidebar -->
+<!-- wp:group {"className":"studio-docs-sidebar__featured","layout":{"type":"default"}} -->
+<div class="wp-block-group studio-docs-sidebar__featured"><!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li><a href="https://wordpress.studio">WordPress Studio</a></li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list --></div>
+<!-- /wp:group -->
 
-<!-- wp:studio-docs/main -->
-<!-- wp:studio-docs/breadcrumbs /-->
+<!-- wp:studio-docs/navigation /-->
+<!-- /wp:studio-docs/sidebar -->
 
-<!-- wp:studio-docs/toc {"variant":"mobile"} /-->
+<!-- wp:group {"tagName":"main","className":"studio-docs-main","layout":{"type":"constrained","contentSize":"42rem"}} -->
+<main class="wp-block-group studio-docs-main"><!-- wp:studio-docs/breadcrumbs /-->
 
-<!-- wp:studio-docs/article /-->
+<!-- wp:studio-docs/toc {"collapsible":true} /-->
 
-<!-- wp:studio-docs/pagination /-->
-<!-- /wp:studio-docs/main -->
+<!-- wp:group {"tagName":"article","className":"studio-docs-article","layout":{"type":"default"}} -->
+<article class="wp-block-group studio-docs-article"><!-- wp:post-title {"level":1} /-->
 
-<!-- wp:studio-docs/rail -->
-<!-- wp:studio-docs/toc /-->
+<!-- wp:post-excerpt /-->
 
-<!-- wp:studio-docs/page-actions /-->
-<!-- /wp:studio-docs/rail -->
-<!-- /wp:studio-docs/layout -->
+<!-- wp:post-content /--></article>
+<!-- /wp:group -->
 
-<!-- wp:studio-docs/footer /-->
+<!-- wp:studio-docs/pagination /--></main>
+<!-- /wp:group -->
+
+<!-- wp:group {"tagName":"aside","className":"studio-docs-rail","layout":{"type":"default"}} -->
+<aside class="wp-block-group studio-docs-rail"><!-- wp:studio-docs/toc /-->
+
+<!-- wp:studio-docs/page-actions /--></aside>
+<!-- /wp:group --></div>
+<!-- /wp:group -->
+
+<!-- wp:template-part {"slug":"docs-footer"} /-->

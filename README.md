@@ -51,7 +51,7 @@ The content lives in one SQLite file, `wp-content/database/.ht.sqlite`. Git can 
 
 ## The docs
 
-The Studio documentation at wordpress.studio/docs is WordPress too: the `docs` post type of the `studio-docs` plugin (`wp-content/plugins/studio-docs`), rendered by the plugin's blocks through the `single-docs` and `archive-docs` templates of the theme. The markdown is not edited here. Its source of truth is `docs/user/docs/` in the [Studio repository](https://github.com/Automattic/studio/tree/trunk/docs/user), so the docs evolve with the code and ship with each release; the site imports it at build time and the posts are build output (the database is not committed).
+The Studio documentation at wordpress.studio/docs is WordPress too: the `docs` post type of the `studio-docs` plugin (`wp-content/plugins/studio-docs`), rendered by the theme's `single-docs` template and its docs header and footer parts, built from core blocks and the plugin's blocks (code, callout, navigation, table of contents, search, …), so the pages and the templates open in the block editor and the Site Editor like the rest of the site. The markdown is not edited here. Its source of truth is `docs/user/docs/` in the [Studio repository](https://github.com/Automattic/studio/tree/trunk/docs/user), so the docs evolve with the code and ship with each release; the site imports it at build time and the posts are build output (the database is not committed).
 
 ```bash
 npm install                            # once: Shiki, for the code highlighting

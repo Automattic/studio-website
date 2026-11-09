@@ -1,51 +1,49 @@
 <?php
 /**
- * Rendering helpers shared by the blocks: the current page, the sidebar tree, icons, code highlights.
- *
- * The markup and class names follow the Blume build of the docs element by element (the Tailwind
- * utility classes are the spec; assets/css/docs.css is Blume's compiled stylesheet, pruned to what
- * these pages use), so the WordPress version looks the same in both color schemes.
+ * Rendering helpers shared by the blocks: the docs page a block renders for, icons, the code
+ * highlights, the table of contents, the sidebar tree, the previous and next pages.
  *
  * @package WP_Docs
  */
 
 namespace WP_Docs\Render;
 
+use WP_Block;
 use WP_Post;
 
 defined( 'WPINC' ) || die();
 
 /**
- * The docs page the request shows: the single page, or the home on /docs/.
+ * The docs page a block renders for: the block's `postId` context (templates pass the queried page,
+ * the editor the one being edited), else the queried page, else the docs home (the Site Editor's
+ * template preview, where there is no page).
  *
+ * @param WP_Block|null $block Block, for its context.
  * @return WP_Post|null
  */
-function current_doc() {
-	$id = \WP_Docs\Agents::current_page_id();
-	if ( $id ) {
-		return get_post( $id );
+function current_doc( $block = null ) {
+	$id = 0;
+	if ( $block instanceof WP_Block && ! empty( $block->context['postId'] ) ) {
+		$id = (int) $block->context['postId'];
 	}
-	// Outside a front-end request (the editor's server-side previews), the post being edited.
-	$post = get_post();
+	if ( ! $id ) {
+		$id = \WP_Docs\Agents::current_page_id();
+	}
+	if ( ! $id ) {
+		$post = get_post();
+		if ( $post instanceof WP_Post && \WP_Docs\POST_TYPE === $post->post_type ) {
+			$id = $post->ID;
+		}
+	}
+	if ( ! $id ) {
+		$id = \WP_Docs\Permalinks::post_for_path( '' );
+	}
+	$post = $id ? get_post( $id ) : null;
 	return $post instanceof WP_Post && \WP_Docs\POST_TYPE === $post->post_type ? $post : null;
 }
 
 /**
- * Tree node of the current page.
- *
- * @return array|null
- */
-function current_node() {
-	$post = current_doc();
-	if ( ! $post ) {
-		return null;
-	}
-	$tree = wp_docs_get_tree();
-	return $tree['nodes'][ $post->ID ] ?? null;
-}
-
-/**
- * Root-relative URL of a tree node (the site is static: links never carry a host).
+ * Root-relative URL of a tree node (the site is exported as static files: links never carry a host).
  *
  * @param array $node Node.
  * @return string
@@ -55,68 +53,36 @@ function node_href( array $node ) {
 }
 
 /**
- * An icon from the sprite printed in the footer (Blume's `#blume-i-*` symbols).
+ * An inline icon (Lucide outlines).
  *
- * @param string $name  Symbol name.
- * @param int    $size  Width and height.
+ * @param string $name  Icon name.
+ * @param int    $size  Width and height in pixels.
  * @param string $class Extra classes.
  * @return string
  */
 function icon( $name, $size = 16, $class = '' ) {
-	return sprintf(
-		'<svg aria-hidden="true"%s height="%d" width="%d"><use href="#blume-i-%s"></use></svg>',
-		'' !== $class ? ' class="' . esc_attr( $class ) . '"' : '',
-		(int) $size,
-		(int) $size,
-		esc_attr( $name )
-	);
-}
-
-/**
- * An inline Lucide-style icon (what Blume's scripts draw for the copy buttons and the search rows).
- *
- * @param string $name  check|copy|file|chevron-down|search.
- * @param int    $size  Size.
- * @param string $class Classes.
- * @return string
- */
-function inline_icon( $name, $size = 14, $class = '' ) {
 	$paths = array(
-		'check'        => '<path d="M20 6 9 17l-5-5"/>',
-		'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
-		'copy'         => '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
-		'file'         => '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
-		'search'       => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+		'arrow-left'     => '<path d="m12 19-7-7 7-7M19 12H5"/>',
+		'arrow-right'    => '<path d="M5 12h14m-7-7 7 7-7 7"/>',
+		'arrow-up'       => '<path d="m5 12 7-7 7 7m-7 7V5"/>',
+		'arrow-up-right' => '<path d="M7 7h10v10M7 17 17 7"/>',
+		'check'          => '<path d="M20 6 9 17l-5-5"/>',
+		'chevron-down'   => '<path d="m6 9 6 6 6-6"/>',
+		'chevron-right'  => '<path d="m9 18 6-6-6-6"/>',
+		'copy'           => '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+		'external-link'  => '<path d="M15 3h6v6m-11 5L21 3m-3 10v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+		'file'           => '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
+		'menu'           => '<path d="M4 5h16M4 12h16M4 19h16"/>',
+		'moon'           => '<path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/>',
+		'search'         => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+		'sun'            => '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>',
 	);
 	return sprintf(
-		'<svg xmlns="http://www.w3.org/2000/svg" width="%1$d" height="%1$d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"%2$s>%3$s</svg>',
+		'<svg xmlns="http://www.w3.org/2000/svg" width="%1$d" height="%1$d" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"%2$s>%3$s</svg>',
 		(int) $size,
 		'' !== $class ? ' class="' . esc_attr( $class ) . '"' : '',
 		$paths[ $name ] ?? ''
 	);
-}
-
-/**
- * The SVG sprite with every symbol the blocks use.
- *
- * @return string
- */
-function sprite() {
-	$stroke = 'fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"';
-	return '<svg aria-hidden="true" hidden xmlns="http://www.w3.org/2000/svg">'
-		. '<symbol id="blume-i-menu" viewBox="0 0 24 24"><path ' . $stroke . ' d="M4 5h16M4 12h16M4 19h16"/></symbol>'
-		. '<symbol id="blume-i-chevron-right" viewBox="0 0 24 24"><path ' . $stroke . ' d="m9 18l6-6l-6-6"/></symbol>'
-		. '<symbol id="blume-i-sun" viewBox="0 0 24 24"><g ' . $stroke . '><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></g></symbol>'
-		. '<symbol id="blume-i-moon" viewBox="0 0 24 24"><path ' . $stroke . ' d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></symbol>'
-		. '<symbol id="blume-i-arrow-up-right" viewBox="0 0 24 24"><path ' . $stroke . ' d="M7 7h10v10M7 17L17 7"/></symbol>'
-		. '<symbol id="blume-i-chevron-down" viewBox="0 0 24 24"><path ' . $stroke . ' d="m6 9l6 6l6-6"/></symbol>'
-		. '<symbol id="blume-i-arrow-left" viewBox="0 0 24 24"><path ' . $stroke . ' d="m12 19l-7-7l7-7m7 7H5"/></symbol>'
-		. '<symbol id="blume-i-arrow-right" viewBox="0 0 24 24"><path ' . $stroke . ' d="M5 12h14m-7-7l7 7l-7 7"/></symbol>'
-		. '<symbol id="blume-i-arrow-up" viewBox="0 0 24 24"><path ' . $stroke . ' d="m5 12l7-7l7 7m-7 7V5"/></symbol>'
-		. '<symbol id="blume-i-copy" viewBox="0 0 24 24"><g ' . $stroke . '><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></g></symbol>'
-		. '<symbol id="blume-i-external-link" viewBox="0 0 24 24"><path ' . $stroke . ' d="M15 3h6v6m-11 5L21 3m-3 10v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>'
-		. '<symbol id="blume-i-search" viewBox="0 0 24 24"><g ' . $stroke . '><path d="m21 21l-4.34-4.34"/><circle cx="11" cy="11" r="8"/></g></symbol>'
-		. '</svg>';
 }
 
 /**
@@ -130,7 +96,7 @@ function asset( $path ) {
 }
 
 /**
- * The display name of a code block language (Blume's map).
+ * The display name of a code block language.
  *
  * @param string $lang Fence language.
  * @return string
@@ -157,6 +123,7 @@ function language_label( $lang ) {
 		'graphql'      => 'GraphQL',
 		'html'         => 'HTML',
 		'http'         => 'HTTP',
+		'ini'          => 'INI',
 		'java'         => 'Java',
 		'javascript'   => 'JavaScript',
 		'js'           => 'JavaScript',
@@ -204,7 +171,7 @@ function language_label( $lang ) {
 }
 
 /**
- * The icon drawn next to a code block's language label (Blume's `data-icon`).
+ * The icon drawn next to a code block's language label (the block's stylesheet knows these two).
  *
  * @param string $lang Fence language.
  * @return string Empty when there is none.
@@ -261,10 +228,9 @@ function highlight( $lang, $code ) {
 function toc_items( WP_Post $post ) {
 	$items = array();
 	foreach ( \WP_Docs\Transforms\Anchors\headings( (string) $post->post_content, array( 2, 3 ) ) as $heading ) {
-		if ( '' === $heading['anchor'] ) {
-			continue;
+		if ( '' !== $heading['anchor'] ) {
+			$items[] = $heading;
 		}
-		$items[] = $heading;
 	}
 	return $items;
 }
@@ -272,19 +238,15 @@ function toc_items( WP_Post $post ) {
 /**
  * The list of a table of contents.
  *
- * @param array  $items      toc_items().
- * @param string $list_class Classes of the `<ul>`.
- * @param string $link_class Classes of each link.
+ * @param array $items toc_items().
  * @return string
  */
-function toc_list( array $items, $list_class, $link_class ) {
-	$html = '<ul class="' . esc_attr( $list_class ) . '">';
+function toc_list( array $items ) {
+	$html = '<ul class="studio-docs-toc__list">';
 	foreach ( $items as $item ) {
 		$html .= sprintf(
-			'<li data-depth="%1$d" style="padding-inline-start:%2$srem"><a class="%3$s" href="#%4$s">%5$s</a></li>',
+			'<li class="is-level-%1$d"><a href="#%2$s">%3$s</a></li>',
 			(int) $item['level'],
-			3 === (int) $item['level'] ? '0.75' : '0',
-			esc_attr( $link_class ),
 			esc_attr( $item['anchor'] ),
 			esc_html( $item['text'] )
 		);
@@ -327,7 +289,7 @@ function popular_pages() {
  */
 function nav_tree( $current ) {
 	$tree = wp_docs_get_tree();
-	$html = '<ul class="m-0 list-none space-y-px p-0">';
+	$html = '<ul class="studio-docs-nav">';
 	if ( $tree['home'] && isset( $tree['nodes'][ $tree['home'] ] ) ) {
 		$html .= nav_item( $tree['nodes'][ $tree['home'] ], $current );
 	}
@@ -342,8 +304,8 @@ function nav_tree( $current ) {
 		$groups[ $node['group'] ]['items'][] = $id;
 	}
 	foreach ( $groups as $group ) {
-		$html .= '<li class="mt-6"><p class="blume-nav-heading"><span class="truncate">' . esc_html( $group['title'] ) . '</span></p>';
-		$html .= '<div class="space-y-0.5">' . nav_list( $group['items'], $current, $tree ) . '</div></li>';
+		$html .= '<li class="studio-docs-nav__group"><p class="studio-docs-nav__heading"><span>' . esc_html( $group['title'] ) . '</span></p>';
+		$html .= nav_list( $group['items'], $current, $tree ) . '</li>';
 	}
 	return $html . '</ul>';
 }
@@ -357,7 +319,7 @@ function nav_tree( $current ) {
  * @return string
  */
 function nav_list( array $ids, $current, array $tree ) {
-	$html = '<ul class="m-0 list-none space-y-px p-0">';
+	$html = '<ul>';
 	foreach ( $ids as $id ) {
 		$node = $tree['nodes'][ $id ];
 		if ( empty( $tree['children'][ $id ] ) ) {
@@ -365,7 +327,7 @@ function nav_list( array $ids, $current, array $tree ) {
 			continue;
 		}
 		$html .= sprintf(
-			'<li class="mt-6"><p class="blume-nav-heading"><a class="blume-nav-heading-link" href="%1$s"><span class="truncate">%2$s</span></a></p><div class="space-y-0.5">%3$s</div></li>',
+			'<li class="studio-docs-nav__group"><p class="studio-docs-nav__heading"><a class="studio-docs-nav__heading-link" href="%1$s"><span>%2$s</span></a></p>%3$s</li>',
 			esc_url( node_href( $node ) ),
 			esc_html( $node['heading'] ),
 			nav_list( array_merge( array( $id ), $tree['children'][ $id ] ), $current, array_merge( $tree, array( 'children' => array_diff_key( $tree['children'], array( $id => true ) ) ) ) )
@@ -383,7 +345,7 @@ function nav_list( array $ids, $current, array $tree ) {
  */
 function nav_item( array $node, $current ) {
 	return sprintf(
-		'<li><a%1$s class="blume-nav-link truncate" href="%2$s">%3$s</a></li>',
+		'<li><a class="studio-docs-nav__link"%1$s href="%2$s">%3$s</a></li>',
 		(int) $node['id'] === (int) $current ? ' aria-current="page"' : '',
 		esc_url( node_href( $node ) ),
 		esc_html( $node['label'] )

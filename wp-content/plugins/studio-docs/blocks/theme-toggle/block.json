@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/theme-toggle",
+	"version": "1.0.0",
+	"title": "Docs Theme Toggle",
+	"category": "studio-docs",
+	"icon": "lightbulb",
+	"description": "Switches the docs between the light and the dark color scheme.",
+	"textdomain": "studio-docs",
+	"supports": {
+		"html": false,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css",
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
+}

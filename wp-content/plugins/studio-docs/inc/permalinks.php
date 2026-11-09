@@ -95,10 +95,12 @@ class Permalinks {
 	 */
 	public static function parse_request( $wp ) {
 		$request = trim( (string) $wp->request, '/' );
-		if ( 0 !== strpos( $request, 'docs/' ) ) {
+		if ( 'docs' !== $request && 0 !== strpos( $request, 'docs/' ) ) {
 			return;
 		}
-		$id = self::post_for_path( substr( $request, 5 ) );
+		// `/docs/` itself is the home page (the manifest `index`, stored with an empty path), shown with the
+		// single template like every other page; without a home, the post type archive answers.
+		$id = self::post_for_path( (string) substr( $request, 4 ) );
 		if ( ! $id ) {
 			return;
 		}

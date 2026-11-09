@@ -1,0 +1,7 @@
+.wp-block-studio-docs-theme-toggle .studio-docs-theme-toggle__dark,
+[data-theme="dark"] .wp-block-studio-docs-theme-toggle .studio-docs-theme-toggle__light {
+	display: none;
+}
+[data-theme="dark"] .wp-block-studio-docs-theme-toggle .studio-docs-theme-toggle__dark {
+	display: block;
+}

@@ -1,0 +1,6 @@
+/* Shown while the sidebar is a drawer (below the sidebar breakpoint, 64rem). */
+@media (min-width: 64rem) {
+	.studio-docs .studio-docs-icon-button.wp-block-studio-docs-menu-toggle {
+		display: none;
+	}
+}

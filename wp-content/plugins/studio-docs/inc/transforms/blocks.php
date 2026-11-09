@@ -14,12 +14,12 @@
  * |--------------------------------------|--------------------------------------------------------|
  * | `<p>`, stray inline content          | core/paragraph                                         |
  * | `<h1>`..`<h6>`                       | core/heading (level, id kept as the anchor)            |
- * | `<pre><code class="language-x">`     | studio-docs/code (`language` and `code` attributes; rendered with the Shiki output) |
+ * | `<pre><code class="language-x">`     | studio-docs/code (`language` attribute, the code in `<code>`) |
  * | `<pre>` without `<code>`             | core/preformatted                                      |
  * | `<ul>`, `<ol>`                       | core/list + core/list-item (nested lists as inner blocks) |
- * | `<table>`                            | studio-docs/table (`html` attribute, `align` becomes `has-text-align-*`) |
+ * | `<table>`                            | core/table (`align` becomes `has-text-align-*`)        |
  * | `<blockquote>`                       | core/quote with inner blocks                           |
- * | `<img>` alone, `<figure><img>`       | studio-docs/image (`src`, `alt`, `id` from `wp-image-<id>`, `href`, `caption`) |
+ * | `<img>` alone, `<figure><img>`       | core/image (attachment id from `wp-image-<id>`)        |
  * | `<hr>`                               | core/separator                                         |
  * | alert placeholder (alerts.php)       | studio-docs/callout (default), wporg/notice, wporg/callout or core/group |
  * | `<details>`                          | core/details with inner blocks                         |
@@ -327,15 +327,25 @@ function code( DOMElement $pre ): string {
 		$language = strtolower( $code->getAttribute( 'lang' ) );
 	}
 
-	// The parser ends every code block with a newline; the code block does not need it. The code is
-	// stored as text in an attribute (the block has no saved markup), decoded from the parser's entities.
-	$text  = html_entity_decode( preg_replace( '/\n$/', '', inner_html( $code ) ), ENT_QUOTES | ENT_HTML5, 'UTF-8' );
-	$attrs = array( 'code' => $text );
-	if ( '' !== $language ) {
-		$attrs = array( 'language' => $language ) + $attrs;
-	}
+	// The parser ends every code block with a newline; the code block does not need it. The code is the
+	// block's rich-text content (`<code>`), escaped the way the block's save does (core's code block
+	// escaping: `[` and a lone URL's `//`, so shortcodes and embeds never fire).
+	$inner = escape_code( preg_replace( '/\n$/', '', inner_html( $code ) ) );
+	$attrs = '' !== $language ? array( 'language' => $language ) : array();
 
-	return serialize_void_block( 'studio-docs/code', $attrs );
+	return serialize_block( 'studio-docs/code', $attrs, '<pre class="wp-block-studio-docs-code"><code>' . $inner . '</code></pre>' );
+}
+
+/**
+ * The escaping the code block's save applies to its content (core's code block, utils.js: opening
+ * square brackets, and the `//` of a line that is only a URL).
+ *
+ * @param string $html Code as HTML text (entities for `<`, `>` and `&`).
+ * @return string
+ */
+function escape_code( string $html ): string {
+	$html = str_replace( '[', '&#91;', $html );
+	return (string) preg_replace( '/^(\s*https?:)\/\/([^\s<>"]+\s*)$/m', '$1&#47;&#47;$2', $html );
 }
 
 /**
@@ -451,7 +461,7 @@ function list_item( DOMElement $li ): ?string {
  * @return string
  */
 function table( DOMElement $table ): string {
-	$html = '<table>';
+	$html = '<figure class="wp-block-table"><table>';
 	foreach ( $table->childNodes as $section ) {
 		if ( ! $section instanceof DOMElement ) {
 			continue;
@@ -472,9 +482,9 @@ function table( DOMElement $table ): string {
 		}
 		$html .= '</' . $name . '>';
 	}
-	$html .= '</table>';
+	$html .= '</table></figure>';
 
-	return serialize_void_block( 'studio-docs/table', array( 'html' => $html ) );
+	return serialize_block( 'core/table', array(), $html );
 }
 
 /**
@@ -559,24 +569,35 @@ function image_from( DOMElement $el ): ?string {
 		$id = (int) $m[1];
 	}
 
-	$attrs = array(
-		'src' => $el->getAttribute( 'src' ),
-		'alt' => $el->getAttribute( 'alt' ),
-	);
+	$attrs  = array();
+	$figure = 'wp-block-image';
 	if ( $id ) {
-		$attrs['id'] = $id;
+		$attrs['id']       = $id;
+		$attrs['sizeSlug'] = 'full';
+		$figure           .= ' size-full';
 	}
-	if ( '' !== $el->getAttribute( 'title' ) ) {
-		$attrs['title'] = $el->getAttribute( 'title' );
-	}
-	if ( null !== $link ) {
-		$attrs['href'] = $link;
-	}
-	if ( '' !== $caption ) {
-		$attrs['caption'] = $caption;
+	$attrs['linkDestination'] = null === $link ? 'none' : 'custom';
+	if ( ! $id && null === $link ) {
+		$attrs = array();
 	}
 
-	return serialize_void_block( 'studio-docs/image', $attrs );
+	$img_html = '<img' . attrs_html(
+		array(
+			'src'   => $el->getAttribute( 'src' ),
+			'alt'   => $el->getAttribute( 'alt' ),
+			'class' => $id ? 'wp-image-' . $id : '',
+			'title' => $el->getAttribute( 'title' ),
+		),
+		array( 'alt' )
+	) . '/>';
+	if ( null !== $link ) {
+		$img_html = '<a' . attrs_html( array( 'href' => $link ) ) . '>' . $img_html . '</a>';
+	}
+	if ( '' !== $caption ) {
+		$img_html .= '<figcaption class="wp-element-caption">' . $caption . '</figcaption>';
+	}
+
+	return serialize_block( 'core/image', $attrs, '<figure class="' . $figure . '">' . $img_html . '</figure>' );
 }
 
 /**

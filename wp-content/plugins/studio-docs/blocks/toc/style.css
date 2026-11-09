@@ -1,0 +1,102 @@
+/* "On this page" in the rail. */
+.wp-block-studio-docs-toc {
+	font-size: 0.875rem;
+	line-height: 1.4286;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__title {
+	margin: 0 0 0.75rem;
+	color: var(--docs-foreground);
+	font-size: 0.875rem;
+	font-weight: 600;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__list li {
+	margin: 0;
+	padding: 0;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__list .is-level-3 {
+	padding-inline-start: 0.75rem;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__list a {
+	display: block;
+	padding: 0.375rem 0;
+	color: var(--docs-muted-foreground);
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__list a:hover,
+.wp-block-studio-docs-toc .studio-docs-toc__list a[aria-current="location"] {
+	color: var(--docs-foreground);
+}
+.wp-block-studio-docs-toc .studio-docs-toc__list a[aria-current="location"] {
+	font-weight: 500;
+}
+
+/* The collapsible form above the article, for screens without the rail. */
+.wp-block-studio-docs-toc.is-collapsible {
+	margin: 0 0 1.5rem;
+	border: 1px solid var(--docs-border);
+	border-radius: var(--docs-radius);
+}
+.wp-block-studio-docs-toc.is-collapsible.is-empty {
+	border: 0;
+}
+.wp-block-studio-docs-toc.is-collapsible.is-empty:not(:has(.wp-block-studio-docs-page-actions)) {
+	display: none;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__summary {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.75rem 1rem;
+	color: var(--docs-foreground);
+	font-weight: 500;
+	list-style: none;
+	cursor: pointer;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__summary::-webkit-details-marker {
+	display: none;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__summary svg {
+	color: var(--docs-muted-foreground);
+	transition: transform 0.15s;
+}
+.wp-block-studio-docs-toc[open] .studio-docs-toc__summary svg {
+	transform: rotate(180deg);
+}
+.wp-block-studio-docs-toc.is-collapsible .studio-docs-toc__list {
+	padding: 0.5rem;
+	border-top: 1px solid var(--docs-border);
+}
+.wp-block-studio-docs-toc.is-collapsible .studio-docs-toc__list a {
+	padding: 0.375rem 0.5rem;
+	border-radius: 0.375rem;
+	font-weight: 500;
+	color: var(--docs-foreground);
+}
+.wp-block-studio-docs-toc.is-collapsible .studio-docs-toc__list a:not(:hover):not([aria-current="location"]) {
+	color: var(--docs-muted-foreground);
+	font-weight: 400;
+}
+.wp-block-studio-docs-toc .studio-docs-toc__actions:not(:empty) {
+	border-top: 1px solid var(--docs-border);
+}
+.wp-block-studio-docs-toc.is-empty .studio-docs-toc__actions:not(:empty) {
+	border: 1px solid var(--docs-border);
+	border-radius: var(--docs-radius);
+}
+@media (min-width: 80rem) {
+	.wp-block-studio-docs-toc.is-collapsible {
+		display: none;
+	}
+}
+@media print {
+	.wp-block-studio-docs-toc {
+		display: none;
+	}
+}

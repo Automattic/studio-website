@@ -285,7 +285,9 @@ check( 'blocks: freeform found', Blocks\find_freeform( "text\n<!-- wp:paragraph 
 check( 'blocks: bare text wrapped', Blocks\convert( "Bare <em>text</em>\n<h2>H</h2>" ), "<!-- wp:paragraph -->\n<p>Bare <em>text</em></p>\n<!-- /wp:paragraph -->\n\n<!-- wp:heading -->\n<h2 class=\"wp-block-heading\">H</h2>\n<!-- /wp:heading -->" );
 check( 'blocks: attribute escaping like core', Blocks\serialize_block( 'core/paragraph', array( 'className' => 'a--b<c>&"' ), '<p>x</p>' ), "<!-- wp:paragraph {\"className\":\"a\\u002d\\u002db\\u003cc\\u003e\\u0026\\u0022\"} -->\n<p>x</p>\n<!-- /wp:paragraph -->" );
 check( 'blocks: ordered list start', strpos( Blocks\convert( '<ol start="3"><li>c</li></ol>' ), '<!-- wp:list {"ordered":true,"start":3} -->' . "\n" . '<ol class="wp-block-list" start="3">' ) === 0, true );
-check( 'blocks: figure with caption', Blocks\convert( '<figure><img src="a.png" alt="A"><figcaption>Cap</figcaption></figure>' ), "<!-- wp:studio-docs/image {\"src\":\"a.png\",\"alt\":\"A\",\"caption\":\"Cap\"} /-->" );
+check( 'blocks: figure with caption', Blocks\convert( '<figure><img src="a.png" alt="A"><figcaption>Cap</figcaption></figure>' ), "<!-- wp:image -->\n<figure class=\"wp-block-image\"><img src=\"a.png\" alt=\"A\"/><figcaption class=\"wp-element-caption\">Cap</figcaption></figure>\n<!-- /wp:image -->" );
+check( 'blocks: code block keeps the language, escapes brackets', Blocks\convert( '<pre><code class="language-bash">echo [x] &lt;y&gt;</code></pre>' ), "<!-- wp:studio-docs/code {\"language\":\"bash\"} -->\n<pre class=\"wp-block-studio-docs-code\"><code>echo &#91;x] &lt;y&gt;</code></pre>\n<!-- /wp:studio-docs/code -->" );
+check( 'blocks: table is a core table', strpos( Blocks\convert( '<table><thead><tr><th>A</th></tr></thead><tbody><tr><td>1</td></tr></tbody></table>' ), "<!-- wp:table -->\n<figure class=\"wp-block-table\"><table><thead><tr><th>A</th></tr></thead>" ) === 0, true );
 check( 'blocks: pre without code is preformatted', Blocks\convert( '<pre>x</pre>' ), "<!-- wp:preformatted -->\n<pre class=\"wp-block-preformatted\">x</pre>\n<!-- /wp:preformatted -->" );
 check( 'blocks: empty input', Blocks\convert( '' ), '' );
 

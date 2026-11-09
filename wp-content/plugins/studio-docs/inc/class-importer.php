@@ -28,7 +28,7 @@ class Importer extends Markdown_Importer {
 	/**
 	 * Bump when a transform changes, so stored ETags stop short-circuiting re-imports.
 	 */
-	const TRANSFORM_VERSION = 4;
+	const TRANSFORM_VERSION = 5;
 
 	/**
 	 * Cron hook for the full, ordered import (manifest stage, then Markdown stage).
@@ -781,13 +781,9 @@ class Importer extends Markdown_Importer {
 		if ( ! $this->current || empty( $postarr['ID'] ) || (int) $postarr['ID'] !== $this->current['post_id'] || ! isset( $postarr['post_content'] ) ) {
 			return $data;
 		}
-		$description = $this->description_for( $this->current['doc'], (array) $this->current['front_matter'] );
-		if ( '' === $description && ! empty( $this->current['first_para'] ) ) {
-			$description = $this->current['first_para'];
-		}
-		if ( '' !== $description ) {
-			$data['post_excerpt'] = wp_slash( sanitize_text_field( $description ) );
-		}
+		// The description only: the Post Excerpt block in the docs template shows it as the lede, and
+		// stays empty for a page without one (a generated excerpt would repeat the first paragraph).
+		$data['post_excerpt'] = wp_slash( sanitize_text_field( $this->description_for( $this->current['doc'], (array) $this->current['front_matter'] ) ) );
 		return $data;
 	}
 

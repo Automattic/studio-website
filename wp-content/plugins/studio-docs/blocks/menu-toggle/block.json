@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/menu-toggle",
+	"version": "1.0.0",
+	"title": "Docs Menu Toggle",
+	"category": "studio-docs",
+	"icon": "menu",
+	"description": "The button that opens the docs navigation drawer on small screens.",
+	"textdomain": "studio-docs",
+	"supports": {
+		"html": false,
+		"inserter": true,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

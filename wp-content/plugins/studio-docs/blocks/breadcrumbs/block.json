@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio-docs/breadcrumbs",
+	"version": "1.0.0",
+	"title": "Docs Breadcrumbs",
+	"category": "studio-docs",
+	"icon": "ellipsis",
+	"description": "The group or parent page of the current docs page, above its title.",
+	"textdomain": "studio-docs",
+	"usesContext": [ "postId", "postType" ],
+	"supports": {
+		"html": false,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css",
+	"render": "file:./render.php"
+}

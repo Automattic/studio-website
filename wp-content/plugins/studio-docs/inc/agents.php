@@ -458,14 +458,14 @@ class Agents {
 		$text = '';
 		foreach ( $blocks as $block ) {
 			$name = (string) ( $block['blockName'] ?? '' );
-			if ( 'studio-docs/code' === $name ) {
-				$text .= ' ' . (string) ( $block['attrs']['code'] ?? '' ) . ' ';
-			} elseif ( 'studio-docs/table' === $name ) {
-				$text .= ' ' . preg_replace( '#</(td|th|tr)>#i', ' ', (string) ( $block['attrs']['html'] ?? '' ) ) . ' ';
-			} elseif ( 'studio-docs/image' === $name ) {
-				$text .= ' ' . (string) ( $block['attrs']['alt'] ?? '' ) . ' ';
+			if ( 'core/image' === $name ) {
+				// The alt text, which the tag stripping would drop.
+				$tags = new \WP_HTML_Tag_Processor( (string) $block['innerHTML'] );
+				if ( $tags->next_tag( 'img' ) ) {
+					$text .= ' ' . (string) $tags->get_attribute( 'alt' ) . ' ';
+				}
 			} else {
-				$text .= ' ' . preg_replace( '#</(p|li|h[1-6]|tr|pre|blockquote|div)>#i', ' ', (string) $block['innerHTML'] ) . ' ';
+				$text .= ' ' . preg_replace( '#</(p|li|h[1-6]|td|th|tr|pre|code|blockquote|div)>#i', ' ', (string) $block['innerHTML'] ) . ' ';
 			}
 			if ( ! empty( $block['innerBlocks'] ) ) {
 				$text .= self::blocks_text( $block['innerBlocks'] );

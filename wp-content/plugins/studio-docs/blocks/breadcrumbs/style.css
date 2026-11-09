@@ -1,0 +1,14 @@
+.wp-block-studio-docs-breadcrumbs {
+	margin-bottom: 0.5rem;
+	color: var(--docs-muted-foreground);
+	font-size: 0.875rem;
+	line-height: 1.4286;
+}
+.wp-block-studio-docs-breadcrumbs a {
+	color: inherit;
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.wp-block-studio-docs-breadcrumbs a:hover {
+	color: var(--docs-foreground);
+}

@@ -1,0 +1,126 @@
+/* Page actions: rows of muted buttons under the table of contents in the rail. */
+.wp-block-studio-docs-page-actions {
+	margin-top: 2rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--docs-border);
+	font-size: 0.875rem;
+	line-height: 1.4286;
+}
+.wp-block-studio-docs-page-actions > * + * {
+	margin-top: 2px;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__item {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	gap: 0.625rem;
+	padding: 0.375rem 0;
+	border: 0;
+	background: none;
+	color: var(--docs-muted-foreground);
+	font: inherit;
+	text-align: start;
+	cursor: pointer;
+	list-style: none;
+	transition: color 0.15s;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__item::-webkit-details-marker {
+	display: none;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__item:hover {
+	color: var(--docs-foreground);
+}
+.wp-block-studio-docs-page-actions svg {
+	flex-shrink: 0;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__chevron {
+	margin-inline-start: auto;
+	transition: transform 0.15s;
+}
+.wp-block-studio-docs-page-actions details[open] .studio-docs-page-actions__chevron {
+	transform: rotate(180deg);
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__menu {
+	position: relative;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__dropdown {
+	display: grid;
+	gap: 2px;
+	padding: 0.25rem;
+	border: 1px solid var(--docs-border);
+	border-radius: var(--docs-radius);
+	background: var(--docs-background);
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__dropdown hr {
+	margin: 0.25rem 0;
+	border: 0;
+	border-top: 1px solid var(--docs-border);
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__option {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.625rem;
+	padding: 0.375rem 0.5rem;
+	border-radius: 0.375rem;
+	color: var(--docs-muted-foreground);
+	text-decoration: none;
+	transition: color 0.15s, background-color 0.15s;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__option:hover {
+	background: var(--docs-muted);
+	color: var(--docs-foreground);
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__option > span {
+	flex: 1;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__brand,
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__external {
+	margin-top: 0.1875rem;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__brand {
+	width: 1rem;
+	height: 1rem;
+}
+/* In the rail the menu floats over the content, flipped above the row when there is no room below
+   (`data-docs-flip`, set by the script). */
+.studio-docs-rail .wp-block-studio-docs-page-actions .studio-docs-page-actions__dropdown {
+	position: absolute;
+	top: 100%;
+	inset-inline-end: 0;
+	z-index: 50;
+	width: max-content;
+	min-width: min(14rem, 100%);
+	max-width: calc(100% + 1rem);
+	margin-top: 0.25rem;
+	overflow-wrap: anywhere;
+	box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+.studio-docs-rail .wp-block-studio-docs-page-actions .studio-docs-page-actions__menu[data-docs-flip] .studio-docs-page-actions__dropdown {
+	top: auto;
+	bottom: 100%;
+	margin-top: 0;
+	margin-bottom: 0.25rem;
+}
+/* Inside the collapsible table of contents, below the rail breakpoint: a list of menu-like rows. */
+.studio-docs-toc__actions .wp-block-studio-docs-page-actions {
+	margin-top: 0;
+	padding: 0.5rem;
+}
+.studio-docs-toc__actions .wp-block-studio-docs-page-actions .studio-docs-page-actions__item {
+	padding: 0.375rem 0.5rem;
+	border-radius: 0.375rem;
+	transition: color 0.15s, background-color 0.15s;
+}
+.studio-docs-toc__actions .wp-block-studio-docs-page-actions .studio-docs-page-actions__item:hover {
+	background: var(--docs-muted);
+}
+.studio-docs-toc__actions .wp-block-studio-docs-page-actions .studio-docs-page-actions__dropdown {
+	margin-top: 2px;
+	border: 0;
+	padding: 0 0 0 1.5rem;
+}
+@media print {
+	.wp-block-studio-docs-page-actions {
+		display: none;
+	}
+}
