@@ -1,13 +1,13 @@
 /* The sidebar: a drawer that slides in from the start edge below 64rem, a sticky column above. */
 .wp-block-studio-docs-sidebar {
 	position: fixed;
-	top: var(--docs-drawer-top, var(--docs-header-height));
+	top: var(--docs-drawer-top, calc(var(--docs-header-height) + var(--docs-header-top, 0px)));
 	inset-inline-start: 0;
 	z-index: 35;
 	box-sizing: border-box;
 	width: 16rem;
 	max-width: 80vw;
-	height: calc(100dvh - var(--docs-drawer-top, var(--docs-header-height)));
+	height: calc(100dvh - var(--docs-drawer-top, calc(var(--docs-header-height) + var(--docs-header-top, 0px))));
 	padding: 1rem 1.25rem 1.5rem;
 	overflow-y: auto;
 	border-inline-end: 1px solid var(--docs-border);
