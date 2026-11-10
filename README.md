@@ -75,6 +75,17 @@ npm run docs:drift -- --reset           # discard the edits (asks first): re-imp
 
 `npm run docs:drift` is `studio wp wp-docs drift`. The reconciliation (`wp wp-docs drift --export`, which `scripts/reconcile-docs.mjs` runs) merges the page's blocks back into the Markdown it was imported from, keeping every unchanged chunk byte for byte, verifies that the result converts to the same blocks, and replays the change onto the upstream file (whose text the staging script transforms), so the diff on the pull request is the editor's change and nothing else. The branch is `docs/site-edits-<date>`; the pull request's body names the pages, who edited them on the site and when. GitHub stays the source of truth: once the pull request merges, the next build imports the pages from `trunk` again. Saving in the editor straight to GitHub is not implemented; the plugin's README has the details of the detection and the merge.
 
+## Blueprints (proof of concept)
+
+`/blueprints/` is a gallery of the Blueprints WordPress Studio offers, with a page per Blueprint (a preview and the ways to open it in WordPress Studio) and the catalog as JSON at `/blueprints/index.json`, in the shape the app already reads. The `studio-blueprints` plugin (`wp-content/plugins/studio-blueprints`) renders it in the docs design, through the theme's `blueprints` template and its `blueprints-header` and `blueprints-footer` parts; the pages are virtual, nothing is stored in the database. Like the docs, the source is in the [Studio repository](https://github.com/Automattic/studio): one folder per Blueprint under `blueprints/`, which this build turns into the plugin's `catalog/`:
+
+```bash
+node scripts/build-blueprints-catalog.mjs                                     # from the proof-of-concept branch of Automattic/studio
+STUDIO_BLUEPRINTS_SOURCE=../studio node scripts/build-blueprints-catalog.mjs  # from a local checkout
+```
+
+Not done yet: the static export and `npm run deploy` do not include these pages, and most bundles still download from `blueprintlibrary.wordpress.com`.
+
 ## Publishing
 
 The site is published as static files to a [Spacefast](https://spacefast.com) Space, which serves wordpress.studio. Nothing publishes on its own: a docs change in the Studio repository, or a theme or plugin change here, reaches the site when someone builds and publishes it. Pushing to this repository deploys nothing.
