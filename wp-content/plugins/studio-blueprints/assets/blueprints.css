@@ -1,0 +1,860 @@
+/*
+ * The Blueprints pages, in the docs design: the docs tokens (tokens.css), header and footer, with a
+ * gallery and a Blueprint page in between. Scoped to `.studio-blueprints`, the body class of these pages.
+ */
+
+.studio-blueprints {
+	--sbp-width: 72rem;
+	--sbp-ring: color-mix(in oklab, var(--docs-foreground) 14%, transparent);
+	--sbp-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 8px 24px -12px rgb(0 0 0 / 0.12);
+}
+[data-theme="dark"] .studio-blueprints {
+	--sbp-shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+}
+
+/* ---- Header link (next to Download) ---- */
+.studio-blueprints .studio-blueprints-header__link {
+	margin: 0 0.5rem 0 0;
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+.studio-blueprints .studio-blueprints-header__link a {
+	color: var(--docs-muted-foreground);
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.studio-blueprints .studio-blueprints-header__link a:hover {
+	color: var(--docs-foreground);
+}
+
+/* ---- Page frame ---- */
+.studio-blueprints .sbp-main {
+	box-sizing: border-box;
+	width: 100%;
+	max-width: var(--sbp-width);
+	min-height: calc(100vh - var(--docs-header-height) - 4rem);
+	margin: 0 auto;
+	padding: 2rem 1rem 4rem;
+	color: var(--docs-foreground);
+	font-family: var(--docs-font-sans);
+	font-size: 1rem;
+	line-height: 1.5;
+}
+@media (min-width: 48rem) {
+	.studio-blueprints .sbp-main {
+		padding: 3rem 1.5rem 5rem;
+	}
+}
+.studio-blueprints .sbp-main :where(h1, h2, h3, p, ul, dl, dd, pre) {
+	margin: 0;
+	padding: 0;
+	font-family: inherit;
+	letter-spacing: normal;
+}
+.studio-blueprints .sbp-main :where(ul) {
+	list-style: none;
+}
+.studio-blueprints .sbp-main h1 {
+	font-size: 2rem;
+	font-weight: 700;
+	letter-spacing: -0.02em;
+	line-height: 1.2;
+}
+.studio-blueprints .sbp-main h2 {
+	font-size: 1.125rem;
+	font-weight: 600;
+	line-height: 1.4;
+}
+.studio-blueprints .sbp-main a {
+	color: inherit;
+}
+.studio-blueprints .sbp-icon {
+	flex-shrink: 0;
+}
+
+/* ---- Gallery: title, toolbar ---- */
+.studio-blueprints .sbp-hero {
+	max-width: 38rem;
+}
+.studio-blueprints .sbp-hero p {
+	margin-top: 0.75rem;
+	color: var(--docs-muted-foreground);
+	font-size: 1.125rem;
+	line-height: 1.55;
+}
+.studio-blueprints .sbp-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem 1rem;
+	margin: 2rem 0 1.5rem;
+}
+.studio-blueprints .sbp-filters {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+}
+.studio-blueprints .sbp-chip {
+	padding: 0.375rem 0.75rem;
+	border: 0;
+	border-radius: 9999px;
+	background: transparent;
+	color: var(--docs-muted-foreground);
+	font: inherit;
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1.4286;
+	cursor: pointer;
+	transition: color 0.15s, background-color 0.15s;
+}
+.studio-blueprints .sbp-chip:hover {
+	background: var(--docs-muted);
+	color: var(--docs-foreground);
+}
+.studio-blueprints .sbp-chip[aria-pressed="true"] {
+	background: var(--docs-foreground);
+	color: var(--docs-background);
+}
+.studio-blueprints .sbp-search {
+	display: flex;
+	flex: 1 1 14rem;
+	align-items: center;
+	gap: 0.5rem;
+	max-width: 18rem;
+	height: 2.25rem;
+	padding: 0 0.75rem;
+	border: 1px solid var(--docs-border);
+	border-radius: var(--docs-radius);
+	color: var(--docs-muted-foreground);
+	transition: border-color 0.15s;
+}
+.studio-blueprints .sbp-search:focus-within {
+	border-color: var(--docs-accent);
+	outline: 2px solid color-mix(in oklab, var(--docs-accent) 25%, transparent);
+}
+.studio-blueprints .sbp-search input {
+	flex: 1;
+	min-width: 0;
+	padding: 0;
+	border: 0;
+	outline: 0;
+	background: transparent;
+	color: var(--docs-foreground);
+	font: inherit;
+	font-size: 0.875rem;
+}
+.studio-blueprints .sbp-search input::placeholder {
+	color: var(--docs-muted-foreground);
+}
+
+/* ---- Grid and cards ---- */
+.studio-blueprints .sbp-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(min(100%, 17.5rem), 1fr));
+	gap: 2rem 1.5rem;
+}
+.studio-blueprints .sbp-card[hidden] {
+	display: none;
+}
+.studio-blueprints .sbp-card__link {
+	display: flex;
+	flex-direction: column;
+	text-decoration: none;
+}
+.studio-blueprints .sbp-card__link:focus-visible {
+	outline: 0;
+}
+.studio-blueprints .sbp-thumb {
+	position: relative;
+	display: block;
+	aspect-ratio: 16 / 10;
+	overflow: hidden;
+	border-radius: 0.625rem;
+	background: var(--docs-muted);
+	box-shadow: 0 0 0 1px var(--sbp-ring);
+}
+.studio-blueprints .sbp-thumb img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: top center;
+	transform-origin: top center;
+	transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+}
+/* The frame stays put; the screenshot inside it zooms in a little. */
+.studio-blueprints .sbp-card__link:hover .sbp-thumb img {
+	transform: scale(1.04);
+}
+.studio-blueprints .sbp-thumb--empty {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background:
+		radial-gradient(circle at 1px 1px, var(--sbp-ring) 1px, transparent 0) 0 0 / 14px 14px,
+		var(--docs-muted);
+	color: var(--docs-muted-foreground);
+}
+.studio-blueprints .sbp-card__link:focus-visible .sbp-thumb {
+	outline: 2px solid var(--docs-accent);
+	outline-offset: 2px;
+}
+.studio-blueprints .sbp-card__body {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 0.75rem;
+	margin-top: 0.875rem;
+}
+.studio-blueprints .sbp-card__title {
+	min-width: 0;
+	overflow: hidden;
+	font-size: 0.9375rem;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.studio-blueprints .sbp-card__tag {
+	flex-shrink: 0;
+	color: var(--docs-muted-foreground);
+	font-size: 0.75rem;
+	font-weight: 500;
+}
+.studio-blueprints .sbp-card__excerpt {
+	display: -webkit-box;
+	margin-top: 0.25rem;
+	overflow: hidden;
+	color: var(--docs-muted-foreground);
+	font-size: 0.875rem;
+	line-height: 1.5;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+}
+.studio-blueprints .sbp-empty {
+	padding: 4rem 0;
+	color: var(--docs-muted-foreground);
+	text-align: center;
+}
+.studio-blueprints .sbp-empty[hidden] {
+	display: none;
+}
+.studio-blueprints .sbp-link {
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--docs-accent);
+	font: inherit;
+	cursor: pointer;
+}
+.studio-blueprints .sbp-link:hover {
+	text-decoration: underline;
+}
+
+/* ---- Buttons ---- */
+.studio-blueprints .sbp-button {
+	display: inline-flex;
+	box-sizing: border-box;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	height: 2.5rem;
+	padding: 0 1rem;
+	border: 1px solid transparent;
+	border-radius: var(--docs-radius);
+	font-size: 0.875rem;
+	font-weight: 500;
+	line-height: 1;
+	text-decoration: none;
+	white-space: nowrap;
+	cursor: pointer;
+	transition: opacity 0.15s, background-color 0.15s, border-color 0.15s;
+}
+.studio-blueprints .sbp-main a.sbp-button--accent {
+	background: var(--docs-accent);
+	color: var(--docs-accent-foreground);
+}
+.studio-blueprints .sbp-button--accent:hover {
+	opacity: 0.9;
+}
+.studio-blueprints .sbp-button--outline {
+	border-color: var(--docs-border);
+	background: var(--docs-background);
+}
+.studio-blueprints .sbp-button--outline:hover,
+.studio-blueprints .sbp-button--ghost:hover {
+	background: var(--docs-muted);
+}
+.studio-blueprints .sbp-button--block {
+	width: 100%;
+}
+
+/* ---- Gallery footer note ---- */
+.studio-blueprints .sbp-cta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.25rem 2rem;
+	margin-top: 4rem;
+	padding: 1.5rem;
+	border: 1px solid var(--docs-border);
+	border-radius: 0.75rem;
+}
+.studio-blueprints .sbp-cta > div {
+	flex: 1 1 22rem;
+	max-width: 34rem;
+}
+.studio-blueprints .sbp-cta p {
+	margin-top: 0.25rem;
+	color: var(--docs-muted-foreground);
+	font-size: 0.9375rem;
+}
+.studio-blueprints .sbp-cta .sbp-cta__links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+	margin: 0;
+	color: var(--docs-foreground);
+}
+
+/* ---- Blueprint page ---- */
+.studio-blueprints .sbp-single {
+	padding-top: 1.5rem;
+}
+.studio-blueprints .sbp-crumbs {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	margin-bottom: 1.5rem;
+	color: var(--docs-muted-foreground);
+	font-size: 0.875rem;
+}
+.studio-blueprints .sbp-crumbs a {
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.studio-blueprints .sbp-crumbs a:hover {
+	color: var(--docs-foreground);
+}
+.studio-blueprints .sbp-crumbs [aria-current] {
+	color: var(--docs-foreground);
+}
+.studio-blueprints .sbp-single__layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 2rem;
+	align-items: start;
+}
+@media (min-width: 64rem) {
+	.studio-blueprints .sbp-single__layout {
+		grid-template-columns: minmax(0, 1fr) 19rem;
+		gap: 3rem;
+	}
+	.studio-blueprints .sbp-rail {
+		position: sticky;
+		top: calc(var(--docs-header-top) + var(--docs-header-height) + 1.5rem);
+	}
+}
+.studio-blueprints .sbp-single__header p {
+	max-width: 40rem;
+	margin-top: 0.5rem;
+	color: var(--docs-muted-foreground);
+	font-size: 1.0625rem;
+}
+
+/* The preview frame */
+.studio-blueprints .sbp-preview {
+	margin-top: 1.5rem;
+	overflow: hidden;
+	border-radius: 0.75rem;
+	background: var(--docs-background);
+	box-shadow: 0 0 0 1px var(--sbp-ring), var(--sbp-shadow);
+}
+.studio-blueprints .sbp-preview__bar {
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+	height: 2.75rem;
+	padding: 0 0.75rem;
+	border-bottom: 1px solid var(--docs-border);
+	background: var(--docs-code-background);
+}
+.studio-blueprints .sbp-preview__dots {
+	display: flex;
+	gap: 0.375rem;
+}
+.studio-blueprints .sbp-preview__dots i {
+	width: 0.625rem;
+	height: 0.625rem;
+	border-radius: 50%;
+	background: var(--sbp-ring);
+}
+.studio-blueprints .sbp-segments {
+	display: flex;
+	padding: 2px;
+	border-radius: 0.5rem;
+	background: var(--docs-muted);
+}
+.studio-blueprints .sbp-segments button {
+	padding: 0.25rem 0.75rem;
+	border: 0;
+	border-radius: 0.375rem;
+	background: transparent;
+	color: var(--docs-muted-foreground);
+	font: inherit;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	cursor: pointer;
+}
+.studio-blueprints .sbp-segments button[aria-pressed="true"] {
+	background: var(--docs-background);
+	box-shadow: 0 0 0 1px var(--docs-border), 0 1px 2px rgb(0 0 0 / 0.06);
+	color: var(--docs-foreground);
+}
+.studio-blueprints .sbp-preview__open {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	justify-self: end;
+	width: 2rem;
+	height: 2rem;
+	border-radius: 0.375rem;
+	color: var(--docs-muted-foreground);
+	transition: color 0.15s, background-color 0.15s;
+}
+.studio-blueprints .sbp-main a.sbp-preview__open {
+	color: var(--docs-muted-foreground);
+}
+.studio-blueprints .sbp-main a.sbp-preview__open:hover {
+	background: var(--docs-muted);
+	color: var(--docs-foreground);
+}
+.studio-blueprints .sbp-preview__stage {
+	position: relative;
+	aspect-ratio: 16 / 10;
+	background: var(--docs-muted);
+}
+.studio-blueprints .sbp-preview__image {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	object-position: top center;
+}
+.studio-blueprints .sbp-preview__image--empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75rem;
+	padding: 2rem;
+	box-sizing: border-box;
+	color: var(--docs-muted-foreground);
+	font-size: 0.9375rem;
+	text-align: center;
+}
+.studio-blueprints .sbp-preview__image[hidden],
+.studio-blueprints .sbp-preview__live[hidden],
+.studio-blueprints .sbp-preview__start[hidden] {
+	display: none;
+}
+.studio-blueprints .sbp-preview__live {
+	position: absolute;
+	inset: 0;
+	background: #fff;
+}
+.studio-blueprints .sbp-preview__live iframe {
+	position: relative;
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: 0;
+}
+.studio-blueprints .sbp-preview__loading {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #6b6b6b;
+	font-size: 0.9375rem;
+}
+.studio-blueprints .sbp-preview__start {
+	position: absolute;
+	right: 1rem;
+	bottom: 1rem;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	height: 2.25rem;
+	padding: 0 0.875rem;
+	border: 0;
+	border-radius: 9999px;
+	background: rgb(20 20 20 / 0.86);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+	color: #fff;
+	font: inherit;
+	font-size: 0.8125rem;
+	font-weight: 500;
+	cursor: pointer;
+	transition: background-color 0.15s;
+}
+.studio-blueprints .sbp-preview__start:hover {
+	background: rgb(20 20 20);
+}
+@media (max-width: 40rem) {
+	.studio-blueprints .sbp-preview__dots {
+		visibility: hidden;
+	}
+	.studio-blueprints .sbp-preview__stage:has(.sbp-preview__live:not([hidden])) {
+		aspect-ratio: 3 / 4;
+	}
+}
+
+/* The rail */
+.studio-blueprints .sbp-rail {
+	display: grid;
+	gap: 1.75rem;
+}
+.studio-blueprints .sbp-launch {
+	display: grid;
+	gap: 0.5rem;
+}
+.studio-blueprints .sbp-command {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	height: 2.5rem;
+	padding: 0 0.25rem 0 0.75rem;
+	border-radius: var(--docs-radius);
+	background: var(--docs-code-background);
+	box-shadow: inset 0 0 0 1px var(--docs-border);
+}
+.studio-blueprints .sbp-command code {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	background: none;
+	color: var(--docs-foreground);
+	font-family: var(--docs-font-mono);
+	font-size: 0.8125rem;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.studio-blueprints .sbp-command code::before {
+	content: "$ ";
+	color: var(--docs-muted-foreground);
+}
+.studio-blueprints .sbp-command__copy {
+	display: inline-flex;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	width: 2rem;
+	height: 2rem;
+	border: 0;
+	border-radius: 0.375rem;
+	background: transparent;
+	color: var(--docs-muted-foreground);
+	cursor: pointer;
+}
+.studio-blueprints .sbp-command__copy:hover {
+	background: var(--docs-muted);
+	color: var(--docs-foreground);
+}
+.studio-blueprints .sbp-command__copy .sbp-icon:last-child,
+.studio-blueprints .sbp-command__copy.is-copied .sbp-icon:first-child {
+	display: none;
+}
+.studio-blueprints .sbp-command__copy.is-copied .sbp-icon:last-child {
+	display: block;
+	color: var(--docs-success);
+}
+.studio-blueprints .sbp-launch__note {
+	margin-top: 0.25rem;
+	color: var(--docs-muted-foreground);
+	font-size: 0.8125rem;
+}
+.studio-blueprints .sbp-main .sbp-launch__note a,
+.studio-blueprints .sbp-main .sbp-more__head a {
+	color: var(--docs-accent);
+	text-decoration: none;
+}
+.studio-blueprints .sbp-launch__note a:hover,
+.studio-blueprints .sbp-more__head a:hover {
+	text-decoration: underline;
+}
+.studio-blueprints .sbp-rail h2,
+.studio-blueprints .sbp-rail h3 {
+	margin-bottom: 0.5rem;
+	color: var(--docs-foreground);
+	font-size: 0.8125rem;
+	font-weight: 600;
+	line-height: 1.5;
+}
+.studio-blueprints .sbp-rail h3 {
+	margin-top: 1rem;
+}
+.studio-blueprints .sbp-rail h3 span {
+	margin-left: 0.25rem;
+	color: var(--docs-muted-foreground);
+	font-weight: 400;
+}
+.studio-blueprints .sbp-facts dl > div {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+	padding: 0.5rem 0;
+	border-top: 1px solid var(--docs-border);
+	font-size: 0.875rem;
+}
+.studio-blueprints .sbp-facts dt {
+	color: var(--docs-muted-foreground);
+}
+.studio-blueprints .sbp-facts dd {
+	text-align: right;
+}
+.studio-blueprints .sbp-plugins {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.375rem;
+}
+.studio-blueprints .sbp-plugins li {
+	padding: 0.1875rem 0.5rem;
+	border-radius: 0.375rem;
+	background: var(--docs-muted);
+	font-size: 0.8125rem;
+}
+.studio-blueprints .sbp-files ul {
+	display: grid;
+	gap: 0.375rem;
+}
+.studio-blueprints .sbp-main .sbp-files a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+	color: var(--docs-muted-foreground);
+	font-size: 0.875rem;
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.studio-blueprints .sbp-main .sbp-files a:hover {
+	color: var(--docs-foreground);
+}
+
+/* The Blueprint's JSON */
+.studio-blueprints .sbp-source {
+	margin-top: 2.5rem;
+	border: 1px solid var(--docs-border);
+	border-radius: 0.75rem;
+}
+.studio-blueprints .sbp-source summary {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	padding: 0.875rem 1rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+	list-style: none;
+	cursor: pointer;
+}
+.studio-blueprints .sbp-source summary::-webkit-details-marker {
+	display: none;
+}
+.studio-blueprints .sbp-source summary .sbp-icon {
+	color: var(--docs-muted-foreground);
+	transition: transform 0.15s;
+}
+.studio-blueprints .sbp-source[open] summary .sbp-icon {
+	transform: rotate(90deg);
+}
+.studio-blueprints .sbp-source pre {
+	max-height: 28rem;
+	padding: 1rem;
+	overflow: auto;
+	border-top: 1px solid var(--docs-border);
+	border-radius: 0 0 0.75rem 0.75rem;
+	background: var(--docs-code-background);
+}
+.studio-blueprints .sbp-source code {
+	background: none;
+	color: var(--docs-foreground);
+	font-family: var(--docs-font-mono);
+	font-size: 0.8125rem;
+	line-height: 1.6;
+}
+
+/* More Blueprints */
+.studio-blueprints .sbp-more {
+	margin-top: 4rem;
+	padding-top: 2rem;
+	border-top: 1px solid var(--docs-border);
+}
+.studio-blueprints .sbp-more__head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	margin-bottom: 1.25rem;
+}
+.studio-blueprints .sbp-more__head a {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.875rem;
+	font-weight: 500;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.studio-blueprints .sbp-thumb img,
+	.studio-blueprints .sbp-source summary .sbp-icon {
+		transition: none;
+	}
+	.studio-blueprints .sbp-card__link:hover .sbp-thumb img {
+		transform: none;
+	}
+}
+
+/* ---- Over the theme's global styles (headings, links, code) ---- */
+.studio-blueprints .sbp-main h1,
+.studio-blueprints .sbp-main h2,
+.studio-blueprints .sbp-main h3 {
+	color: var(--docs-foreground);
+}
+.studio-blueprints .sbp-main a.sbp-button--outline,
+.studio-blueprints .sbp-main a.sbp-button--ghost {
+	color: var(--docs-foreground);
+}
+.studio-blueprints .sbp-main a.sbp-button--outline {
+	background: transparent;
+}
+.studio-blueprints .sbp-main a.sbp-button--outline:hover,
+.studio-blueprints .sbp-main a.sbp-button--ghost:hover {
+	background: var(--docs-muted);
+}
+.studio-blueprints .sbp-main code {
+	padding: 0;
+	border: 0;
+	border-radius: 0;
+	box-shadow: none;
+}
+.studio-blueprints .sbp-rail,
+.studio-blueprints .sbp-launch {
+	grid-template-columns: minmax(0, 1fr);
+}
+
+/* ---- Footer: the main site's footer (brand, three link columns, legal line) in the docs tokens ---- */
+.studio-docs .sbp-footer {
+	margin-block-start: 0;
+	padding: 0 1rem;
+	color: var(--docs-foreground);
+	font-family: var(--docs-font-sans);
+	font-size: 0.875rem;
+	line-height: 1.5;
+}
+@media (min-width: 48rem) {
+	.studio-docs .sbp-footer {
+		padding: 0 1.5rem;
+	}
+}
+.studio-docs .sbp-footer > * {
+	max-width: calc(var(--sbp-width, 72rem) - 3rem);
+	margin-inline: auto;
+}
+.studio-docs .sbp-footer :where(p, ul, li, div) {
+	margin: 0;
+	padding: 0;
+}
+.studio-docs .sbp-footer__top {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 2.5rem 3rem;
+	padding: 3rem 0;
+}
+.studio-docs .sbp-footer__brand {
+	display: grid;
+	align-content: start;
+	gap: 0.5rem;
+	max-width: 18rem;
+}
+.studio-docs .sbp-footer__name {
+	display: flex;
+	align-items: center;
+	gap: 0.625rem;
+	font-size: 1rem;
+	font-weight: 600;
+}
+.studio-docs .sbp-footer .wp-block-site-logo,
+.studio-docs .sbp-footer .wp-block-site-logo a {
+	display: flex;
+	line-height: 0;
+}
+.studio-docs .sbp-footer .wp-block-site-logo img {
+	width: 1.25rem;
+	height: 1.25rem;
+}
+[data-theme="dark"] .studio-docs .sbp-footer .wp-block-site-logo img {
+	filter: invert(1);
+}
+.studio-docs .sbp-footer__tagline {
+	color: var(--docs-muted-foreground);
+}
+.studio-docs .sbp-footer__links {
+	display: grid;
+	grid-template-columns: repeat(3, max-content);
+	gap: 2rem clamp(2rem, 6vw, 5rem);
+}
+.studio-docs .sbp-footer__links ul {
+	display: grid;
+	align-content: start;
+	gap: 0.5rem;
+	list-style: none;
+}
+.studio-docs .sbp-footer a {
+	color: inherit;
+	font-weight: inherit;
+	text-decoration: none;
+	transition: color 0.15s;
+}
+.studio-docs .sbp-footer__links a {
+	color: var(--docs-muted-foreground);
+}
+.studio-docs .sbp-footer__links a:hover,
+.studio-docs .sbp-footer__bottom a:hover {
+	color: var(--docs-foreground);
+}
+.studio-docs .sbp-footer__bottom {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	gap: 0.5rem 2rem;
+	padding: 1.25rem 0;
+	border-top: 1px solid var(--docs-border);
+	color: var(--docs-muted-foreground);
+	font-size: 0.8125rem;
+}
+@media (max-width: 40rem) {
+	.studio-docs .sbp-footer__links {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		width: 100%;
+	}
+}
+.studio-docs .sbp-footer .sbp-footer__top,
+.studio-docs .sbp-footer .sbp-footer__bottom {
+	margin-inline: auto;
+}
+.studio-docs .sbp-footer .sbp-footer__name,
+.studio-docs .sbp-footer .sbp-footer__name p,
+.studio-docs .sbp-footer .sbp-footer__name a {
+	color: var(--docs-foreground);
+}
+.studio-docs .sbp-footer .sbp-footer__bottom p,
+.studio-docs .sbp-footer .sbp-footer__bottom a {
+	color: var(--docs-muted-foreground);
+}
+.studio-docs .sbp-footer .sbp-footer__bottom a:hover {
+	color: var(--docs-foreground);
+}
