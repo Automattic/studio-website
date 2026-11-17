@@ -77,6 +77,7 @@ const PAGES = [
 	{ src: "developer-tools/studio/studio-code/ai-credits-guidelines.md", route: "studio-code/ai-credits-guidelines", old: "studio-code/ai-credits-guidelines", label: "AI credits", group: "build-with-ai" },
 	{ src: "developer-tools/studio/studio-code/image-generation.md", route: "studio-code/image-generation", old: "studio-code/image-generation", group: "build-with-ai" },
 	{ src: "developer-tools/studio/studio-code/choosing-an-ai-model-tier-in-studio-code.md", route: "studio-code/choosing-an-ai-model-tier-in-studio-code", old: "studio-code/choosing-an-ai-model-tier-in-studio-code", label: "Model tiers", group: "build-with-ai" },
+	{ src: "developer-tools/studio/providers.md", route: "providers", old: null, label: "Providers", group: "build-with-ai" },
 
 	{ src: "developer-tools/studio/cli.md", route: "cli", old: "cli", label: "Studio CLI", group: "developer-tools" },
 	{ src: "developer-tools/studio/ssl-in-studio.md", route: "ssl-in-studio", old: "ssl-in-studio", label: "SSL and custom domains", group: "developer-tools" },
