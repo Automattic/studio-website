@@ -840,6 +840,8 @@ pre.wp-block-code.agent-prompt { white-space: pre-wrap; overflow-wrap: anywhere;
 .brand a { display: inline-flex; align-items: center; gap: 8px; color: var(--c-text); text-decoration: none; }
 .brand a:hover { color: var(--c-primary); }
 :where(.brand)::before { content: ""; display: inline-block; width: 18px; height: 18px; margin-right: 8px; vertical-align: -4px; background-color: var(--c-text); -webkit-mask: center / contain no-repeat; mask: center / contain no-repeat; }
+/* An agent without a logo in assets/logos/ shows its name alone. */
+:where(.brand:not([class*="logo-"]))::before { content: none; }
 .is-style-mosaic.is-hero > .works-with { margin-bottom: 8px !important; }
 
 /* agent page hero logo */
@@ -879,6 +881,7 @@ pre.wp-block-code.agent-prompt { white-space: pre-wrap; overflow-wrap: anywhere;
 .agent-card .card-link a:focus-visible { outline: none; }
 .agent-card .card-link a::before { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 .agent-card:hover .card-link a::after { margin-left: 4px; }
+.agent-card > p:not(.card-link) a { position: relative; z-index: 1; }
 .agent-card__head { gap: 12px !important; align-items: center !important; }
 .agent-card__head.has-logo::before { width: 28px; height: 28px; margin: 0; }
 .agent-card__head h3 { margin: 0; font-size: 1.1875rem; }
