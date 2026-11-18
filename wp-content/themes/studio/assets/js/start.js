@@ -6,7 +6,8 @@
  * focus or is hidden; when it is still in front after a moment, the app most likely didn't open.
  * Chromium browsers open the link from the page (they ignore it from a frame without a click and
  * add no history entry); Firefox and Safari from a hidden frame, since a page-level link to a
- * scheme nothing handles shows an error there.
+ * scheme nothing handles shows an error there. A click on the button in Safari opens it from the
+ * page, since Safari may not open an app from a frame.
  */
 ( function () {
 	'use strict';
@@ -21,7 +22,8 @@
 	var WAIT = 1500;
 	var link = button.getAttribute( 'href' );
 	var ua = navigator.userAgent;
-	var useFrame = /Firefox\//.test( ua ) || ( /Safari\//.test( ua ) && ! /Chrome|Chromium|Edg|OPR|CriOS|FxiOS/.test( ua ) );
+	var safari = /Safari\//.test( ua ) && ! /Chrome|Chromium|Edg|OPR|CriOS|FxiOS/.test( ua );
+	var useFrame = /Firefox\//.test( ua ) || safari;
 	var phone = /Android|iPhone|iPad|iPod/i.test( ua ) || ( /Macintosh/.test( ua ) && navigator.maxTouchPoints > 1 );
 	var timer = null;
 
@@ -60,7 +62,7 @@
 		}
 	}
 
-	function open() {
+	function open( clicked ) {
 		clearTimeout( timer );
 		show( 'opening', [ 'Opening WordPress Studio…' ] );
 		timer = setTimeout( function () {
@@ -68,7 +70,7 @@
 			show( 'fallback', [ 'WordPress Studio didn’t open. ' ].concat( otherWays ) );
 		}, WAIT );
 
-		if ( useFrame ) {
+		if ( useFrame && ! ( clicked && safari ) ) {
 			var old = document.getElementById( 'start-frame' );
 			if ( old ) {
 				old.remove();
@@ -95,7 +97,7 @@
 
 	button.addEventListener( 'click', function ( event ) {
 		event.preventDefault();
-		open();
+		open( true );
 	} );
 
 	if ( phone ) {
