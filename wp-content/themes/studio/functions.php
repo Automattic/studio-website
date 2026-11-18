@@ -154,9 +154,6 @@ function studio_seo_description() {
 	if ( is_singular() && has_excerpt() ) {
 		return wp_strip_all_tags( get_the_excerpt() );
 	}
-	if ( studio_is_start() ) {
-		return 'Open WordPress Studio and add your first site, start from the command line, or download the app.';
-	}
 	return get_bloginfo( 'description' );
 }
 
@@ -176,8 +173,6 @@ add_action( 'wp_head', function () {
 	$url         = is_singular() ? studio_public_url( get_permalink() ) : ( is_front_page() ? studio_public_url( home_url( '/' ) ) : '' );
 	if ( $doc ) {
 		$url = studio_public_url( get_permalink( $doc ) );
-	} elseif ( studio_is_start() ) {
-		$url = studio_public_url( home_url( '/start/' ) );
 	}
 	$image       = array( studio_public_url( get_theme_file_uri( 'assets/images/share.png' ) ), 1200, 630 );
 	$image_alt   = 'WordPress Studio: the app window with a site list, a Studio Code chat and a live site preview.';
@@ -299,64 +294,34 @@ add_action( 'wp_head', function () {
 
 /*
  * /start/: the page the "Start your first site" button in the WordPress Studio welcome email opens.
- * It tries to open the app's new-site flow (wp-studio://app/v1/new-site) and shows the other ways in.
- * The page is virtual, like the Blueprints pages: the theme's `start` template, resolved from the
- * request path, with nothing in the database. It is noindexed and left out of the nav and the sitemap.
+ * start.js tries to open the app's new-site flow (wp-studio://app/v1/new-site) and points at the
+ * other ways in. Nothing links to the page, so it is noindexed, left out of the sitemap and added
+ * to the static export by hand.
  */
-function studio_is_start() {
-	static $is_start = null;
-	if ( null === $is_start ) {
-		$path = trim( (string) wp_parse_url( isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '', PHP_URL_PATH ), '/' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-		$home = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
-		if ( '' !== $home && str_starts_with( $path . '/', $home . '/' ) ) {
-			$path = trim( substr( $path, strlen( $home ) ), '/' );
-		}
-		$is_start = 'start' === $path;
-	}
-	return $is_start;
-}
-
-add_filter( 'do_parse_request', function ( $parse, $wp ) {
-	if ( ! studio_is_start() ) {
-		return $parse;
-	}
-	$wp->query_vars = array();
-	remove_action( 'template_redirect', 'redirect_canonical' );
-	return false;
-}, 10, 2 );
-
-add_action( 'wp', function () {
-	if ( ! studio_is_start() ) {
-		return;
-	}
-	global $wp_query;
-	$wp_query->is_home = false;
-	$wp_query->is_404  = false;
-	status_header( 200 );
-
-	add_filter( 'body_class', function ( $classes ) {
-		return array_merge( array_diff( $classes, array( 'home', 'blog' ) ), array( 'studio-start' ) );
-	} );
-	add_filter( 'document_title_parts', function () {
-		return array( 'title' => 'Start your first site', 'site' => get_bloginfo( 'name' ) );
-	} );
-	add_filter( 'wp_robots', function ( $robots ) {
-		return array_merge( $robots, array( 'noindex' => true, 'follow' => true ) );
-	} );
-	add_action( 'wp_enqueue_scripts', function () {
-		wp_enqueue_script(
-			'studio-start',
-			get_parent_theme_file_uri( 'assets/js/start.js' ),
-			array(),
-			filemtime( get_parent_theme_file_path( 'assets/js/start.js' ) ),
-			array( 'strategy' => 'defer', 'in_footer' => true )
-		);
-	} );
+add_filter( 'wp_robots', function ( $robots ) {
+	return is_page( 'start' ) ? array_merge( $robots, array( 'noindex' => true, 'follow' => true ) ) : $robots;
 } );
 
-add_filter( 'template_include', function ( $template ) {
-	return studio_is_start() ? locate_block_template( $template, 'start', array( 'start' ) ) : $template;
-}, 99 );
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! is_page( 'start' ) ) {
+		return;
+	}
+	wp_enqueue_script(
+		'studio-start',
+		get_parent_theme_file_uri( 'assets/js/start.js' ),
+		array(),
+		filemtime( get_parent_theme_file_path( 'assets/js/start.js' ) ),
+		array( 'strategy' => 'defer', 'in_footer' => true )
+	);
+} );
+
+add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $post_type ) {
+	$start = 'page' === $post_type ? get_page_by_path( 'start' ) : null;
+	if ( $start ) {
+		$args['post__not_in'] = array_merge( $args['post__not_in'] ?? array(), array( $start->ID ) );
+	}
+	return $args;
+}, 10, 2 );
 
 // The static export follows links from the home page and the sitemap, and nothing links here.
 add_filter( 'ss_additional_urls', function ( $urls ) {

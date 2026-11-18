@@ -12,7 +12,7 @@
 ( function () {
 	'use strict';
 
-	var page = document.querySelector( '.start-page' );
+	var page = document.querySelector( '.start-hero' );
 	var button = page && page.querySelector( '.start-open a[href^="wp-studio:"]' );
 	var status = page && page.querySelector( '.start-status' );
 	if ( ! button || ! status ) {
