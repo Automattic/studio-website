@@ -77,7 +77,23 @@ npm run docs:drift -- --reset           # discard the edits (asks first): re-imp
 
 ## Publishing
 
-The site is published as static files to a [Spacefast](https://spacefast.com) Space, which serves wordpress.studio. Nothing publishes on its own: a docs change in the Studio repository, or a theme or plugin change here, reaches the site when someone builds and publishes it. Pushing to this repository deploys nothing.
+The site is published as static files to a [Spacefast](https://spacefast.com) Space, which serves wordpress.studio.
+
+### Automatic deploys
+
+The [Deploy workflow](.github/workflows/deploy.yml) builds the site on GitHub Actions and publishes it to production:
+
+- on every push to `main`, unless it only touches `video/`;
+- every day at 06:17 UTC, when the docs in Automattic/studio are ahead of the live site (`npm run docs:check`), so docs changes reach the site without a commit here;
+- by hand: **Actions → Deploy → Run workflow**, with a choice of `production` or `preview`. Production runs only from `main`; a preview can be built from any branch and gets its own URL.
+
+Merging to `main` therefore puts the change live, content included: the SQLite database is published as committed. Deploys never run in parallel; a new one waits for the running one to finish. A failed build publishes nothing, and that includes a build stopped by docs pages edited in WordPress (see "Edits made in WordPress" above).
+
+The workflow needs a repository secret, `SPACEFAST_TOKEN`: a Spacefast API key that can publish to the Space, created by a member of the Spacefast team that owns it with `sf api-keys create --name studio-website-deploy --preset ci_deploy`. Without it the build runs and the publish step fails.
+
+### Deploying by hand
+
+Publishing from your machine still works, for example to check a build before merging:
 
 ```bash
 npm run docs:check      # is the live site behind the docs in Automattic/studio? (exit 1 when it is)
@@ -85,7 +101,7 @@ npm run deploy          # build and publish to production (asks before publishin
 npm run deploy:preview  # the same to a preview version, with its own URL, leaving production alone
 ```
 
-`npm run docs:check` (`scripts/check-docs-freshness.mjs`) reads the revision the live docs were built from out of `/docs/index.json` and lists the upstream commits since then that touched the docs or their screenshots, so a rebuild is never a guess; `--local` checks the last local staging instead, `--site <url>` another site. The build refuses to run while a docs page was edited in WordPress (see "Edits made in WordPress" above): reconcile or discard the edits first, or set `DOCS_ALLOW_DRIFT=1` to let the import overwrite them. `npm run deploy` (`scripts/publish-site.sh`) runs the build below and then `sf publish`; extra arguments go to `sf publish` (`-y` skips the confirmation, `-m` sets the version message), and it ends with the freshness check against the live site.
+`npm run docs:check` (`scripts/check-docs-freshness.mjs`) reads the revision the live docs were built from out of `/docs/index.json` and lists the upstream commits since then that touched the docs or their screenshots, so a rebuild is never a guess; `--local` checks the last local staging instead, `--site <url>` another site. The build refuses to run while a docs page was edited in WordPress (see "Edits made in WordPress" above): reconcile or discard the edits first, or set `DOCS_ALLOW_DRIFT=1` to let the import overwrite them. `npm run deploy` (`scripts/publish-site.sh`) runs the build below and then `sf publish`; extra arguments go to `sf publish` (`-y` skips the confirmation, `--message` sets the version message), and it ends with the freshness check against the live site.
 
 Under the hood, `scripts/build-site.sh` builds the whole site into `dist/`: it checks for docs edited in WordPress, stages and imports the docs, exports the WordPress site (pages and docs) and adds the root files below. Then `dist/` is published with the [Spacefast CLI](https://spacefast.com/docs/cli/):
 
@@ -109,7 +125,7 @@ mkdir -p ../studio-spacefast/bin && printf '#!/usr/bin/env bash\nexec node "$(di
 npm run deploy
 ```
 
-That build reads the same site list as the Studio app, so the site needs no re-registration.
+That build reads the same site list as the Studio app, so the site needs no re-registration. The Deploy workflow builds the same branch on every run.
 
 ## The video
 
