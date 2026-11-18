@@ -83,10 +83,12 @@ jobs:
           echo "$PWD/bin" >> "$GITHUB_PATH"
 
       # Studio only adds an empty folder or a full WordPress install: create a blank site, then check
-      # this commit out over it.
+      # this commit out over it. The site starts once so WordPress writes its wp-config.php, which the
+      # repository doesn't track.
       - name: Load the site in Studio
         run: |
-          studio site create --path "$GITHUB_WORKSPACE/site" --name "WordPress Studio" --start=false
+          studio site create --path "$GITHUB_WORKSPACE/site" --name "WordPress Studio" --skip-browser
+          studio site stop --path "$GITHUB_WORKSPACE/site"
           cd site
           git init --quiet
           git fetch --quiet --depth 1 "https://github.com/$GITHUB_REPOSITORY.git" "$GITHUB_SHA"
