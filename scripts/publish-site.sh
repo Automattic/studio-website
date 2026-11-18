@@ -5,7 +5,7 @@
 #
 # Usage: scripts/publish-site.sh [preview|production] [sf publish flags…]
 #   The target defaults to production. The CLI asks for confirmation before it publishes; pass -y to
-#   skip that. Extra flags go to `sf publish` (for example -m "Docs: new blueprint page").
+#   skip that. Extra flags go to `sf publish` (for example --message "Docs: new blueprint page").
 set -euo pipefail
 cd "$(dirname "$0")/.."
 

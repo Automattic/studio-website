@@ -1,0 +1,112 @@
+# Builds wordpress.studio and publishes it to its Spacefast Space: on every push to main, once a day
+# when the docs in Automattic/studio are ahead of the live site, and by hand from the Actions tab.
+# The steps are the README's (Load the site in Studio, Publishing) and scripts/build-site.sh.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['video/**']
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Publish to production, or to a preview version with its own URL
+        type: choice
+        options: [production, preview]
+        default: production
+
+permissions:
+  contents: read
+
+jobs:
+  docs-check:
+    if: github.event_name == 'schedule' && github.repository == 'Automattic/studio-website'
+    runs-on: ubuntu-latest
+    outputs:
+      behind: ${{ steps.check.outputs.behind }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      # Exit 1 means the live docs are behind; 2 (could not tell) fails the job.
+      - id: check
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          status=0
+          node scripts/check-docs-freshness.mjs || status=$?
+          [[ $status -le 1 ]] || exit $status
+          echo "behind=$([[ $status -eq 1 ]] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: docs-check
+    # Never from a fork; production only from main, previews from any branch.
+    if: >-
+      !cancelled() && github.repository == 'Automattic/studio-website'
+      && (github.event_name != 'schedule' || needs.docs-check.outputs.behind == 'true')
+      && (github.ref == 'refs/heads/main' || inputs.target == 'preview')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # Queue deploys rather than cancel one mid-publish.
+    concurrency:
+      group: deploy
+      cancel-in-progress: false
+    env:
+      TARGET: ${{ inputs.target || 'production' }}
+      # The export fetches pages from the site on localhost, which can resolve to IPv6 first.
+      NODE_OPTIONS: --dns-result-order=ipv4first
+    steps:
+      # `studio export-static` is not in a Studio release yet (Automattic/studio#5567): build the CLI from
+      # that branch, as the README does, and put it on PATH as `studio`.
+      - name: Fetch the Studio CLI with export-static
+        run: git clone --quiet --depth 1 --branch add-spacefast-publishing https://github.com/Automattic/studio.git studio-cli
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: studio-cli/package-lock.json
+      - name: Build the Studio CLI
+        working-directory: studio-cli
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: 1
+        run: |
+          npm ci
+          npm run cli:build
+          mkdir -p bin
+          printf '#!/usr/bin/env bash\nexec node "%s/apps/cli/dist/cli/main.mjs" "$@"\n' "$PWD" > bin/studio
+          chmod +x bin/studio
+          echo "$PWD/bin" >> "$GITHUB_PATH"
+
+      # Studio only adds an empty folder or a full WordPress install: create a blank site, then check
+      # this commit out over it.
+      - name: Load the site in Studio
+        run: |
+          studio site create --path "$GITHUB_WORKSPACE/site" --name "WordPress Studio" --start=false
+          cd site
+          git init --quiet
+          git fetch --quiet --depth 1 "https://github.com/$GITHUB_REPOSITORY.git" "$GITHUB_SHA"
+          git checkout --quiet --force FETCH_HEAD
+          npm ci
+
+      - name: Build
+        working-directory: site
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: scripts/build-site.sh
+
+      - name: Publish to Spacefast
+        working-directory: site
+        env:
+          SPACEFAST_TOKEN: ${{ secrets.SPACEFAST_TOKEN }}
+          SPACEFAST_NON_INTERACTIVE: 1
+        run: |
+          message="$(git log -1 --format=%s)"
+          [[ "$GITHUB_EVENT_NAME" == schedule ]] && message="Docs update from Automattic/studio"
+          npx --yes spacefast@0.9.0 publish dist --root-directory . \
+            --space spc_95b3647e99974586b104ab2cf1050dd6 --target "$TARGET" --yes --wait \
+            --message "$message"
