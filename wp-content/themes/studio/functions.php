@@ -292,6 +292,43 @@ add_action( 'wp_head', function () {
 	}
 }, 1 );
 
+/*
+ * /start/: the page the "Start your first site" button in the WordPress Studio welcome email opens.
+ * start.js tries to open the app's new-site flow (wp-studio://app/v1/new-site) and points at the
+ * other ways in. Nothing links to the page, so it is noindexed, left out of the sitemap and added
+ * to the static export by hand.
+ */
+add_filter( 'wp_robots', function ( $robots ) {
+	return is_page( 'start' ) ? array_merge( $robots, array( 'noindex' => true, 'follow' => true ) ) : $robots;
+} );
+
+add_action( 'wp_enqueue_scripts', function () {
+	if ( ! is_page( 'start' ) ) {
+		return;
+	}
+	wp_enqueue_script(
+		'studio-start',
+		get_parent_theme_file_uri( 'assets/js/start.js' ),
+		array(),
+		filemtime( get_parent_theme_file_path( 'assets/js/start.js' ) ),
+		array( 'strategy' => 'defer', 'in_footer' => true )
+	);
+} );
+
+add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $post_type ) {
+	$start = 'page' === $post_type ? get_page_by_path( 'start' ) : null;
+	if ( $start ) {
+		$args['post__not_in'] = array_merge( $args['post__not_in'] ?? array(), array( $start->ID ) );
+	}
+	return $args;
+}, 10, 2 );
+
+// The static export follows links from the home page and the sitemap, and nothing links here.
+add_filter( 'ss_additional_urls', function ( $urls ) {
+	$urls[] = home_url( '/start/' );
+	return $urls;
+} );
+
 /**
  * Block style variations: repeated treatments stay switchable in the editor.
  */

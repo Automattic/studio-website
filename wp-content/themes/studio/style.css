@@ -951,6 +951,19 @@ pre.wp-block-code.agent-prompt { white-space: pre-wrap; overflow-wrap: anywhere;
 .first-step > * + * { margin-block-start: 10px; }
 .first-step h3 { font-size: 1.375rem; }
 .first-step p:not(.is-style-kicker) { color: var(--c-muted); }
+
+/* start: the welcome email's "Start your first site" page. start.js fills .start-status. */
+.start-open { margin-top: 30px !important; }
+.start-status { margin-top: 18px !important; max-width: 54ch; font-size: 1rem; color: var(--c-text); }
+.start-status:empty { display: none; }
+.start-status a { color: var(--c-primary); text-underline-offset: 2px; }
+.start-hero.is-fallback .start-status { padding-left: 16px; border-left: 3px solid var(--c-primary); }
+.start-note { margin-top: 14px !important; max-width: 54ch; }
+.start-grid { gap: 16px !important; }
+.start-way { gap: 10px !important; scroll-margin-top: calc(var(--header-h) + 24px); }
+.start-way h3 { font-size: 1.375rem; }
+.start-way pre.wp-block-code { margin-block: 4px !important; font-size: 0.8125rem; }
+.start-download { margin-top: 8px !important; }
 .is-style-compare { margin: 0; }
 .is-style-compare table { width: 100%; border-collapse: collapse; font-size: 0.9875rem; }
 .is-style-compare thead { border-bottom: 0; }
