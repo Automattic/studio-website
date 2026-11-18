@@ -89,7 +89,7 @@ The [Deploy workflow](.github/workflows/deploy.yml) builds the site on GitHub Ac
 
 Merging to `main` therefore puts the change live, content included: the SQLite database is published as committed. Deploys never run in parallel; a new one waits for the running one to finish. A failed build publishes nothing, and that includes a build stopped by docs pages edited in WordPress (see "Edits made in WordPress" above).
 
-The workflow needs a repository secret, `SPACEFAST_TOKEN`: a Spacefast API key that can publish to the Space, created by a member of the Spacefast team that owns it with `sf api-keys create --name studio-website-deploy --preset ci_deploy`. Without it the build runs and the publish step fails.
+The workflow needs a repository secret, `SPACEFAST_TOKEN`: a Spacefast API key that can publish to the Space, created by a member of the Spacefast team that owns it with `sf api-keys create --team studio --name studio-website-deploy --preset ci_deploy` (without `--team`, the key belongs to your default team). Without it the build runs and the publish step fails.
 
 ### Deploying by hand
 
