@@ -13,6 +13,7 @@
 /wp-content/index.php
 /wp-content/plugins/*
 !/wp-content/plugins/studio-docs/
+!/wp-content/plugins/studio-blueprints/
 /wp-content/plugins/studio-docs/tests/.deps/
 /wp-content/themes/index.php
 /wp-content/themes/twentytwenty*/
