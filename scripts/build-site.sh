@@ -67,6 +67,9 @@ node scripts/build-docs-manifest.mjs
 echo "Importing the docs into WordPress…"
 studio wp --path "$site" wp-docs import --force --manifest="$PWD/build/docs/manifest.json"
 
+echo "Updating the search landing pages…"
+studio wp --path "$site" eval-file "$PWD/scripts/import-search-pages.php"
+
 # The export refuses an output folder inside the site, so it goes to a temporary folder
 # first and becomes dist/ afterwards.
 echo "Exporting the WordPress site…"

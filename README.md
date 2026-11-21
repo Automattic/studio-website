@@ -49,6 +49,8 @@ Ask Studio Code (in the app, or `studio code` in the site's folder) for changes,
 
 The content lives in one SQLite file, `wp-content/database/.ht.sqlite`. Git can version it but not merge it: stop the site before you pull or commit, and when two people change content, the last commit wins.
 
+The titles, excerpts, hero headings and added search sections on `/compare/` and `/agents/` are the exception: edit `scripts/import-search-pages.php` and `content/search/` for those pieces. The build applies them to the WordPress pages before export, using the pages' excerpts for their meta descriptions. To apply them to a registered local copy without a full build, run `studio wp eval-file scripts/import-search-pages.php`. The import stops if one of those fields or sections has been edited in WordPress since its last import, so reconcile the edit in the source files first. The rest of each page stays in WordPress.
+
 ## The docs
 
 The Studio documentation at wordpress.studio/docs is WordPress too: the `docs` post type of the `studio-docs` plugin (`wp-content/plugins/studio-docs`), rendered by the theme's `single-docs` template and its docs header and footer parts, built from core blocks and the plugin's blocks (code, callout, navigation, table of contents, search, …), so the pages and the templates open in the block editor and the Site Editor like the rest of the site. The markdown is not edited here. Its source of truth is `docs/user/docs/` in the [Studio repository](https://github.com/Automattic/studio/tree/trunk/docs/user), so the docs evolve with the code and ship with each release; the site imports it at build time and the posts are build output (the database is not committed).
