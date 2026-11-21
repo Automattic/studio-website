@@ -227,6 +227,14 @@ add_action( 'wp_head', function () {
 		array_unshift( $app_images, studio_public_url( $icon ) );
 	}
 	$publisher = array( '@id' => $home_url . '#organization' );
+	$offers    = array( '@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'USD' );
+	if ( is_page( 'pricing' ) ) {
+		// These offers mirror the free prices visible on /pricing/; keep them in sync with the page.
+		$offers = array(
+			array( '@type' => 'Offer', 'name' => 'Studio app', 'price' => '0', 'priceCurrency' => 'USD', 'url' => $url ),
+			array( '@type' => 'Offer', 'name' => 'Studio CLI', 'price' => '0', 'priceCurrency' => 'USD', 'url' => $url ),
+		);
+	}
 	$graph     = array(
 		'@context' => 'https://schema.org',
 		'@graph'   => array(
@@ -249,7 +257,7 @@ add_action( 'wp_head', function () {
 				'operatingSystem'     => 'macOS, Windows, Linux',
 				'license'             => 'https://www.gnu.org/licenses/old-licenses/gpl-2.0.html',
 				'isAccessibleForFree' => true,
-				'offers'              => array( '@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'USD' ),
+				'offers'              => $offers,
 				'publisher'           => $publisher,
 				'author'              => $publisher,
 				'sameAs'              => array( 'https://github.com/Automattic/studio', 'https://www.npmjs.com/package/wp-studio' ),
