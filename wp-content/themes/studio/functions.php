@@ -214,37 +214,58 @@ add_action( 'wp_head', function () {
 		printf( "<meta %s=\"%s\" content=\"%s\" />\n", $tag[0], esc_attr( $tag[1] ), esc_attr( $tag[2] ) );
 	}
 
-	if ( is_front_page() ) {
-		$publisher = array( '@type' => 'Organization', 'name' => 'Automattic', 'url' => 'https://automattic.com/' );
-		$graph     = array(
-			'@context' => 'https://schema.org',
-			'@graph'   => array(
-				array(
-					'@type'       => 'WebSite',
-					'name'        => get_bloginfo( 'name' ),
-					'url'         => studio_public_url( home_url( '/' ) ),
-					'description' => $description,
-					'publisher'   => $publisher,
-				),
-				array(
-					'@type'               => 'SoftwareApplication',
-					'name'                => 'WordPress Studio',
-					'alternateName'       => array( 'Studio', 'Studio by WordPress.com' ),
-					'description'         => $description,
-					'url'                 => studio_public_url( home_url( '/' ) ),
-					'downloadUrl'         => studio_public_url( home_url( '/download/' ) ),
-					'image'               => $image[0],
-					'applicationCategory' => 'DeveloperApplication',
-					'operatingSystem'     => 'macOS, Windows, Linux',
-					'license'             => 'https://www.gnu.org/licenses/old-licenses/gpl-2.0.html',
-					'isAccessibleForFree' => true,
-					'offers'              => array( '@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'USD' ),
-					'publisher'           => $publisher,
-					'sameAs'              => array( 'https://github.com/Automattic/studio', 'https://www.npmjs.com/package/wp-studio' ),
-				),
+	// The application is the same on every page, so use the homepage excerpt and site icon,
+	// rather than the current page's description or featured image.
+	$home_url        = studio_public_url( home_url( '/' ) );
+	$home_id         = get_option( 'page_on_front' );
+	$app_description = $home_id && has_excerpt( $home_id ) ? wp_strip_all_tags( get_the_excerpt( $home_id ) ) : get_bloginfo( 'description' );
+	$app_images      = array( studio_public_url( get_theme_file_uri( 'assets/images/share.png' ) ) );
+	// The docs replace the favicon via get_site_icon_url, so read the configured attachment directly.
+	$icon_id         = get_option( 'site_icon' );
+	$icon            = $icon_id ? wp_get_attachment_image_url( $icon_id, 'full' ) : false;
+	if ( $icon ) {
+		array_unshift( $app_images, studio_public_url( $icon ) );
+	}
+	$publisher = array( '@id' => $home_url . '#organization' );
+	$graph     = array(
+		'@context' => 'https://schema.org',
+		'@graph'   => array(
+			array(
+				'@type' => 'Organization',
+				'@id'   => $publisher['@id'],
+				'name'  => 'Automattic',
+				'url'   => 'https://automattic.com/',
 			),
+			array(
+				'@type'               => 'SoftwareApplication',
+				'@id'                 => $home_url . '#softwareapplication',
+				'name'                => 'WordPress Studio',
+				'alternateName'       => array( 'Studio', 'Studio by WordPress.com' ),
+				'description'         => $app_description,
+				'url'                 => $home_url,
+				'downloadUrl'         => studio_public_url( home_url( '/download/' ) ),
+				'image'               => $app_images,
+				'applicationCategory' => 'DeveloperApplication',
+				'operatingSystem'     => 'macOS, Windows, Linux',
+				'license'             => 'https://www.gnu.org/licenses/old-licenses/gpl-2.0.html',
+				'isAccessibleForFree' => true,
+				'offers'              => array( '@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'USD' ),
+				'publisher'           => $publisher,
+				'author'              => $publisher,
+				'sameAs'              => array( 'https://github.com/Automattic/studio', 'https://www.npmjs.com/package/wp-studio' ),
+			),
+		),
+	);
+
+	if ( is_front_page() ) {
+		$graph['@graph'][] = array(
+			'@type'       => 'WebSite',
+			'@id'         => $home_url . '#website',
+			'name'        => get_bloginfo( 'name' ),
+			'url'         => $home_url,
+			'description' => $description,
+			'publisher'   => $publisher,
 		);
-		echo '<script type="application/ld+json">' . wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "</script>\n";
 	} elseif ( $doc ) {
 		// A docs page: the article, and the trail Home › Docs › (parents) › page.
 		$items = array( array( '@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => studio_public_url( home_url( '/' ) ) ) );
@@ -261,22 +282,17 @@ add_action( 'wp_head', function () {
 				'item'     => studio_public_url( get_permalink( $id ) ),
 			);
 		}
-		$graph = array(
-			'@context' => 'https://schema.org',
-			'@graph'   => array(
-				array(
-					'@type'       => 'TechArticle',
-					'headline'    => html_entity_decode( get_the_title( $doc ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
-					'description' => $description,
-					'url'         => $url,
-					'inLanguage'  => get_locale(),
-					'isPartOf'    => array( '@type' => 'WebSite', 'name' => 'WordPress Studio Docs', 'url' => studio_public_url( home_url( '/docs/' ) ) ),
-					'publisher'   => array( '@type' => 'Organization', 'name' => 'Automattic', 'url' => 'https://automattic.com/' ),
-				),
-				array( '@type' => 'BreadcrumbList', 'itemListElement' => $items ),
-			),
+		$graph['@graph'][] = array(
+			'@type'       => 'TechArticle',
+			'@id'         => $url . '#article',
+			'headline'    => html_entity_decode( get_the_title( $doc ), ENT_QUOTES | ENT_HTML5, 'UTF-8' ),
+			'description' => $description,
+			'url'         => $url,
+			'inLanguage'  => get_locale(),
+			'isPartOf'    => array( '@type' => 'WebSite', 'name' => 'WordPress Studio Docs', 'url' => studio_public_url( home_url( '/docs/' ) ) ),
+			'publisher'   => $publisher,
 		);
-		echo '<script type="application/ld+json">' . wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "</script>\n";
+		$graph['@graph'][] = array( '@type' => 'BreadcrumbList', '@id' => $url . '#breadcrumb', 'itemListElement' => $items );
 	} elseif ( is_page() ) {
 		$items = array( array( '@type' => 'ListItem', 'position' => 1, 'name' => 'Home', 'item' => studio_public_url( home_url( '/' ) ) ) );
 		foreach ( array_merge( array_reverse( get_post_ancestors( get_the_ID() ) ), array( get_the_ID() ) ) as $id ) {
@@ -287,9 +303,9 @@ add_action( 'wp_head', function () {
 				'item'     => studio_public_url( get_permalink( $id ) ),
 			);
 		}
-		$graph = array( '@context' => 'https://schema.org', '@type' => 'BreadcrumbList', 'itemListElement' => $items );
-		echo '<script type="application/ld+json">' . wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . "</script>\n";
+		$graph['@graph'][] = array( '@type' => 'BreadcrumbList', '@id' => $url . '#breadcrumb', 'itemListElement' => $items );
 	}
+	echo '<script type="application/ld+json">' . wp_json_encode( $graph, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG ) . "</script>\n";
 }, 1 );
 
 /*
