@@ -66,6 +66,7 @@ const PAGES = [
 	{ src: "developer-tools/studio/sites.md", route: "sites", old: "sites", label: "Sites", group: "use-studio" },
 	{ src: "developer-tools/studio/sync.md", route: "sync", old: "sync", label: "Sync", group: "use-studio" },
 	{ src: "developer-tools/studio/preview-sites.md", route: "preview-sites", old: "preview-sites", label: "Preview sites", group: "use-studio" },
+	{ src: "developer-tools/studio/deployignore.md", route: "deployignore", old: "deployignore", label: ".deployignore", group: "use-studio" },
 	{ src: "developer-tools/studio/import-export.md", route: "import-export", old: "import-export", label: "Import and export", group: "use-studio" },
 	{ src: "developer-tools/studio/blueprints/index.md", route: "blueprints", old: "blueprints", label: "Blueprints", group: "use-studio" },
 	{ src: "guides/how-to-create-custom-blueprints.md", route: "blueprints/how-to-create-custom-blueprints", old: null, oldUrl: "https://developer.wordpress.com/docs/guides/how-to-create-custom-blueprints", label: "Custom Blueprints", group: "use-studio" },
