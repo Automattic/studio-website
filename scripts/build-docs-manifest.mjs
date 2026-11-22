@@ -181,7 +181,8 @@ function readPage(page, sourceDir) {
 		lines.shift();
 	}
 	// Without an authored description, a short opening paragraph becomes the lede (printed under
-	// the title) and leaves the body; a long one lends its first sentence and stays.
+	// the title) and leaves the body; a long one lends its first sentence.
+	let lifted = false;
 	if (!description) {
 		const i = lines.findIndex((l) => l.trim());
 		const first = lines[i] ?? "";
@@ -190,9 +191,32 @@ function readPage(page, sourceDir) {
 			if (first.length <= 220) {
 				description = plain;
 				lines.splice(i, 1);
+				lifted = true;
 			} else {
 				description = plain.includes(". ") ? plain.slice(0, plain.indexOf(". ") + 1) : plain;
 			}
+		}
+	}
+	// Do not print the same paragraph as both the description and the opening body text.
+	if (description && !lifted) {
+		let i = lines.findIndex((l) => l.trim());
+		// A frontmatter title can leave the source H1 in the body.
+		if (lines[i]?.startsWith("# ")) i = lines.findIndex((l, n) => n > i && l.trim());
+		const first = lines[i] ?? "";
+		if (i >= 0 && first && !first.startsWith("#") && !first.startsWith("!") && !first.startsWith("-") && !/^\d+\./.test(first)) {
+			const end = lines.findIndex((l, n) => n > i && !l.trim());
+			const count = (end < 0 ? lines.length : end) - i;
+			const stripTags = (text) => {
+				// Repeat until stable so nested fragments like `<scr<b>ipt>` cannot reassemble a tag, then drop stray brackets.
+				for (let prev = null; prev !== text; ) {
+					prev = text;
+					text = text.replace(/<[^<>]*>/g, "");
+				}
+				return text.replace(/[<>]/g, "");
+			};
+			const plain = (text) => describe([stripTags(text)]);
+			const paragraph = plain(lines.slice(i, i + count).join(" "));
+			if (paragraph && plain(description) === paragraph) lines.splice(i, count);
 		}
 	}
 	return { ...page, title, description, anchors, lines, file: fileOf(page) };

@@ -1,9 +1,9 @@
 <?php
 /**
  * What a docs page loads on top of the theme and core: the docs stylesheets (tokens, layout, article
- * typography), the shared script (clipboard helpers, image zoom), the color scheme set before the
- * first paint, the favicons, and the document title in the docs' form. The block editor gets the
- * same stylesheets while a docs page or a docs template is edited.
+ * typography), the shared script (clipboard helpers, image zoom), the favicons, and the document
+ * title in the docs' form. The block editor gets the same stylesheets while a docs page or a docs
+ * template is edited.
  *
  * @package WP_Docs
  */
@@ -40,7 +40,6 @@ function setup() {
 		return;
 	}
 	add_action( 'wp_enqueue_scripts', __NAMESPACE__ . '\\enqueue' );
-	add_action( 'wp_head', __NAMESPACE__ . '\\theme_script', 0 );
 	add_action( 'wp_head', __NAMESPACE__ . '\\head', 2 );
 	add_filter( 'body_class', __NAMESPACE__ . '\\body_class' );
 	add_filter( 'document_title_parts', __NAMESPACE__ . '\\title_parts' );
@@ -90,14 +89,6 @@ function editor_styles( $settings, $context ) {
 		$settings['styles'][] = array( 'css' => str_replace( '.studio-docs-article', '.editor-styles-wrapper', $prose ) );
 	}
 	return $settings;
-}
-
-/**
- * Set `data-theme` on `<html>` before the first paint: the saved choice, else the system scheme.
- * Printing uses the light scheme.
- */
-function theme_script() {
-	echo '<script>(()=>{const r=document.documentElement;let s=null;try{s=localStorage.getItem("studio-docs-theme")||localStorage.getItem("blume-theme")}catch{}const sys=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";r.dataset.theme=s==="dark"||s==="light"?s:sys;let printed=null;addEventListener("beforeprint",()=>{if(r.dataset.theme==="dark"){printed="dark";r.dataset.theme="light"}});addEventListener("afterprint",()=>{if(printed){r.dataset.theme=printed;printed=null}})})();</script>' . "\n";
 }
 
 /**
