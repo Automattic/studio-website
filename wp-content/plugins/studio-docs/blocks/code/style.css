@@ -73,11 +73,11 @@
 	font-weight: var(--shiki-light-font-weight, inherit);
 	text-decoration: var(--shiki-light-text-decoration, inherit);
 }
-@media not print {
-	[data-theme="dark"] .wp-block-studio-docs-code {
+@media (prefers-color-scheme: dark) {
+	.studio-docs .wp-block-studio-docs-code {
 		color: var(--shiki-dark, var(--docs-foreground));
 	}
-	[data-theme="dark"] .wp-block-studio-docs-code span {
+	.studio-docs .wp-block-studio-docs-code span {
 		color: var(--shiki-dark, inherit);
 		font-style: var(--shiki-dark-font-style, inherit);
 		font-weight: var(--shiki-dark-font-weight, inherit);
@@ -122,6 +122,15 @@
 	transform: scale(0);
 }
 @media print {
+	.studio-docs .wp-block-studio-docs-code {
+		color: var(--shiki-light, var(--docs-foreground));
+	}
+	.studio-docs .wp-block-studio-docs-code span {
+		color: var(--shiki-light, inherit);
+		font-style: var(--shiki-light-font-style, inherit);
+		font-weight: var(--shiki-light-font-weight, inherit);
+		text-decoration: var(--shiki-light-text-decoration, inherit);
+	}
 	.wp-block-studio-docs-code .studio-docs-code__copy {
 		display: none;
 	}

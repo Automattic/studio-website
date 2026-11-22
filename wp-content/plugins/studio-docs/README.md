@@ -34,7 +34,7 @@ inc/render.php             rendering helpers: the page a block renders for, icon
 inc/blocks.php             registers blocks/*; the Post Excerpt block shows only a written description
 inc/content.php            render filters: heading anchors, external links in a new tab
 inc/assets.php             the stylesheets and shared script on docs pages and in the editor, the
-                           color scheme script, favicons, the document title
+                           favicons, the document title
 inc/cli.php                `wp wp-docs import|status|drift|convert`
 blocks/<name>/             one folder per block: block.json, index.js (editor), render.php,
                            style.css, view.js (front end)
@@ -137,7 +137,6 @@ previews the docs home when no page is in context):
 |---|---|
 | `menu-toggle` | the button that opens the sidebar drawer below 64rem |
 | `search` | the search button and dialog: loads `/docs/search-index.json` on first open, scores title, headings, description and content, filters by section, previews the selected result; ⌘K / Ctrl K and `/` open it, ⌘J toggles the preview. The placeholder is a setting. |
-| `theme-toggle` | switches `data-theme` on `<html>` (set before the first paint by an inline script) and remembers the choice |
 | `sidebar` | a container: the drawer below 64rem (inert page behind it, Escape closes, focus returns), a sticky column above; the current page scrolled into view |
 | `navigation` | the page tree: Overview, a heading per group, a sub-heading for a page with children, the current page marked |
 | `breadcrumbs` | the page's group, or its parent page when it has one |
@@ -155,8 +154,8 @@ with the external-link icon.
 ## Styling
 
 `tokens.css` defines the tokens (`--docs-background`, `--docs-foreground`, `--docs-muted`, `--docs-border`,
-`--docs-accent`, …) on `:root`, with the dark values under `[data-theme="dark"]`; the content blocks list it
-as a dependency so they are styled wherever they are inserted. `docs.css` lays out the page frame; `prose.css` sets the article typography; every block's `style.css` styles
+`--docs-accent`, …) on `:root`; docs pages follow the system color scheme and use light colors for print.
+The content blocks list it as a dependency so they are styled wherever they are inserted. `docs.css` lays out the page frame; `prose.css` sets the article typography; every block's `style.css` styles
 that block. The theme's stylesheet and core's block styles stay loaded; the docs rules override them
 where the docs differ. The block editor gets the same stylesheets while a docs page or a docs template
 is edited (`block_editor_settings_all`), so the previews look like the pages.
