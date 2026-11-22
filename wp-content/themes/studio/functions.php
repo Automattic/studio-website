@@ -309,13 +309,17 @@ add_action( 'wp_head', function () {
 }, 1 );
 
 /*
- * /start/: the page the "Start your first site" button in the WordPress Studio welcome email opens.
- * start.js tries to open the app's new-site flow (wp-studio://app/v1/new-site) and points at the
- * other ways in. Nothing links to the page, so it is noindexed, left out of the sitemap and added
- * to the static export by hand.
+ * Hidden pages: nothing links to them, so they are noindexed, left out of the sitemap and added to
+ * the static export by hand.
+ * - /start/: the page the "Start your first site" button in the WordPress Studio welcome email
+ *   opens. start.js tries to open the app's new-site flow (wp-studio://app/v1/new-site) and points
+ *   at the other ways in.
+ * - /cloud/: the Studio Cloud plans, until Studio Cloud launches.
  */
+const STUDIO_HIDDEN_PAGES = array( 'start', 'cloud' );
+
 add_filter( 'wp_robots', function ( $robots ) {
-	return is_page( 'start' ) ? array_merge( $robots, array( 'noindex' => true, 'follow' => true ) ) : $robots;
+	return is_page( STUDIO_HIDDEN_PAGES ) ? array_merge( $robots, array( 'noindex' => true, 'follow' => true ) ) : $robots;
 } );
 
 add_action( 'wp_enqueue_scripts', function () {
@@ -332,17 +336,48 @@ add_action( 'wp_enqueue_scripts', function () {
 } );
 
 add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $post_type ) {
-	$start = 'page' === $post_type ? get_page_by_path( 'start' ) : null;
-	if ( $start ) {
-		$args['post__not_in'] = array_merge( $args['post__not_in'] ?? array(), array( $start->ID ) );
+	if ( 'page' !== $post_type ) {
+		return $args;
+	}
+	foreach ( STUDIO_HIDDEN_PAGES as $slug ) {
+		$page = get_page_by_path( $slug );
+		if ( $page ) {
+			$args['post__not_in'] = array_merge( $args['post__not_in'] ?? array(), array( $page->ID ) );
+		}
 	}
 	return $args;
 }, 10, 2 );
 
 // The static export follows links from the home page and the sitemap, and nothing links here.
 add_filter( 'ss_additional_urls', function ( $urls ) {
-	$urls[] = home_url( '/start/' );
+	foreach ( STUDIO_HIDDEN_PAGES as $slug ) {
+		$urls[] = home_url( "/$slug/" );
+	}
 	return $urls;
+} );
+
+/*
+ * Studio Cloud checkout: the plan buttons link to WordPress.com's Studio checkout, which signs the
+ * buyer in, and send them on to the app after a purchase or back to the plans when they cancel.
+ * WordPress.com only returns to wordpress.studio and app.wordpress.studio.
+ */
+const STUDIO_CLOUD_APP_URL = 'https://app.wordpress.studio';
+
+add_filter( 'render_block_core/button', function ( $html ) {
+	return preg_replace_callback(
+		'#href="(https://wordpress\.com/checkout/studio/[a-z0-9-]+)"#',
+		function ( $match ) {
+			$url = add_query_arg(
+				array(
+					'redirect_to' => rawurlencode( STUDIO_CLOUD_APP_URL ),
+					'cancel_to'   => rawurlencode( studio_public_url( home_url( '/cloud/' ) ) ),
+				),
+				$match[1]
+			);
+			return 'href="' . esc_url( $url ) . '"';
+		},
+		$html
+	);
 } );
 
 /**
