@@ -206,7 +206,15 @@ function readPage(page, sourceDir) {
 		if (i >= 0 && first && !first.startsWith("#") && !first.startsWith("!") && !first.startsWith("-") && !/^\d+\./.test(first)) {
 			const end = lines.findIndex((l, n) => n > i && !l.trim());
 			const count = (end < 0 ? lines.length : end) - i;
-			const plain = (text) => describe([text.replace(/<[^>]*>/g, "")]);
+			const stripTags = (text) => {
+				// Repeat until stable so nested fragments like `<scr<b>ipt>` cannot reassemble a tag, then drop stray brackets.
+				for (let prev = null; prev !== text; ) {
+					prev = text;
+					text = text.replace(/<[^<>]*>/g, "");
+				}
+				return text.replace(/[<>]/g, "");
+			};
+			const plain = (text) => describe([stripTags(text)]);
 			const paragraph = plain(lines.slice(i, i + count).join(" "));
 			if (paragraph && plain(description) === paragraph) lines.splice(i, count);
 		}
