@@ -33,6 +33,25 @@
 	--docs-success: oklch(0.723 0.219 149.579);
 	color-scheme: dark;
 }
+/* Keep theme heading colors from leaking into the docs without overriding component styles. */
+:where(:root[data-theme="dark"]) :where(body).studio-docs :where(h1, h2, h3, h4, h5, h6) {
+	color: var(--docs-foreground);
+}
+@media print {
+	/* Keep these color tokens in sync with the light :root values above. */
+	:root[data-theme="dark"] {
+		--docs-background: #fff;
+		--docs-foreground: oklch(0.275 0 0);
+		--docs-muted: oklch(0.965 0 0);
+		--docs-muted-foreground: oklch(0.55 0 0);
+		--docs-border: rgb(0 0 0 / 0.1);
+		--docs-accent: #3858e9;
+		--docs-accent-foreground: #fff;
+		--docs-code-background: oklch(0.975 0 0);
+		--docs-success: oklch(0.627 0.194 149.214);
+		color-scheme: light;
+	}
+}
 /* Below 600px the admin bar is not fixed: it scrolls away with the page, so the sticky header and the
    columns sit at the very top once it has gone. */
 @media (max-width: 600px) {

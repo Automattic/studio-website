@@ -94,10 +94,10 @@ function editor_styles( $settings, $context ) {
 
 /**
  * Set `data-theme` on `<html>` before the first paint: the saved choice, else the system scheme.
- * Printing uses the light scheme.
+ * Reapply it when restoring a page from the back-forward cache; print styles use the light scheme.
  */
 function theme_script() {
-	echo '<script>(()=>{const r=document.documentElement;let s=null;try{s=localStorage.getItem("studio-docs-theme")||localStorage.getItem("blume-theme")}catch{}const sys=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";r.dataset.theme=s==="dark"||s==="light"?s:sys;let printed=null;addEventListener("beforeprint",()=>{if(r.dataset.theme==="dark"){printed="dark";r.dataset.theme="light"}});addEventListener("afterprint",()=>{if(printed){r.dataset.theme=printed;printed=null}})})();</script>' . "\n";
+	echo '<script>(()=>{const r=document.documentElement;function a(){let s=null;try{s=localStorage.getItem("studio-docs-theme")||localStorage.getItem("blume-theme")}catch{}const sys=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";r.dataset.theme=s==="dark"||s==="light"?s:sys}a();addEventListener("pageshow",e=>{if(e.persisted)a()})})();</script>' . "\n";
 }
 
 /**

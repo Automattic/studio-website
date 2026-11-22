@@ -110,8 +110,10 @@ body.studio-docs {
 	width: 1.875rem;
 	height: 1.875rem;
 }
-[data-theme="dark"] .studio-docs .studio-docs-header .wp-block-site-logo img {
-	filter: invert(1);
+@media not print {
+	[data-theme="dark"] .studio-docs .studio-docs-header .wp-block-site-logo img {
+		filter: invert(1);
+	}
 }
 .studio-docs .studio-docs-header .studio-docs-header__title {
 	min-width: 0;
