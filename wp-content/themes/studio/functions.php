@@ -27,6 +27,22 @@ add_action( 'after_setup_theme', function () {
 } );
 
 /**
+ * One favicon set for every page, marketing and docs. WordPress's own site icon output is dropped
+ * (it pointed at a different file than the docs used, and the root /favicon.ico and
+ * /apple-touch-icon.png were missing, so Safari fell back to a blank icon). The same files are
+ * published at the site root by scripts/build-site.sh.
+ */
+remove_action( 'wp_head', 'wp_site_icon', 99 );
+add_action( 'wp_head', function () {
+	$icons = get_theme_file_uri( 'assets/icons/' );
+	printf( '<link rel="icon" href="%s" sizes="32x32" type="image/png">' . "\n", esc_url( $icons . 'favicon-32x32.png' ) );
+	printf( '<link rel="icon" href="%s" sizes="16x16" type="image/png">' . "\n", esc_url( $icons . 'favicon-16x16.png' ) );
+	printf( '<link rel="icon" href="%s" type="image/svg+xml">' . "\n", esc_url( $icons . 'favicon.svg' ) );
+	printf( '<link rel="shortcut icon" href="%s">' . "\n", esc_url( home_url( '/favicon.ico' ) ) );
+	printf( '<link rel="apple-touch-icon" href="%s" sizes="180x180">' . "\n", esc_url( $icons . 'apple-touch-icon.png' ) );
+}, 1 );
+
+/**
  * Mark the document as scripted before first paint, so CSS can lay out
  * JS-enhanced parts (hero tabs) in their final state and avoid layout shift.
  */

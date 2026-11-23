@@ -34,7 +34,7 @@ inc/render.php             rendering helpers: the page a block renders for, icon
 inc/blocks.php             registers blocks/*; the Post Excerpt block shows only a written description
 inc/content.php            render filters: heading anchors, external links in a new tab
 inc/assets.php             the stylesheets and shared script on docs pages and in the editor, the
-                           favicons, the document title
+                           the document title
 inc/cli.php                `wp wp-docs import|status|drift|convert`
 blocks/<name>/             one folder per block: block.json, index.js (editor), render.php,
                            style.css, view.js (front end)
@@ -43,7 +43,6 @@ assets/css/docs.css        the page frame (header, columns, footer) and shared c
 assets/css/prose.css       the article: title, lede and the content's core blocks
 assets/js/docs.js          shared helpers for the block scripts (clipboard, live region), image zoom
 assets/vendor/             medium-zoom 1.1.2 (MIT)
-assets/images/             the favicon pair and the touch icon
 vendor/wporg-markdown/     the WordPress.org Markdown importer base class, unchanged
 vendor/jetpack-markdown/   Jetpack's Markdown parser (16.3.1, GPL), unchanged
 tests/                     plain-PHP tests of the pipeline and the reverse sync (no database)

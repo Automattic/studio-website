@@ -76,7 +76,7 @@ studio export-static "$export_dir" --path "$site" --overwrite
 rm -rf dist
 mv "$export_dir" dist
 
-for file in _redirects _headers robots.txt llms.txt; do
+for file in _redirects _headers robots.txt llms.txt favicon.ico apple-touch-icon.png; do
 	cp "$file" dist/
 done
 # Spacefast renders .md files as pages: see the script.
