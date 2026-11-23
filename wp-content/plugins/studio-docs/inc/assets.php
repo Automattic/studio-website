@@ -92,14 +92,9 @@ function editor_styles( $settings, $context ) {
 }
 
 /**
- * Favicons (the light and dark app icon) and the font preload.
+ * The font preload. The favicons come from the theme, the same set on every page.
  */
 function head() {
-	$images = Render\asset( 'images/' );
-	echo '<link href="' . esc_url( $images . 'favicon.svg' ) . '" rel="icon" type="image/svg+xml">' . "\n";
-	echo '<link href="' . esc_url( $images . 'favicon-dark.svg' ) . '" media="(prefers-color-scheme: dark)" rel="icon" type="image/svg+xml">' . "\n";
-	echo '<link href="' . esc_url( $images . 'favicon.svg' ) . '" media="(prefers-color-scheme: light)" rel="icon" type="image/svg+xml">' . "\n";
-	echo '<link href="' . esc_url( $images . 'apple-icon.png' ) . '" rel="apple-touch-icon">' . "\n";
 	echo '<link rel="preload" href="' . esc_url( get_theme_file_uri( 'assets/fonts/inter/inter-400-700-latin.woff2' ) ) . '" as="font" type="font/woff2" crossorigin>' . "\n";
 }
 
