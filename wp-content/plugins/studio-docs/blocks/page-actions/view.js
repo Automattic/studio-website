@@ -9,7 +9,6 @@
 		const toggle = menu?.querySelector( '[data-docs-page-actions-toggle]' );
 		const dropdown = menu?.querySelector( '[role="menu"]' );
 		const items = dropdown ? [ ...dropdown.querySelectorAll( '[role="menuitem"]' ) ] : [];
-		const backdrop = actions.querySelector( '[data-docs-page-actions-backdrop]' );
 
 		// Keep the focused item visible by scrolling only the menu, never the page.
 		const focusItem = ( item ) => {
@@ -26,12 +25,20 @@
 			}
 		};
 
-		// The rail scrolls independently. Keep its menu in the visible part of the rail.
+		// Keep the open menu on screen: the header menu shortens to fit above the bottom edge,
+		// and the rail menu, which scrolls independently, flips to whichever side has more room.
 		const flip = () => {
-			if ( ! menu || ! dropdown || dropdown.hidden || ! actions.classList.contains( 'is-rail' ) ) {
+			if ( ! menu || ! dropdown || dropdown.hidden ) {
 				return;
 			}
 			dropdown.style.maxHeight = '';
+			if ( ! actions.classList.contains( 'is-rail' ) ) {
+				const room = window.innerHeight - dropdown.getBoundingClientRect().top - 8;
+				if ( dropdown.offsetHeight > room ) {
+					dropdown.style.maxHeight = `${ Math.max( 160, room ) }px`;
+				}
+				return;
+			}
 			const box = toggle.getBoundingClientRect();
 			const rail = actions.closest( '.studio-docs-rail' )?.getBoundingClientRect();
 			const top = Math.max( 0, rail?.top ?? 0 );
@@ -47,9 +54,6 @@
 				return;
 			}
 			dropdown.hidden = false;
-			if ( backdrop ) {
-				backdrop.hidden = false;
-			}
 			toggle.setAttribute( 'aria-expanded', 'true' );
 			flip();
 			focusItem( items[ 0 ] );
@@ -57,9 +61,6 @@
 		const close = ( focus ) => {
 			if ( toggle && dropdown && ! dropdown.hidden ) {
 				dropdown.hidden = true;
-				if ( backdrop ) {
-					backdrop.hidden = true;
-				}
 				toggle.setAttribute( 'aria-expanded', 'false' );
 				if ( focus ) {
 					toggle.focus( { preventScroll: true } );
@@ -113,7 +114,6 @@
 				close( true );
 			}
 		} );
-		backdrop?.addEventListener( 'pointerdown', () => close( false ) );
 		document.addEventListener( 'pointerdown', ( e ) => {
 			if ( menu && ! menu.contains( e.target ) ) {
 				close( false );

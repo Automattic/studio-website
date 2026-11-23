@@ -49,7 +49,6 @@ $wp_docs_wrapper      = get_block_wrapper_attributes(
 				<?php echo page_actions_menu( $wp_docs_menu_id, $wp_docs_markdown_url, $wp_docs_variant ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</div>
 		</div>
-		<div class="studio-docs-page-actions__backdrop" data-docs-page-actions-backdrop aria-hidden="true" hidden></div>
 	<?php endif; ?>
 	<span class="screen-reader-text" role="status" aria-live="polite" data-docs-copy-status></span>
 </div>

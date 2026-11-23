@@ -179,52 +179,19 @@
 	margin-top: 0;
 	margin-bottom: 0.375rem;
 }
-.wp-block-studio-docs-page-actions .studio-docs-page-actions__backdrop {
-	display: none;
-}
+/* Narrow screens put the split button at the start of the row above the title, so the menu opens from that edge. */
 @media (max-width: 47.999rem) {
-	.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__copy,
-	.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__split .studio-docs-page-actions__toggle {
-		width: calc(2.5rem - 1px);
-		padding: 0;
-	}
-	.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__copy [data-docs-copy-label] {
-		position: absolute;
-		width: 1px;
-		height: 1px;
-		margin: -1px;
-		overflow: hidden;
-		clip: rect(0 0 0 0);
-		white-space: nowrap;
-	}
-	.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__backdrop:not([hidden]) {
-		position: fixed;
-		inset: 0;
-		z-index: 60;
-		display: block;
-		background: color-mix(in srgb, var(--docs-foreground) 40%, transparent);
-	}
 	.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__dropdown {
-		position: fixed;
-		top: auto;
-		bottom: 0;
-		inset-inline: 0;
-		width: 100%;
-		max-height: calc(100dvh - 1rem);
-		margin: 0;
-		padding: 0.5rem 0.75rem max(0.75rem, env(safe-area-inset-bottom));
-		overscroll-behavior: contain;
-		border-inline: 0;
-		border-bottom: 0;
-		border-radius: 0.75rem 0.75rem 0 0;
-	}
-	.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__option {
-		padding-block: 0.625rem;
+		inset-inline: 0 auto;
+		width: min(14rem, calc(100vw - 2rem));
+		max-width: calc(100vw - 2rem);
 	}
 }
-@media (max-width: 47.999rem) and (prefers-color-scheme: dark) {
-	.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__backdrop:not([hidden]) {
-		background: color-mix(in srgb, var(--docs-background) 75%, transparent);
+/* Comfortable tap targets on touch screens. */
+@media (pointer: coarse) {
+	.wp-block-studio-docs-page-actions:is(.is-header, .is-rail) .studio-docs-page-actions__option {
+		min-height: 2.5rem;
+		padding-block: 0.5rem;
 	}
 }
 @media print {
