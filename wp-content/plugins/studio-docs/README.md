@@ -148,8 +148,7 @@ The docs templates in the theme place them next to core blocks: Site Logo and Si
 with a Download button, a constrained `main` group holding Post Title and page actions in one header row,
 Post Excerpt (the description) underneath and Post Content, lists and Social Links in the footer. The
 right rail holds the table of contents and the rail variant of the page actions. Two render filters apply to every block on a
-docs page: headings wrap their text in a `#` anchor link, and links to other sites open in a new tab
-with the external-link icon.
+docs page: headings wrap their text in a `#` anchor link, and links to other sites open in a new tab.
 
 ## Styling
 

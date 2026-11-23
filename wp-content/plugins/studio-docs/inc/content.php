@@ -1,7 +1,7 @@
 <?php
 /**
  * Content rendering on docs pages: headings wrap their text in an anchor link (a `#` appears on
- * hover), and links to other sites open in a new tab with an external-link icon.
+ * hover), and links to other sites open in a new tab.
  *
  * @package WP_Docs
  */
@@ -25,8 +25,9 @@ function in_doc() {
 }
 
 /**
- * Links to other sites open in a new tab and get the external-link icon: every absolute http(s) link,
- * in the content and in the template parts around it.
+ * Links to other sites open in a new tab, described by a hidden "Opens in a new tab" hint: every
+ * absolute http(s) link, in the content and in the template parts around it. `data-docs-external`
+ * marks a link as done, so a block rendered inside another is not processed twice.
  *
  * @param string $content Rendered block.
  * @param array  $block   Block.

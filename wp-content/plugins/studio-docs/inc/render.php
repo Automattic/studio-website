@@ -113,7 +113,6 @@ function page_actions_menu( $menu_id, $markdown_url, $variant ) {
 			<a class="studio-docs-page-actions__option" href="<?php echo esc_url( $markdown_url ); ?>" role="menuitem" tabindex="-1" target="_blank" rel="noreferrer">
 				<?php echo icon( 'file', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<span><?php esc_html_e( 'View as Markdown', 'studio-docs' ); ?></span>
-				<?php echo icon( 'external-link', 14, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</a>
 			<hr role="separator">
 		<?php endif; ?>
@@ -124,7 +123,6 @@ function page_actions_menu( $menu_id, $markdown_url, $variant ) {
 			<a class="studio-docs-page-actions__option" href="#" data-open-in="<?php echo esc_attr( $key ); ?>" role="menuitem" tabindex="-1" target="_blank" rel="noreferrer">
 				<?php echo $target[1]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<span><?php echo esc_html( $target[0] ); ?></span>
-				<?php echo icon( 'external-link', 14, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</a>
 		<?php endforeach; ?>
 	</div>

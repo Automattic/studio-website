@@ -375,24 +375,6 @@ body.studio-docs {
 	height: 1.125rem;
 }
 
-/* ---- External links (set by the plugin on every link to another site) ---- */
-.studio-docs a[data-docs-external]:not(:has(img, svg))::after {
-	content: "";
-	display: inline-block;
-	width: 0.875rem;
-	height: 0.875rem;
-	margin-inline-start: 0.125em;
-	vertical-align: -0.125em;
-	background: currentColor;
-	opacity: 0.6;
-	-webkit-mask: var(--docs-external-icon) center / contain no-repeat;
-	mask: var(--docs-external-icon) center / contain no-repeat;
-}
-.studio-docs .studio-docs-footer a[data-docs-external]::after,
-.studio-docs .studio-docs-header a[data-docs-external]::after {
-	content: none;
-}
-
 /* ---- Image zoom (medium-zoom) ---- */
 .medium-zoom-overlay {
 	position: fixed;
