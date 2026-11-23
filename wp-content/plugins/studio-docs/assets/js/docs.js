@@ -38,10 +38,15 @@
 		}
 	};
 
-	const flashLabel = ( el, text, ms = 1500 ) => {
+	const flashLabel = ( el, text, ms = 1500, localStatus = null ) => {
 		el.dataset.label ??= el.textContent ?? '';
 		el.textContent = text;
-		announce( text );
+		if ( localStatus ) {
+			localStatus.textContent = '';
+			localStatus.textContent = text;
+		} else {
+			announce( text );
+		}
 		clearTimeout( el._timer );
 		el._timer = setTimeout( () => {
 			el.textContent = el.dataset.label ?? '';
@@ -50,13 +55,9 @@
 
 	const escapeHtml = ( s ) => String( s ).replace( /[&<>"']/g, ( c ) => ( { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ c ] ) );
 
-	const ICONS = {
-		check: '<path d="M20 6 9 17l-5-5"/>',
-		copy: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
-		file: '<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/>',
-	};
-	const icon = ( name, size = 16 ) =>
-		`<svg xmlns="http://www.w3.org/2000/svg" width="${ size }" height="${ size }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ ICONS[ name ] ?? '' }</svg>`;
+	// PHP's Render\icon() supplies the same Solar markup for dynamically inserted icons.
+	const icon = ( name, size = 16 ) => ( window.studioDocsIcons?.[ name ] ?? '' )
+		.replace( 'width="16" height="16"', `width="${ size }" height="${ size }"` );
 
 	const readStorage = ( key ) => {
 		try {

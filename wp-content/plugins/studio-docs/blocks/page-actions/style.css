@@ -1,15 +1,25 @@
-/* Compact article header controls. */
+/* Header controls and the secondary actions below the table of contents. */
 .wp-block-studio-docs-page-actions {
-	display: flex;
-	flex-wrap: nowrap;
-	align-items: center;
-	gap: 0.25rem;
 	font-size: 0.8125rem;
 	line-height: 1.4286;
 }
-.wp-block-studio-docs-page-actions .studio-docs-page-actions__split {
+.wp-block-studio-docs-page-actions.is-header {
+	display: flex;
+	flex-wrap: nowrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__split,
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__navigation-group {
 	display: flex;
 	flex: none;
+	align-items: center;
+	gap: 0.25rem;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__split {
+	position: relative;
+	gap: 0;
 	border: 1px solid var(--docs-border);
 	border-radius: var(--docs-radius);
 }
@@ -19,7 +29,7 @@
 	align-items: center;
 	justify-content: center;
 	gap: 0.375rem;
-	height: 2rem;
+	height: 1.75rem;
 	padding: 0 0.625rem;
 	border: 1px solid var(--docs-border);
 	border-radius: var(--docs-radius);
@@ -32,37 +42,40 @@
 	cursor: pointer;
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__item:hover {
-	background: var(--docs-muted);
-	color: var(--docs-foreground);
+	background: var(--docs-accent);
+	color: var(--docs-accent-foreground);
 	text-decoration: none;
 }
 .wp-block-studio-docs-page-actions svg {
 	flex-shrink: 0;
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__split .studio-docs-page-actions__item {
-	height: calc(2rem - 2px);
+	height: calc(1.75rem - 2px);
 	border: 0;
 	background: transparent;
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__split .studio-docs-page-actions__item:hover {
-	background: var(--docs-muted);
+	background: var(--docs-accent);
 }
-.wp-block-studio-docs-page-actions .studio-docs-page-actions__copy {
+.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__copy {
 	border-start-end-radius: 0;
 	border-end-end-radius: 0;
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__menu {
 	position: relative;
 }
+.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__menu {
+	position: static; /* The split button anchors the menu, including on narrow screens. */
+}
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__split .studio-docs-page-actions__toggle {
-	width: calc(2rem - 1px);
+	width: calc(1.75rem - 1px);
 	padding: 0;
 	border-inline-start: 1px solid var(--docs-border);
 	border-start-start-radius: 0;
 	border-end-start-radius: 0;
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__navigation {
-	width: 2rem;
+	width: 1.75rem;
 	padding: 0;
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__dropdown {
@@ -78,11 +91,17 @@
 	margin-top: 0.375rem;
 	padding: 0.25rem;
 	overflow-y: auto;
-	overflow-wrap: anywhere;
 	border: 1px solid var(--docs-border);
 	border-radius: var(--docs-radius);
-	background: var(--docs-background);
+	background: var(--docs-popover);
+	color: var(--docs-popover-foreground);
 	box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+@media (max-width: 47.999rem) {
+	.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__dropdown {
+		inset-inline-start: 0;
+		inset-inline-end: auto;
+	}
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__dropdown[hidden] {
 	display: none;
@@ -98,14 +117,14 @@
 	gap: 0.625rem;
 	padding: 0.375rem 0.5rem;
 	border-radius: 0.375rem;
-	color: var(--docs-muted-foreground);
+	color: var(--docs-popover-foreground);
 	font-weight: 400;
 	text-decoration: none;
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__option:hover,
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__option:focus-visible {
-	background: var(--docs-muted);
-	color: var(--docs-foreground);
+	background: var(--docs-accent);
+	color: var(--docs-accent-foreground);
 	text-decoration: none;
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__option > span {
@@ -118,8 +137,40 @@
 	width: 1rem;
 	height: 1rem;
 }
+.wp-block-studio-docs-page-actions.is-rail {
+	margin-top: 2rem;
+	padding-top: 1rem;
+	border-top: 1px solid var(--docs-border);
+	font-size: 0.875rem;
+}
+.wp-block-studio-docs-page-actions.is-rail .studio-docs-page-actions__item {
+	display: flex;
+	justify-content: flex-start;
+	width: 100%;
+	height: auto;
+	gap: 0.625rem;
+	padding: 0.375rem 0.5rem;
+	border: 0;
+	background: transparent;
+	color: var(--docs-muted-foreground);
+	font-weight: 400;
+	text-align: start;
+}
+.wp-block-studio-docs-page-actions.is-rail .studio-docs-page-actions__item:hover {
+	background: var(--docs-accent);
+	color: var(--docs-accent-foreground);
+}
+.wp-block-studio-docs-page-actions.is-rail .studio-docs-page-actions__chevron {
+	margin-inline-start: auto;
+}
+.wp-block-studio-docs-page-actions .studio-docs-page-actions__menu[data-docs-flip] .studio-docs-page-actions__dropdown {
+	top: auto;
+	bottom: 100%;
+	margin-top: 0;
+	margin-bottom: 0.375rem;
+}
 @media print {
 	.wp-block-studio-docs-page-actions {
-		display: none;
+		display: none !important;
 	}
 }

@@ -27,7 +27,7 @@ if ( ! $wp_docs_items ) {
 if ( ! empty( $attributes['collapsible'] ) ) {
 	?>
 	<details <?php echo get_block_wrapper_attributes( array( 'class' => 'is-collapsible' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-		<summary class="studio-docs-toc__summary"><span><?php esc_html_e( 'On this page', 'studio-docs' ); ?></span><?php echo icon( 'chevron-down', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></summary>
+		<summary class="studio-docs-toc__summary"><span><?php esc_html_e( 'On this page', 'studio-docs' ); ?></span><?php echo icon( 'chevron-down', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></summary>
 		<?php echo toc_list( $wp_docs_items ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</details>
 	<?php

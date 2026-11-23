@@ -140,14 +140,14 @@ previews the docs home when no page is in context):
 | `sidebar` | a container: the drawer below 64rem (inert page behind it, Escape closes, focus returns), a sticky column above; the current page scrolled into view |
 | `navigation` | the page tree: Overview, a heading per group, a sub-heading for a page with children, the current page marked |
 | `toc` | "On this page" (H2 and H3) with the heading in view marked; the `collapsible` setting renders a closed disclosure above the content, shown only when the rail is hidden |
-| `page-actions` | controls beside the article title to copy the page's Markdown, view it or open it in a chat tool (v0, ChatGPT, Claude, T3 Chat, Scira, Cursor), and navigate to adjacent pages |
+| `page-actions` | header controls to copy the page's Markdown, view it or open it in a chat tool (v0, ChatGPT, Claude, T3 Chat, Scira, Cursor), and navigate to adjacent pages. The `rail` variant repeats the copy and chat actions below the table of contents at 80rem and above. |
 | `pagination` | Previous / Next in sidebar order, named by the sidebar heading |
 | `page-meta` | at the end of the article: "Edit this page on GitHub" and the date of the page's last commit (the manifest's `updated`, which the staging script reads from the GitHub commits API); each line is a setting |
 
 The docs templates in the theme place them next to core blocks: Site Logo and Site Title in the header
 with a Download button, a constrained `main` group holding Post Title and page actions in one header row,
 Post Excerpt (the description) underneath and Post Content, lists and Social Links in the footer. The
-right rail holds the table of contents. Two render filters apply to every block on a
+right rail holds the table of contents and the rail variant of the page actions. Two render filters apply to every block on a
 docs page: headings wrap their text in a `#` anchor link, and links to other sites open in a new tab
 with the external-link icon.
 

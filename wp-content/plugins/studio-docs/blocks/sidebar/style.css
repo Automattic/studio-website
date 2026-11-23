@@ -85,8 +85,8 @@
 	transition: color 0.15s, background-color 0.15s;
 }
 .wp-block-studio-docs-sidebar .wp-block-list a:hover {
-	background: var(--docs-muted);
-	color: var(--docs-foreground);
+	background: var(--docs-accent);
+	color: var(--docs-accent-foreground);
 }
 .wp-block-studio-docs-sidebar .wp-block-list a[data-docs-external]::after {
 	float: right;

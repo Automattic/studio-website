@@ -60,11 +60,11 @@
 	transition: color 0.15s, background-color 0.15s;
 }
 .wp-block-studio-docs-navigation .studio-docs-nav__link:hover {
-	background: var(--docs-muted);
-	color: var(--docs-foreground);
+	background: var(--docs-accent);
+	color: var(--docs-accent-foreground);
 }
 .wp-block-studio-docs-navigation .studio-docs-nav__link[aria-current="page"] {
-	background: var(--docs-muted);
-	color: var(--docs-foreground);
+	background: var(--docs-accent);
+	color: var(--docs-accent-foreground);
 	font-weight: 500;
 }

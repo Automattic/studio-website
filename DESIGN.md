@@ -66,9 +66,9 @@ imagery:
 
 Studio as a modern product: white space, a contemporary grotesk in tight lowercase headlines, and a block mosaic (a field of wireframe blocks, as if looking down on the block editor, with a few tiles in solid WordPress blue) fading in behind the hero and once more near the close. WordPress blue is the single confident accent, on the primary button and active states. Cards carry a 1px gray border and no shadow. Code blocks are dark rounded panels in JetBrains Mono with a copy button. Placeholders for app captures sit over the mosaic with a thin border.
 
-The documentation at `/docs/` is the one exception to the rules below: it keeps the design of the Blume docs site it was migrated from (Inter, light and dark schemes that follow the system setting, a three-column reading layout). Print uses the light scheme. Its styles live with the `studio-docs` plugin; the marketing pages follow this document.
+The documentation at `/docs/` is the one exception to the rules below: it uses Inter, shadcn-inspired neutral light and dark schemes that follow the system setting, and a three-column reading layout. Body text and underlined links use the foreground; descriptions and navigation use muted foreground. Print uses the light scheme. Its styles live with the `studio-docs` plugin; the marketing pages follow this document.
 
-Each docs article puts its title and compact page controls in one wrapping header row, with its description below. The controls copy the page as Markdown, offer a menu to view it or open it in a chat tool, and link to the previous and next pages. On narrow screens they wrap below the title; the rail contains only the table of contents.
+Each docs article pairs a 2rem title with compact controls aligned to its first line; on screens below 48rem the 1.75rem title sits above a full-width control row, followed by the description. The header controls copy the page as Markdown, offer a menu to view it or open it in a chat tool, and link to adjacent pages. At 80rem and above the right rail adds Copy as Markdown and Open in chat beneath the table of contents. Controls use Solar Linear icons and outlined or quiet neutral surfaces.
 
 ## Colors
 
