@@ -21,7 +21,7 @@
 						{ title: __( 'Table of contents', 'studio-docs' ) },
 						el( ToggleControl, {
 							label: __( 'Collapsible', 'studio-docs' ),
-							help: __( 'A closed "On this page" disclosure, shown only when the right rail is hidden. The page actions move into it.', 'studio-docs' ),
+							help: __( 'A closed "On this page" disclosure, shown only when the right rail is hidden.', 'studio-docs' ),
 							checked: !! attributes.collapsible,
 							onChange: ( collapsible ) => setAttributes( { collapsible } ),
 							__nextHasNoMarginBottom: true,

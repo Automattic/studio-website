@@ -30,6 +30,13 @@ function register() {
 	wp_register_style( 'studio-docs-prose', Render\asset( 'css/prose.css' ), array( 'studio-docs' ), $version( 'css/prose.css' ) );
 	wp_register_script( 'studio-docs-medium-zoom', Render\asset( 'vendor/medium-zoom.js' ), array(), $version( 'vendor/medium-zoom.js' ), array( 'strategy' => 'defer' ) );
 	wp_register_script( 'studio-docs', Render\asset( 'js/docs.js' ), array( 'studio-docs-medium-zoom' ), $version( 'js/docs.js' ), array( 'strategy' => 'defer' ) );
+
+	// Keep dynamically inserted icons in sync with the PHP icon helper.
+	$icons = array();
+	foreach ( array( 'check', 'copy', 'file' ) as $name ) {
+		$icons[ $name ] = Render\icon( $name );
+	}
+	wp_add_inline_script( 'studio-docs', 'window.studioDocsIcons = ' . wp_json_encode( $icons ) . ';', 'before' );
 }
 
 /**

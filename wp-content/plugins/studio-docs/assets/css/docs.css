@@ -6,6 +6,11 @@
  */
 
 /* ---- The page ---- */
+/* Mobile Safari inflates text in landscape unless told not to; keep the sizes set below. */
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
 /* The tokens are in tokens.css (`studio-docs-tokens`, a dependency of this stylesheet). */
 body.studio-docs {
 	background: var(--docs-background);
@@ -15,32 +20,31 @@ body.studio-docs {
 	line-height: 1.5;
 	-webkit-font-smoothing: antialiased;
 }
+/* WordPress theme presets must follow the docs palette in both color schemes. */
+body.studio-docs {
+	--wp--preset--color--primary: var(--docs-primary);
+	--wp--preset--color--primary-strong: var(--docs-primary);
+	--wp--preset--color--background: var(--docs-background);
+	--wp--preset--color--text: var(--docs-foreground);
+	--wp--preset--color--muted: var(--docs-muted-foreground);
+	--wp--preset--color--rule: var(--docs-border);
+	--wp--preset--color--surface: var(--docs-secondary);
+	--c-primary: var(--wp--preset--color--primary);
+	--c-bg: var(--wp--preset--color--background);
+	--c-text: var(--wp--preset--color--text);
+	--c-muted: var(--wp--preset--color--muted);
+	--c-rule: var(--wp--preset--color--rule);
+	--c-surface: var(--wp--preset--color--surface);
+	--c-rule-strong: color-mix(in srgb, var(--c-rule), var(--c-text) 12%);
+}
 @media screen and (prefers-color-scheme: dark) {
-	/* WordPress global styles use the theme's light presets for headings, links and buttons.
-	   Remap them only on docs pages, including the theme's inherited color aliases. */
-	body.studio-docs {
-		--wp--preset--color--primary: var(--docs-accent);
-		--wp--preset--color--primary-strong: var(--docs-accent);
-		--wp--preset--color--background: var(--docs-background);
-		--wp--preset--color--text: var(--docs-foreground);
-		--wp--preset--color--muted: var(--docs-muted-foreground);
-		--wp--preset--color--rule: var(--docs-border);
-		--wp--preset--color--surface: var(--docs-muted);
-		--c-primary: var(--wp--preset--color--primary);
-		--c-bg: var(--wp--preset--color--background);
-		--c-text: var(--wp--preset--color--text);
-		--c-muted: var(--wp--preset--color--muted);
-		--c-rule: var(--wp--preset--color--rule);
-		--c-surface: var(--wp--preset--color--surface);
-		--c-rule-strong: color-mix(in srgb, var(--c-rule), var(--c-text) 12%);
-	}
 	/* Backstops for global styles; more specific docs component rules still win. */
 	.studio-docs :where(h1, h2, h3, h4, h5, h6, a:not(.wp-element-button)) {
 		color: var(--docs-foreground);
 	}
 	/* Keep default buttons legible on the dark accent; respect outline and custom text colors. */
 	body.studio-docs :is(.wp-element-button, .wp-block-button__link):not(:where(.is-style-ghost > *, .is-style-outline > *, .has-text-color)) {
-		color: var(--docs-accent-foreground);
+		color: var(--docs-primary-foreground);
 	}
 	body.studio-docs :is(.is-style-outline > .wp-block-button__link, .wp-block-button__link.is-style-outline):not(.has-background) {
 		background: transparent;
@@ -55,7 +59,7 @@ body.studio-docs {
 	}
 }
 .studio-docs :focus-visible {
-	outline: 2px solid var(--docs-accent);
+	outline: 2px solid var(--docs-ring);
 	outline-offset: 2px;
 }
 .studio-docs .screen-reader-text {
@@ -208,8 +212,8 @@ body.studio-docs {
 	align-items: center;
 	padding: 0.375rem 0.875rem;
 	border-radius: 9999px;
-	background: var(--docs-accent);
-	color: var(--docs-accent-foreground);
+	background: var(--docs-primary);
+	color: var(--docs-primary-foreground);
 	font-family: inherit;
 	font-size: 0.875rem;
 	font-weight: 500;
@@ -258,14 +262,8 @@ body.studio-docs {
 	}
 }
 /* Core's layout zeroes the margins of a constrained group's children; the column's own rhythm. */
-.studio-docs .studio-docs-main > .wp-block-studio-docs-breadcrumbs {
-	margin-bottom: 0.5rem;
-}
 .studio-docs .studio-docs-main > .wp-block-studio-docs-pagination {
 	margin-top: 3rem;
-}
-.studio-docs .studio-docs-rail > .wp-block-studio-docs-page-actions {
-	margin-top: 2rem;
 }
 .studio-docs .studio-docs-rail {
 	display: none;
@@ -382,23 +380,6 @@ body.studio-docs {
 	height: 1.125rem;
 }
 
-/* ---- External links (set by the plugin on every link to another site) ---- */
-.studio-docs a[data-docs-external]:not(:has(img, svg))::after {
-	content: "";
-	display: inline-block;
-	width: 0.75em;
-	height: 0.75em;
-	margin-inline-start: 0.125em;
-	background: currentColor;
-	opacity: 0.6;
-	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M7 7h10v10M7 17L17 7'/%3E%3C/svg%3E") center / contain no-repeat;
-	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23000' stroke-linecap='round' stroke-linejoin='round' stroke-width='2'%3E%3Cpath d='M7 7h10v10M7 17L17 7'/%3E%3C/svg%3E") center / contain no-repeat;
-}
-.studio-docs .studio-docs-footer a[data-docs-external]::after,
-.studio-docs .studio-docs-header a[data-docs-external]::after {
-	content: none;
-}
-
 /* ---- Image zoom (medium-zoom) ---- */
 .medium-zoom-overlay {
 	position: fixed;
@@ -443,7 +424,7 @@ body.studio-docs {
 }
 /* Server-rendered template blocks are previewed inside their editor wrapper, which carries the same
    block class as the rendered markup: the wrapper stays a plain box, the preview inside is styled. */
-.editor-styles-wrapper .wp-block:is([data-type="studio-docs/pagination"], [data-type="studio-docs/page-actions"], [data-type="studio-docs/toc"], [data-type="studio-docs/breadcrumbs"], [data-type="studio-docs/navigation"]) {
+.editor-styles-wrapper .wp-block:is([data-type="studio-docs/pagination"], [data-type="studio-docs/page-actions"], [data-type="studio-docs/toc"], [data-type="studio-docs/navigation"]) {
 	display: block;
 	margin: 0;
 	padding: 0;

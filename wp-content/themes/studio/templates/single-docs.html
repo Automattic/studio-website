@@ -14,10 +14,12 @@
 <!-- /wp:studio-docs/sidebar -->
 
 <!-- wp:group {"tagName":"main","className":"studio-docs-main","layout":{"type":"constrained","contentSize":"42rem"}} -->
-<main class="wp-block-group studio-docs-main"><!-- wp:studio-docs/breadcrumbs /-->
+<main class="wp-block-group studio-docs-main"><!-- wp:group {"tagName":"article","className":"studio-docs-article","layout":{"type":"default"}} -->
+<article class="wp-block-group studio-docs-article"><!-- wp:group {"className":"studio-docs-article__header","layout":{"type":"default"}} -->
+<div class="wp-block-group studio-docs-article__header"><!-- wp:post-title {"level":1} /-->
 
-<!-- wp:group {"tagName":"article","className":"studio-docs-article","layout":{"type":"default"}} -->
-<article class="wp-block-group studio-docs-article"><!-- wp:post-title {"level":1} /-->
+<!-- wp:studio-docs/page-actions /--></div>
+<!-- /wp:group -->
 
 <!-- wp:post-excerpt /-->
 
@@ -34,7 +36,7 @@
 <!-- wp:group {"tagName":"aside","className":"studio-docs-rail","layout":{"type":"default"}} -->
 <aside class="wp-block-group studio-docs-rail"><!-- wp:studio-docs/toc /-->
 
-<!-- wp:studio-docs/page-actions /--></aside>
+<!-- wp:studio-docs/page-actions {"variant":"rail"} /--></aside>
 <!-- /wp:group --></div>
 <!-- /wp:group -->
 

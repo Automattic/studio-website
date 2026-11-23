@@ -85,13 +85,8 @@
 	transition: color 0.15s, background-color 0.15s;
 }
 .wp-block-studio-docs-sidebar .wp-block-list a:hover {
-	background: var(--docs-muted);
-	color: var(--docs-foreground);
-}
-.wp-block-studio-docs-sidebar .wp-block-list a[data-docs-external]::after {
-	float: right;
-	margin-top: 0.25rem;
-	opacity: 0.6;
+	background: var(--docs-accent);
+	color: var(--docs-accent-foreground);
 }
 .wp-block-studio-docs-sidebar .studio-docs-sidebar__featured {
 	margin-bottom: 1rem;

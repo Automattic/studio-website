@@ -2,16 +2,22 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "studio-docs/page-actions",
-	"version": "1.0.0",
+	"version": "1.0.4",
 	"title": "Docs Page Actions",
 	"category": "studio-docs",
 	"icon": "admin-links",
-	"description": "Scroll to top, Copy as Markdown and Open in chat for the current docs page. Lives in the rail; moves into the collapsible table of contents when the rail is hidden.",
+	"description": "Copy or open the current page's Markdown.",
 	"textdomain": "studio-docs",
 	"usesContext": [ "postId", "postType" ],
+	"attributes": {
+		"variant": {
+			"type": "string",
+			"enum": [ "header", "rail" ],
+			"default": "header"
+		}
+	},
 	"supports": {
-		"html": false,
-		"multiple": false
+		"html": false
 	},
 	"editorScript": "file:./index.js",
 	"style": "file:./style.css",

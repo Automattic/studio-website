@@ -6,7 +6,7 @@
  * - content blocks the importer writes and authors can insert: code, callout (the rest of a page is
  *   core blocks: paragraph, heading, list, image, table, quote, …);
  * - template blocks for the docs layout, placed in the theme's docs templates next to core blocks:
- *   menu-toggle, search (header), sidebar + navigation, breadcrumbs, toc, page-actions,
+ *   menu-toggle, search (header), sidebar + navigation, toc, page-actions,
  *   pagination.
  *
  * @package WP_Docs

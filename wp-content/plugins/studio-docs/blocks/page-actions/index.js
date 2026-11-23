@@ -4,12 +4,13 @@
 ( function ( wp ) {
 	const { createElement: el } = wp.element;
 	wp.blocks.registerBlockType( 'studio-docs/page-actions', {
-		edit: ( { context } ) =>
+		edit: ( { attributes, context } ) =>
 			el(
 				'div',
 				wp.blockEditor.useBlockProps(),
 				el( wp.serverSideRender, {
 					block: 'studio-docs/page-actions',
+					attributes,
 					urlQueryArgs: context.postId ? { post_id: context.postId } : {},
 					EmptyResponsePlaceholder: () => el( 'p', { className: 'studio-docs-empty-preview' }, wp.i18n.__( 'Page actions: shown for a docs page.', 'studio-docs' ) ),
 				} )

@@ -1,104 +1,173 @@
 /**
- * Page actions: Scroll to top, Copy as Markdown (fetches the page's Markdown), the "Open in chat" menu
- * (links built from the Markdown URL; a dropdown in the rail, a plain list in the collapsible table of
- * contents, where the block moves when the rail is hidden).
+ * Each header or rail instance copies Markdown and opens the same chat destinations.
  */
 ( () => {
-	const actions = document.querySelector( '[data-docs-page-actions]' );
-	if ( ! actions ) {
-		return;
-	}
 	const { copyText, flashLabel } = window.studioDocs;
-	const wide = matchMedia( '(min-width: 80rem)' );
-	const home = actions.parentElement;
-	const menu = actions.querySelector( '.studio-docs-page-actions__menu' );
 
-	const place = () => {
-		const target = wide.matches ? home : document.querySelector( '[data-docs-page-actions-mount]' );
-		if ( target && actions.parentElement !== target ) {
-			if ( menu ) {
-				menu.open = false;
+	for ( const actions of document.querySelectorAll( '[data-docs-page-actions]' ) ) {
+		const menu = actions.querySelector( '.studio-docs-page-actions__menu' );
+		const toggle = menu?.querySelector( '[data-docs-page-actions-toggle]' );
+		const dropdown = menu?.querySelector( '[role="menu"]' );
+		const items = dropdown ? [ ...dropdown.querySelectorAll( '[role="menuitem"]' ) ] : [];
+
+		// Keep the focused item visible by scrolling only the menu, never the page.
+		const focusItem = ( item ) => {
+			if ( ! item || ! dropdown ) {
+				return;
 			}
-			target.append( actions );
-		}
-	};
-	place();
-	wide.addEventListener( 'change', place );
+			item.focus( { preventScroll: true } );
+			const menuBox = dropdown.getBoundingClientRect();
+			const itemBox = item.getBoundingClientRect();
+			if ( itemBox.top < menuBox.top ) {
+				dropdown.scrollTop += itemBox.top - menuBox.top;
+			} else if ( itemBox.bottom > menuBox.bottom ) {
+				dropdown.scrollTop += itemBox.bottom - menuBox.bottom;
+			}
+		};
 
-	// The dropdown in the rail: flip up when there is no room below, close on outside click, Escape
-	// and focus out.
-	const flip = () => {
-		if ( ! menu || ! wide.matches ) {
-			return;
-		}
-		const dropdown = menu.querySelector( '.studio-docs-page-actions__dropdown' );
-		const summary = menu.querySelector( 'summary' );
-		const box = summary.getBoundingClientRect();
-		const rail = menu.closest( '.studio-docs-rail' )?.getBoundingClientRect() ?? { bottom: window.innerHeight, top: 0 };
-		const up = box.bottom + dropdown.offsetHeight + 8 > rail.bottom && box.top - dropdown.offsetHeight - 8 > rail.top;
-		menu.toggleAttribute( 'data-docs-flip', up );
-	};
-	const close = ( focus ) => {
-		if ( menu?.open ) {
-			menu.open = false;
-			if ( focus ) {
-				menu.querySelector( 'summary' )?.focus();
+		// Keep the open menu on screen: the header menu shortens to fit above the bottom edge,
+		// and the rail menu, which scrolls independently, flips to whichever side has more room.
+		const flip = () => {
+			if ( ! menu || ! dropdown || dropdown.hidden ) {
+				return;
+			}
+			dropdown.style.maxHeight = '';
+			if ( ! actions.classList.contains( 'is-rail' ) ) {
+				const room = window.innerHeight - dropdown.getBoundingClientRect().top - 8;
+				if ( dropdown.offsetHeight > room ) {
+					dropdown.style.maxHeight = `${ Math.max( 160, room ) }px`;
+				}
+				return;
+			}
+			const box = toggle.getBoundingClientRect();
+			const rail = actions.closest( '.studio-docs-rail' )?.getBoundingClientRect();
+			const top = Math.max( 0, rail?.top ?? 0 );
+			const bottom = Math.min( window.innerHeight, rail?.bottom ?? window.innerHeight );
+			const above = box.top - top - 6;
+			const below = bottom - box.bottom - 6;
+			const up = dropdown.offsetHeight > below && above > below;
+			menu.toggleAttribute( 'data-docs-flip', up );
+			dropdown.style.maxHeight = `${ Math.max( 0, up ? above : below ) }px`;
+		};
+		const open = () => {
+			if ( ! toggle || ! dropdown ) {
+				return;
+			}
+			dropdown.hidden = false;
+			toggle.setAttribute( 'aria-expanded', 'true' );
+			flip();
+			focusItem( items[ 0 ] );
+		};
+		const close = ( focus ) => {
+			if ( toggle && dropdown && ! dropdown.hidden ) {
+				dropdown.hidden = true;
+				toggle.setAttribute( 'aria-expanded', 'false' );
+				if ( focus ) {
+					toggle.focus( { preventScroll: true } );
+				}
+			}
+		};
+		toggle?.addEventListener( 'click', () => {
+			if ( dropdown?.hidden ) {
+				open();
+			} else {
+				close( false );
+			}
+		} );
+		toggle?.addEventListener( 'keydown', ( e ) => {
+			if ( e.key === 'ArrowDown' ) {
+				e.preventDefault();
+				open();
+			}
+		} );
+		dropdown?.addEventListener( 'keydown', ( e ) => {
+			const index = items.indexOf( document.activeElement );
+			let next = index;
+			if ( e.key === 'ArrowDown' ) {
+				next = ( index + 1 ) % items.length;
+			} else if ( e.key === 'ArrowUp' ) {
+				next = ( index - 1 + items.length ) % items.length;
+			} else if ( e.key === 'Home' ) {
+				next = 0;
+			} else if ( e.key === 'End' ) {
+				next = items.length - 1;
+			} else if ( e.key === 'Escape' ) {
+				e.preventDefault();
+				close( true );
+				return;
+			} else if ( e.key === 'Tab' ) {
+				// Restore the toggle before the browser advances focus in the requested direction.
+				close( true );
+				return;
+			} else if ( e.key === ' ' && index !== -1 ) {
+				e.preventDefault();
+				items[ index ].click();
+				return;
+			} else {
+				return;
+			}
+			e.preventDefault();
+			focusItem( items[ next ] );
+		} );
+		dropdown?.addEventListener( 'click', ( e ) => {
+			if ( e.target.closest( '[role="menuitem"]' ) ) {
+				close( true );
+			}
+		} );
+		document.addEventListener( 'pointerdown', ( e ) => {
+			if ( menu && ! menu.contains( e.target ) ) {
+				close( false );
+			}
+		} );
+		document.addEventListener( 'keydown', ( e ) => {
+			if ( e.key === 'Escape' && dropdown && ! dropdown.hidden ) {
+				close( menu.contains( e.target ) );
+			}
+		} );
+		menu?.addEventListener( 'focusout', ( e ) => {
+			if ( e.relatedTarget instanceof Node && ! menu.contains( e.relatedTarget ) ) {
+				close( false );
+			}
+		} );
+		window.addEventListener( 'resize', flip );
+		actions.closest( '.studio-docs-rail' )?.addEventListener( 'scroll', flip );
+
+		const md = actions.dataset.markdownUrl || '';
+		const mdUrl = new URL( md, location.origin ).href;
+		const prompt = encodeURIComponent( ( actions.dataset.chatPrompt || '' ).replaceAll( '{url}', () => mdUrl ) );
+		const targets = {
+			chatgpt: `https://chatgpt.com/?hints=search&prompt=${ prompt }`,
+			claude: `https://claude.ai/new?q=${ prompt }`,
+			cursor: `https://cursor.com/link/prompt?text=${ prompt }`,
+			scira: `https://scira.ai/?q=${ prompt }`,
+			t3: `https://t3.chat/new?q=${ prompt }`,
+			v0: `https://v0.app?q=${ prompt }`,
+		};
+		for ( const a of actions.querySelectorAll( '[data-open-in]' ) ) {
+			const href = targets[ a.dataset.openIn ];
+			if ( href ) {
+				a.setAttribute( 'href', href );
 			}
 		}
-	};
-	menu?.addEventListener( 'toggle', () => menu.open && flip() );
-	window.addEventListener( 'resize', () => menu?.open && flip() );
-	document.addEventListener( 'pointerdown', ( e ) => {
-		if ( wide.matches && menu?.open && ! menu.contains( e.target ) ) {
-			close( false );
-		}
-	} );
-	document.addEventListener( 'keydown', ( e ) => {
-		if ( e.key === 'Escape' && wide.matches && menu?.open && ! e.target.closest( 'dialog' ) ) {
-			close( menu.contains( e.target ) );
-		}
-	} );
-	menu?.addEventListener( 'focusout', ( e ) => {
-		if ( wide.matches && e.relatedTarget instanceof Node && ! menu.contains( e.relatedTarget ) ) {
-			close( false );
-		}
-	} );
 
-	// Chat links.
-	const md = actions.dataset.markdownUrl || '';
-	const mdUrl = new URL( md, location.origin ).href;
-	const prompt = encodeURIComponent( ( actions.dataset.chatPrompt || '' ).replaceAll( '{url}', () => mdUrl ) );
-	const targets = {
-		chatgpt: `https://chatgpt.com/?hints=search&prompt=${ prompt }`,
-		claude: `https://claude.ai/new?q=${ prompt }`,
-		cursor: `https://cursor.com/link/prompt?text=${ prompt }`,
-		scira: `https://scira.ai/?q=${ prompt }`,
-		t3: `https://t3.chat/new?q=${ prompt }`,
-		v0: `https://v0.app?q=${ prompt }`,
-	};
-	for ( const a of actions.querySelectorAll( '[data-open-in]' ) ) {
-		const href = targets[ a.dataset.openIn ];
-		if ( href ) {
-			a.setAttribute( 'href', href );
+		const label = actions.querySelector( '[data-docs-copy-label]' );
+		const status = actions.querySelector( '[data-docs-copy-status]' );
+		for ( const copy of actions.querySelectorAll( '[data-docs-copy-page]' ) ) {
+			copy.addEventListener( 'click', async () => {
+				let ok = false;
+				try {
+					const response = await fetch( md );
+					if ( ! response.ok ) {
+						throw new Error( `Fetching ${ md } failed (${ response.status })` );
+					}
+					ok = await copyText( await response.text() );
+				} catch ( error ) {
+					console.error( '[docs] Copy as Markdown failed', error );
+				}
+				if ( label ) {
+					flashLabel( label, ok ? actions.dataset.copiedLabel || 'Copied' : actions.dataset.failedLabel || 'Copy failed', 2000, status );
+				}
+			} );
 		}
 	}
-
-	actions.querySelector( '[data-docs-scroll-top]' )?.addEventListener( 'click', () => window.scrollTo( { behavior: 'smooth', top: 0 } ) );
-
-	const label = actions.querySelector( '[data-docs-copy-label]' );
-	actions.querySelector( '[data-docs-copy-page]' )?.addEventListener( 'click', async () => {
-		let ok = false;
-		try {
-			const response = await fetch( md );
-			if ( ! response.ok ) {
-				throw new Error( `Fetching ${ md } failed (${ response.status })` );
-			}
-			ok = await copyText( await response.text() );
-		} catch ( error ) {
-			console.error( '[docs] Copy as Markdown failed', error );
-		}
-		if ( label ) {
-			flashLabel( label, ok ? actions.dataset.copiedLabel || 'Copied!' : actions.dataset.failedLabel || 'Copy failed' );
-		}
-	} );
 } )();
