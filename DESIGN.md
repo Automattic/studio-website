@@ -68,7 +68,7 @@ Studio as a modern product: white space, a contemporary grotesk in tight lowerca
 
 The documentation at `/docs/` is the one exception to the rules below: it uses Inter, shadcn-inspired neutral light and dark schemes that follow the system setting, and a three-column reading layout. Body text and underlined links use the foreground; descriptions and navigation use muted foreground. Print uses the light scheme. Its styles live with the `studio-docs` plugin; the marketing pages follow this document.
 
-Each docs article pairs a 2.5rem title with a split Copy page control aligned to its first line. Below 48rem the icon-only control sits above a 1.5rem title, and its menu opens as a bottom sheet. The menu copies or views the page as Markdown and opens it in a chat tool. Previous and next links sit at the bottom of the article. At 80rem and above the right rail adds Copy as Markdown and Open in chat beneath the table of contents. Controls use Solar Linear icons and outlined neutral surfaces.
+Each docs article pairs a 2.5rem title with a split Copy page control aligned to its first line. Below 48rem the icon-only control sits above a 1.5rem title, and its menu opens as a bottom sheet. The menu copies or views the page as Markdown and opens it in a chat tool, one icon and label per item. Previous and next links sit at the bottom of the article. At 80rem and above the right rail adds Copy as Markdown and Open in chat beneath the table of contents. Controls use Solar Linear icons and outlined neutral surfaces.
 
 ## Colors
 

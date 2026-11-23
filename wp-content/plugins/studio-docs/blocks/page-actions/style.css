@@ -91,7 +91,7 @@
 	box-shadow: 0 20px 25px -5px color-mix(in srgb, var(--docs-foreground) 12%, transparent), 0 8px 10px -6px color-mix(in srgb, var(--docs-foreground) 12%, transparent);
 }
 .wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__dropdown {
-	width: min(20rem, calc(100vw - 3rem));
+	width: min(14rem, calc(100vw - 3rem));
 }
 @media (prefers-color-scheme: dark) {
 	.wp-block-studio-docs-page-actions .studio-docs-page-actions__dropdown {
@@ -136,20 +136,12 @@
 	margin-top: 0.1875rem;
 }
 .wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__option {
-	padding: 0.5rem;
+	align-items: center;
+	padding: 0.375rem 0.5rem;
 	line-height: 1.25rem;
 }
 .wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__option > svg {
-	margin-top: 0.125rem;
-}
-.wp-block-studio-docs-page-actions .studio-docs-page-actions__option-title,
-.wp-block-studio-docs-page-actions .studio-docs-page-actions__option-description {
-	display: block;
-}
-.wp-block-studio-docs-page-actions .studio-docs-page-actions__option-description {
-	color: var(--docs-muted-foreground);
-	font-size: 0.75rem;
-	line-height: 1.125rem;
+	margin-top: 0;
 }
 .wp-block-studio-docs-page-actions .studio-docs-page-actions__brand {
 	width: 1rem;
@@ -225,6 +217,9 @@
 		border-inline: 0;
 		border-bottom: 0;
 		border-radius: 0.75rem 0.75rem 0 0;
+	}
+	.wp-block-studio-docs-page-actions.is-header .studio-docs-page-actions__option {
+		padding-block: 0.625rem;
 	}
 }
 @media (max-width: 47.999rem) and (prefers-color-scheme: dark) {

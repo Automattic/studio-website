@@ -108,11 +108,11 @@ function page_actions_menu( $menu_id, $markdown_url, $variant ) {
 		<?php if ( 'header' === $variant ) : ?>
 			<button type="button" class="studio-docs-page-actions__option" role="menuitem" tabindex="-1" data-docs-copy-page>
 				<?php echo icon( 'copy', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<span class="studio-docs-page-actions__option-text"><span class="studio-docs-page-actions__option-title"><?php esc_html_e( 'Copy page', 'studio-docs' ); ?></span><span class="studio-docs-page-actions__option-description"><?php esc_html_e( 'Copy page as Markdown for LLMs', 'studio-docs' ); ?></span></span>
+				<span><?php esc_html_e( 'Copy page', 'studio-docs' ); ?></span>
 			</button>
 			<a class="studio-docs-page-actions__option" href="<?php echo esc_url( $markdown_url ); ?>" role="menuitem" tabindex="-1" target="_blank" rel="noreferrer">
 				<?php echo icon( 'file', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<span class="studio-docs-page-actions__option-text"><span class="studio-docs-page-actions__option-title"><?php esc_html_e( 'View as Markdown', 'studio-docs' ); ?></span><span class="studio-docs-page-actions__option-description"><?php esc_html_e( 'Open this page as plain text', 'studio-docs' ); ?></span></span>
+				<span><?php esc_html_e( 'View as Markdown', 'studio-docs' ); ?></span>
 				<?php echo icon( 'external-link', 14, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</a>
 			<hr role="separator">
@@ -123,11 +123,7 @@ function page_actions_menu( $menu_id, $markdown_url, $variant ) {
 			<?php endif; ?>
 			<a class="studio-docs-page-actions__option" href="#" data-open-in="<?php echo esc_attr( $key ); ?>" role="menuitem" tabindex="-1" target="_blank" rel="noreferrer">
 				<?php echo $target[1]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<?php if ( 'header' === $variant ) : ?>
-					<span class="studio-docs-page-actions__option-text"><span class="studio-docs-page-actions__option-title"><?php echo esc_html( $target[0] ); ?></span><span class="studio-docs-page-actions__option-description"><?php esc_html_e( 'Ask questions about this page', 'studio-docs' ); ?></span></span>
-				<?php else : ?>
-					<span><?php echo esc_html( $target[0] ); ?></span>
-				<?php endif; ?>
+				<span><?php echo esc_html( $target[0] ); ?></span>
 				<?php echo icon( 'external-link', 14, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</a>
 		<?php endforeach; ?>
