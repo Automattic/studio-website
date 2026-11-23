@@ -68,6 +68,8 @@ Studio as a modern product: white space, a contemporary grotesk in tight lowerca
 
 The documentation at `/docs/` is the one exception to the rules below: it keeps the design of the Blume docs site it was migrated from (Inter, light and dark schemes that follow the system setting, a three-column reading layout). Print uses the light scheme. Its styles live with the `studio-docs` plugin; the marketing pages follow this document.
 
+Each docs article puts its title and compact page controls in one wrapping header row, with its description below. The controls copy the page as Markdown, offer a menu to view it or open it in a chat tool, and link to the previous and next pages. On narrow screens they wrap below the title; the rail contains only the table of contents.
+
 ## Colors
 
 - `background` #ffffff is the ground of every section. The page is light from top to bottom.

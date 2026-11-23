@@ -258,14 +258,8 @@ body.studio-docs {
 	}
 }
 /* Core's layout zeroes the margins of a constrained group's children; the column's own rhythm. */
-.studio-docs .studio-docs-main > .wp-block-studio-docs-breadcrumbs {
-	margin-bottom: 0.5rem;
-}
 .studio-docs .studio-docs-main > .wp-block-studio-docs-pagination {
 	margin-top: 3rem;
-}
-.studio-docs .studio-docs-rail > .wp-block-studio-docs-page-actions {
-	margin-top: 2rem;
 }
 .studio-docs .studio-docs-rail {
 	display: none;
@@ -443,7 +437,7 @@ body.studio-docs {
 }
 /* Server-rendered template blocks are previewed inside their editor wrapper, which carries the same
    block class as the rendered markup: the wrapper stays a plain box, the preview inside is styled. */
-.editor-styles-wrapper .wp-block:is([data-type="studio-docs/pagination"], [data-type="studio-docs/page-actions"], [data-type="studio-docs/toc"], [data-type="studio-docs/breadcrumbs"], [data-type="studio-docs/navigation"]) {
+.editor-styles-wrapper .wp-block:is([data-type="studio-docs/pagination"], [data-type="studio-docs/page-actions"], [data-type="studio-docs/toc"], [data-type="studio-docs/navigation"]) {
 	display: block;
 	margin: 0;
 	padding: 0;

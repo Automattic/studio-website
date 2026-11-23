@@ -1,7 +1,5 @@
 /**
- * Page actions: Scroll to top, Copy as Markdown (fetches the page's Markdown), the "Open in chat" menu
- * (links built from the Markdown URL; a dropdown in the rail, a plain list in the collapsible table of
- * contents, where the block moves when the rail is hidden).
+ * Header actions: copy the page's Markdown and open it or a chat prompt from the options menu.
  */
 ( () => {
 	const actions = document.querySelector( '[data-docs-page-actions]' );
@@ -9,57 +7,81 @@
 		return;
 	}
 	const { copyText, flashLabel } = window.studioDocs;
-	const wide = matchMedia( '(min-width: 80rem)' );
-	const home = actions.parentElement;
 	const menu = actions.querySelector( '.studio-docs-page-actions__menu' );
-
-	const place = () => {
-		const target = wide.matches ? home : document.querySelector( '[data-docs-page-actions-mount]' );
-		if ( target && actions.parentElement !== target ) {
-			if ( menu ) {
-				menu.open = false;
-			}
-			target.append( actions );
-		}
-	};
-	place();
-	wide.addEventListener( 'change', place );
-
-	// The dropdown in the rail: flip up when there is no room below, close on outside click, Escape
-	// and focus out.
-	const flip = () => {
-		if ( ! menu || ! wide.matches ) {
+	const toggle = menu?.querySelector( '[data-docs-menu-toggle]' );
+	const dropdown = menu?.querySelector( '[role="menu"]' );
+	const items = dropdown ? [ ...dropdown.querySelectorAll( '[role="menuitem"]' ) ] : [];
+	const open = () => {
+		if ( ! toggle || ! dropdown ) {
 			return;
 		}
-		const dropdown = menu.querySelector( '.studio-docs-page-actions__dropdown' );
-		const summary = menu.querySelector( 'summary' );
-		const box = summary.getBoundingClientRect();
-		const rail = menu.closest( '.studio-docs-rail' )?.getBoundingClientRect() ?? { bottom: window.innerHeight, top: 0 };
-		const up = box.bottom + dropdown.offsetHeight + 8 > rail.bottom && box.top - dropdown.offsetHeight - 8 > rail.top;
-		menu.toggleAttribute( 'data-docs-flip', up );
+		dropdown.hidden = false;
+		toggle.setAttribute( 'aria-expanded', 'true' );
+		items[ 0 ]?.focus();
 	};
 	const close = ( focus ) => {
-		if ( menu?.open ) {
-			menu.open = false;
+		if ( toggle && dropdown && ! dropdown.hidden ) {
+			dropdown.hidden = true;
+			toggle.setAttribute( 'aria-expanded', 'false' );
 			if ( focus ) {
-				menu.querySelector( 'summary' )?.focus();
+				toggle.focus();
 			}
 		}
 	};
-	menu?.addEventListener( 'toggle', () => menu.open && flip() );
-	window.addEventListener( 'resize', () => menu?.open && flip() );
-	document.addEventListener( 'pointerdown', ( e ) => {
-		if ( wide.matches && menu?.open && ! menu.contains( e.target ) ) {
+	toggle?.addEventListener( 'click', () => {
+		if ( dropdown?.hidden ) {
+			open();
+		} else {
 			close( false );
 		}
 	} );
-	document.addEventListener( 'keydown', ( e ) => {
-		if ( e.key === 'Escape' && wide.matches && menu?.open && ! e.target.closest( 'dialog' ) ) {
-			close( menu.contains( e.target ) );
+	toggle?.addEventListener( 'keydown', ( e ) => {
+		if ( e.key === 'ArrowDown' ) {
+			e.preventDefault();
+			open();
+		}
+	} );
+	dropdown?.addEventListener( 'keydown', ( e ) => {
+		const index = items.indexOf( document.activeElement );
+		let next = index;
+		if ( e.key === 'ArrowDown' ) {
+			next = ( index + 1 ) % items.length;
+		} else if ( e.key === 'ArrowUp' ) {
+			next = ( index - 1 + items.length ) % items.length;
+		} else if ( e.key === 'Home' ) {
+			next = 0;
+		} else if ( e.key === 'End' ) {
+			next = items.length - 1;
+		} else if ( e.key === 'Escape' ) {
+			e.preventDefault();
+			close( true );
+			return;
+		} else if ( e.key === 'Tab' ) {
+			// Restore the toggle before the browser advances focus in the requested direction.
+			close( true );
+			return;
+		} else if ( e.key === ' ' && index !== -1 ) {
+			e.preventDefault();
+			items[ index ].click();
+			return;
+		} else {
+			return;
+		}
+		e.preventDefault();
+		items[ next ]?.focus();
+	} );
+	dropdown?.addEventListener( 'click', ( e ) => {
+		if ( e.target.closest( '[role="menuitem"]' ) ) {
+			close( false );
+		}
+	} );
+	document.addEventListener( 'pointerdown', ( e ) => {
+		if ( menu && ! menu.contains( e.target ) ) {
+			close( false );
 		}
 	} );
 	menu?.addEventListener( 'focusout', ( e ) => {
-		if ( wide.matches && e.relatedTarget instanceof Node && ! menu.contains( e.relatedTarget ) ) {
+		if ( e.relatedTarget instanceof Node && ! menu.contains( e.relatedTarget ) ) {
 			close( false );
 		}
 	} );
@@ -83,8 +105,6 @@
 		}
 	}
 
-	actions.querySelector( '[data-docs-scroll-top]' )?.addEventListener( 'click', () => window.scrollTo( { behavior: 'smooth', top: 0 } ) );
-
 	const label = actions.querySelector( '[data-docs-copy-label]' );
 	actions.querySelector( '[data-docs-copy-page]' )?.addEventListener( 'click', async () => {
 		let ok = false;
@@ -98,7 +118,7 @@
 			console.error( '[docs] Copy as Markdown failed', error );
 		}
 		if ( label ) {
-			flashLabel( label, ok ? actions.dataset.copiedLabel || 'Copied!' : actions.dataset.failedLabel || 'Copy failed' );
+			flashLabel( label, ok ? actions.dataset.copiedLabel || 'Copied' : actions.dataset.failedLabel || 'Copy failed', 2000 );
 		}
 	} );
 } )();

@@ -10,6 +10,7 @@
 		if ( ! status?.isConnected ) {
 			status = document.createElement( 'div' );
 			status.setAttribute( 'role', 'status' );
+			status.setAttribute( 'aria-live', 'polite' );
 			status.className = 'screen-reader-text';
 			document.body.append( status );
 		}

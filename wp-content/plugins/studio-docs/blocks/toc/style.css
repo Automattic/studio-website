@@ -42,12 +42,6 @@
 	border: 1px solid var(--docs-border);
 	border-radius: var(--docs-radius);
 }
-.wp-block-studio-docs-toc.is-collapsible.is-empty {
-	border: 0;
-}
-.wp-block-studio-docs-toc.is-collapsible.is-empty:not(:has(.wp-block-studio-docs-page-actions)) {
-	display: none;
-}
 .wp-block-studio-docs-toc .studio-docs-toc__summary {
 	display: flex;
 	align-items: center;
@@ -82,13 +76,6 @@
 .wp-block-studio-docs-toc.is-collapsible .studio-docs-toc__list a:not(:hover):not([aria-current="location"]) {
 	color: var(--docs-muted-foreground);
 	font-weight: 400;
-}
-.wp-block-studio-docs-toc .studio-docs-toc__actions:not(:empty) {
-	border-top: 1px solid var(--docs-border);
-}
-.wp-block-studio-docs-toc.is-empty .studio-docs-toc__actions:not(:empty) {
-	border: 1px solid var(--docs-border);
-	border-radius: var(--docs-radius);
 }
 @media (min-width: 80rem) {
 	.wp-block-studio-docs-toc.is-collapsible {

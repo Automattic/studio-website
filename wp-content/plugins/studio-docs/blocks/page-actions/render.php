@@ -1,7 +1,6 @@
 <?php
 /**
- * Scroll to top, Copy as Markdown and the "Open in chat" menu. The script builds the chat links from the
- * page's Markdown URL and moves the block into the collapsible table of contents when the rail is hidden.
+ * Header controls for copying or opening the page's Markdown and navigating between docs pages.
  *
  * @var array    $attributes Block attributes.
  * @var string   $content    Saved markup (none).
@@ -10,8 +9,10 @@
  * @package WP_Docs
  */
 
+use function WP_Docs\Render\adjacent;
 use function WP_Docs\Render\current_doc;
 use function WP_Docs\Render\icon;
+use function WP_Docs\Render\node_href;
 
 defined( 'WPINC' ) || die();
 
@@ -19,6 +20,10 @@ $wp_docs_doc = current_doc( $block );
 if ( ! $wp_docs_doc ) {
 	return;
 }
+
+$wp_docs_adjacent     = adjacent( $wp_docs_doc );
+$wp_docs_markdown_url = wp_make_link_relative( wp_docs_markdown_url( $wp_docs_doc ) );
+$wp_docs_menu_id      = wp_unique_id( 'studio-docs-page-actions-menu-' );
 
 $wp_docs_targets = array(
 	'v0'      => array( __( 'Open in v0', 'studio-docs' ), '<svg class="studio-docs-page-actions__brand" aria-hidden="true" fill="currentColor" viewBox="0 0 147 70" xmlns="http://www.w3.org/2000/svg"><path d="M56 50.2031V14H70V60.1562C70 65.5928 65.5928 70 60.1562 70C57.5605 70 54.9982 68.9992 53.1562 67.1573L0 14H19.7969L56 50.2031Z"/><path d="M147 56H133V23.9531L100.953 56H133V70H96.6875C85.8144 70 77 61.1856 77 50.3125V14H91V46.1562L123.156 14H91V0H127.312C138.186 0 147 8.81439 147 19.6875V56Z"/></svg>' ),
@@ -31,27 +36,33 @@ $wp_docs_targets = array(
 $wp_docs_wrapper = get_block_wrapper_attributes(
 	array(
 		'data-docs-page-actions' => '',
-		'data-markdown-url'      => wp_make_link_relative( wp_docs_markdown_url( $wp_docs_doc ) ),
+		'data-markdown-url'      => $wp_docs_markdown_url,
 		'data-chat-prompt'       => __( 'Read {url} so I can ask you questions about this page.', 'studio-docs' ),
-		'data-copied-label'      => __( 'Copied!', 'studio-docs' ),
+		'data-copied-label'      => __( 'Copied', 'studio-docs' ),
 		'data-failed-label'      => __( 'Copy failed', 'studio-docs' ),
 	)
 );
 ?>
 <div <?php echo $wp_docs_wrapper; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-	<button type="button" class="studio-docs-page-actions__item" data-docs-scroll-top><?php echo icon( 'arrow-up', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( 'Scroll to top', 'studio-docs' ); ?></button>
-	<button type="button" class="studio-docs-page-actions__item" data-docs-copy-page><?php echo icon( 'copy', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><span data-docs-copy-label><?php esc_html_e( 'Copy as Markdown', 'studio-docs' ); ?></span></button>
-	<details class="studio-docs-page-actions__menu">
-		<summary class="studio-docs-page-actions__item"><?php echo icon( 'external-link', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?php esc_html_e( 'Open in chat', 'studio-docs' ); ?><?php echo icon( 'chevron-down', 14, 'studio-docs-page-actions__chevron' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></summary>
-		<div class="studio-docs-page-actions__dropdown">
-			<?php foreach ( $wp_docs_targets as $wp_docs_key => $wp_docs_target ) : ?>
-				<?php if ( 'chatgpt' === $wp_docs_key ) : ?>
-					<hr>
-				<?php endif; ?>
-				<a class="studio-docs-page-actions__option" href="#" data-open-in="<?php echo esc_attr( $wp_docs_key ); ?>" target="_blank" rel="noreferrer">
-					<?php echo $wp_docs_target[1]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><span><?php echo esc_html( $wp_docs_target[0] ); ?></span><?php echo icon( 'external-link', 13, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				</a>
-			<?php endforeach; ?>
+	<div class="studio-docs-page-actions__split">
+		<button type="button" class="studio-docs-page-actions__item studio-docs-page-actions__copy" data-docs-copy-page><?php echo icon( 'copy', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><span data-docs-copy-label><?php esc_html_e( 'Copy page', 'studio-docs' ); ?></span></button>
+		<div class="studio-docs-page-actions__menu">
+			<button type="button" class="studio-docs-page-actions__item studio-docs-page-actions__toggle" data-docs-menu-toggle aria-label="<?php esc_attr_e( 'More copy options', 'studio-docs' ); ?>" aria-haspopup="menu" aria-expanded="false" aria-controls="<?php echo esc_attr( $wp_docs_menu_id ); ?>"><?php echo icon( 'chevron-down', 14 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></button>
+			<div id="<?php echo esc_attr( $wp_docs_menu_id ); ?>" class="studio-docs-page-actions__dropdown" role="menu" aria-label="<?php esc_attr_e( 'Copy options', 'studio-docs' ); ?>" hidden>
+				<a class="studio-docs-page-actions__option" href="<?php echo esc_url( $wp_docs_markdown_url ); ?>" role="menuitem" tabindex="-1" target="_blank" rel="noreferrer"><?php echo icon( 'file', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><span><?php esc_html_e( 'View as Markdown', 'studio-docs' ); ?></span><?php echo icon( 'external-link', 13, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a>
+				<hr role="separator">
+				<?php foreach ( $wp_docs_targets as $wp_docs_key => $wp_docs_target ) : ?>
+					<a class="studio-docs-page-actions__option" href="#" data-open-in="<?php echo esc_attr( $wp_docs_key ); ?>" role="menuitem" tabindex="-1" target="_blank" rel="noreferrer">
+						<?php echo $wp_docs_target[1]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><span><?php echo esc_html( $wp_docs_target[0] ); ?></span><?php echo icon( 'external-link', 13, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					</a>
+				<?php endforeach; ?>
+			</div>
 		</div>
-	</details>
+	</div>
+	<?php if ( $wp_docs_adjacent['prev'] ) : ?>
+		<a class="studio-docs-page-actions__item studio-docs-page-actions__navigation" href="<?php echo esc_url( node_href( $wp_docs_adjacent['prev'] ) ); ?>" rel="prev" aria-label="<?php /* translators: %s: previous page title. */ echo esc_attr( sprintf( __( 'Previous page: %s', 'studio-docs' ), $wp_docs_adjacent['prev']['heading'] ) ); ?>"><?php echo icon( 'arrow-left', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a>
+	<?php endif; ?>
+	<?php if ( $wp_docs_adjacent['next'] ) : ?>
+		<a class="studio-docs-page-actions__item studio-docs-page-actions__navigation" href="<?php echo esc_url( node_href( $wp_docs_adjacent['next'] ) ); ?>" rel="next" aria-label="<?php /* translators: %s: next page title. */ echo esc_attr( sprintf( __( 'Next page: %s', 'studio-docs' ), $wp_docs_adjacent['next']['heading'] ) ); ?>"><?php echo icon( 'arrow-right', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a>
+	<?php endif; ?>
 </div>
