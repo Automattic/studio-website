@@ -6,6 +6,11 @@
  */
 
 /* ---- The page ---- */
+/* Mobile Safari inflates text in landscape unless told not to; keep the sizes set below. */
+html {
+	-webkit-text-size-adjust: 100%;
+	text-size-adjust: 100%;
+}
 /* The tokens are in tokens.css (`studio-docs-tokens`, a dependency of this stylesheet). */
 body.studio-docs {
 	background: var(--docs-background);

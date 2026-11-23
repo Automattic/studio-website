@@ -73,14 +73,24 @@
 	.editor-styles-wrapper .studio-docs-article__header > .wp-block[data-type="studio-docs/page-actions"] {
 		flex: none;
 		order: 0;
-		/* Center the 32px controls against the first 44px title line. */
-		margin-top: 0.375rem;
+		/* Center the 32px controls against the first title line (the title size plus 4px, see below). */
+		margin-top: calc((var(--docs-h1-size) - 1.75rem) / 2);
 	}
 	.studio-docs-article .wp-block-post-title,
 	.studio-docs-article h1 {
-		font-size: 2.5rem;
+		font-size: var(--docs-h1-size);
 		letter-spacing: -0.03em;
-		line-height: 2.75rem;
+		line-height: calc(var(--docs-h1-size) + 0.25rem);
+	}
+}
+/*
+ * From 48rem the title grows with the viewport, 28px at 768px to 40px at 1280px and up, so phones in
+ * landscape and small tablets get an in-between size; H2 likewise goes from 22px to 24px.
+ */
+@media (min-width: 48rem) {
+	.studio-docs-article {
+		--docs-h1-size: clamp(1.75rem, 0.625rem + 2.34375vw, 2.5rem);
+		--docs-h2-size: clamp(1.375rem, 1.1875rem + 0.390625vw, 1.5rem);
 	}
 }
 .studio-docs-article .wp-block-post-excerpt {
@@ -112,8 +122,8 @@
 }
 @media (min-width: 48rem) {
 	.studio-docs-article h2 {
-		font-size: 1.5rem;
-		line-height: 1.875rem;
+		font-size: var(--docs-h2-size);
+		line-height: calc(var(--docs-h2-size) + 0.375rem);
 	}
 }
 .studio-docs-article h3 {
