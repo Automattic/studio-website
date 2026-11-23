@@ -23,6 +23,8 @@
 	--docs-ring: #a1a1a1;
 	--docs-code-background: #f8f8f8;
 	--docs-success: oklch(0.627 0.194 149.214);
+	/* Paragraph text; headings, links and strong text use the foreground. */
+	--docs-prose-foreground: var(--docs-foreground);
 	--docs-radius: 0.5rem;
 	--docs-content-width: 42rem;
 	--docs-header-height: 4rem;
@@ -54,6 +56,7 @@
 		--docs-ring: #737373;
 		--docs-code-background: #161616;
 		--docs-success: oklch(0.723 0.219 149.579);
+		--docs-prose-foreground: #e5e5e5;
 	}
 }
 @media print {
