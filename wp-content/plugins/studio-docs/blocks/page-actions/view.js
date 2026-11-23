@@ -6,7 +6,7 @@
 
 	for ( const actions of document.querySelectorAll( '[data-docs-page-actions]' ) ) {
 		const menu = actions.querySelector( '.studio-docs-page-actions__menu' );
-		const toggle = menu?.querySelector( '[data-docs-menu-toggle]' );
+		const toggle = menu?.querySelector( '[data-docs-page-actions-toggle]' );
 		const dropdown = menu?.querySelector( '[role="menu"]' );
 		const items = dropdown ? [ ...dropdown.querySelectorAll( '[role="menuitem"]' ) ] : [];
 
