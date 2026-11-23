@@ -2,11 +2,11 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "studio-docs/page-actions",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"title": "Docs Page Actions",
 	"category": "studio-docs",
 	"icon": "admin-links",
-	"description": "Copy or open the current page's Markdown and navigate to the previous or next docs page.",
+	"description": "Copy or open the current page's Markdown.",
 	"textdomain": "studio-docs",
 	"usesContext": [ "postId", "postType" ],
 	"attributes": {

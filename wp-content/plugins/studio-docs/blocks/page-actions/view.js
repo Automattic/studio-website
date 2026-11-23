@@ -9,6 +9,22 @@
 		const toggle = menu?.querySelector( '[data-docs-page-actions-toggle]' );
 		const dropdown = menu?.querySelector( '[role="menu"]' );
 		const items = dropdown ? [ ...dropdown.querySelectorAll( '[role="menuitem"]' ) ] : [];
+		const backdrop = actions.querySelector( '[data-docs-page-actions-backdrop]' );
+
+		// Keep the focused item visible by scrolling only the menu, never the page.
+		const focusItem = ( item ) => {
+			if ( ! item || ! dropdown ) {
+				return;
+			}
+			item.focus( { preventScroll: true } );
+			const menuBox = dropdown.getBoundingClientRect();
+			const itemBox = item.getBoundingClientRect();
+			if ( itemBox.top < menuBox.top ) {
+				dropdown.scrollTop += itemBox.top - menuBox.top;
+			} else if ( itemBox.bottom > menuBox.bottom ) {
+				dropdown.scrollTop += itemBox.bottom - menuBox.bottom;
+			}
+		};
 
 		// The rail scrolls independently. Keep its menu in the visible part of the rail.
 		const flip = () => {
@@ -31,16 +47,22 @@
 				return;
 			}
 			dropdown.hidden = false;
+			if ( backdrop ) {
+				backdrop.hidden = false;
+			}
 			toggle.setAttribute( 'aria-expanded', 'true' );
 			flip();
-			items[ 0 ]?.focus();
+			focusItem( items[ 0 ] );
 		};
 		const close = ( focus ) => {
 			if ( toggle && dropdown && ! dropdown.hidden ) {
 				dropdown.hidden = true;
+				if ( backdrop ) {
+					backdrop.hidden = true;
+				}
 				toggle.setAttribute( 'aria-expanded', 'false' );
 				if ( focus ) {
-					toggle.focus();
+					toggle.focus( { preventScroll: true } );
 				}
 			}
 		};
@@ -84,13 +106,14 @@
 				return;
 			}
 			e.preventDefault();
-			items[ next ]?.focus();
+			focusItem( items[ next ] );
 		} );
 		dropdown?.addEventListener( 'click', ( e ) => {
 			if ( e.target.closest( '[role="menuitem"]' ) ) {
-				close( false );
+				close( true );
 			}
 		} );
+		backdrop?.addEventListener( 'pointerdown', () => close( false ) );
 		document.addEventListener( 'pointerdown', ( e ) => {
 			if ( menu && ! menu.contains( e.target ) ) {
 				close( false );
@@ -129,20 +152,22 @@
 
 		const label = actions.querySelector( '[data-docs-copy-label]' );
 		const status = actions.querySelector( '[data-docs-copy-status]' );
-		actions.querySelector( '[data-docs-copy-page]' )?.addEventListener( 'click', async () => {
-			let ok = false;
-			try {
-				const response = await fetch( md );
-				if ( ! response.ok ) {
-					throw new Error( `Fetching ${ md } failed (${ response.status })` );
+		for ( const copy of actions.querySelectorAll( '[data-docs-copy-page]' ) ) {
+			copy.addEventListener( 'click', async () => {
+				let ok = false;
+				try {
+					const response = await fetch( md );
+					if ( ! response.ok ) {
+						throw new Error( `Fetching ${ md } failed (${ response.status })` );
+					}
+					ok = await copyText( await response.text() );
+				} catch ( error ) {
+					console.error( '[docs] Copy as Markdown failed', error );
 				}
-				ok = await copyText( await response.text() );
-			} catch ( error ) {
-				console.error( '[docs] Copy as Markdown failed', error );
-			}
-			if ( label ) {
-				flashLabel( label, ok ? actions.dataset.copiedLabel || 'Copied' : actions.dataset.failedLabel || 'Copy failed', 2000, status );
-			}
-		} );
+				if ( label ) {
+					flashLabel( label, ok ? actions.dataset.copiedLabel || 'Copied' : actions.dataset.failedLabel || 'Copy failed', 2000, status );
+				}
+			} );
+		}
 	}
 } )();

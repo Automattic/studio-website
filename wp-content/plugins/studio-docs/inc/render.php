@@ -104,9 +104,17 @@ function page_actions_menu( $menu_id, $markdown_url, $variant ) {
 	);
 	ob_start();
 	?>
-	<div id="<?php echo esc_attr( $menu_id ); ?>" class="studio-docs-page-actions__dropdown" role="menu" aria-label="<?php echo esc_attr( 'rail' === $variant ? __( 'Open in chat', 'studio-docs' ) : __( 'Copy options', 'studio-docs' ) ); ?>" hidden>
+	<div id="<?php echo esc_attr( $menu_id ); ?>" class="studio-docs-page-actions__dropdown" role="menu" aria-label="<?php echo esc_attr( 'rail' === $variant ? __( 'Open in chat', 'studio-docs' ) : __( 'Page actions', 'studio-docs' ) ); ?>" hidden>
 		<?php if ( 'header' === $variant ) : ?>
-			<a class="studio-docs-page-actions__option" href="<?php echo esc_url( $markdown_url ); ?>" role="menuitem" tabindex="-1" target="_blank" rel="noreferrer"><?php echo icon( 'file', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><span><?php esc_html_e( 'View as Markdown', 'studio-docs' ); ?></span><?php echo icon( 'external-link', 14, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a>
+			<button type="button" class="studio-docs-page-actions__option" role="menuitem" tabindex="-1" data-docs-copy-page>
+				<?php echo icon( 'copy', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<span class="studio-docs-page-actions__option-text"><span class="studio-docs-page-actions__option-title"><?php esc_html_e( 'Copy page', 'studio-docs' ); ?></span><span class="studio-docs-page-actions__option-description"><?php esc_html_e( 'Copy page as Markdown for LLMs', 'studio-docs' ); ?></span></span>
+			</button>
+			<a class="studio-docs-page-actions__option" href="<?php echo esc_url( $markdown_url ); ?>" role="menuitem" tabindex="-1" target="_blank" rel="noreferrer">
+				<?php echo icon( 'file', 16 ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<span class="studio-docs-page-actions__option-text"><span class="studio-docs-page-actions__option-title"><?php esc_html_e( 'View as Markdown', 'studio-docs' ); ?></span><span class="studio-docs-page-actions__option-description"><?php esc_html_e( 'Open this page as plain text', 'studio-docs' ); ?></span></span>
+				<?php echo icon( 'external-link', 14, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			</a>
 			<hr role="separator">
 		<?php endif; ?>
 		<?php foreach ( $targets as $key => $target ) : ?>
@@ -114,7 +122,13 @@ function page_actions_menu( $menu_id, $markdown_url, $variant ) {
 				<hr role="separator">
 			<?php endif; ?>
 			<a class="studio-docs-page-actions__option" href="#" data-open-in="<?php echo esc_attr( $key ); ?>" role="menuitem" tabindex="-1" target="_blank" rel="noreferrer">
-				<?php echo $target[1]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><span><?php echo esc_html( $target[0] ); ?></span><?php echo icon( 'external-link', 14, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php echo $target[1]; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?php if ( 'header' === $variant ) : ?>
+					<span class="studio-docs-page-actions__option-text"><span class="studio-docs-page-actions__option-title"><?php echo esc_html( $target[0] ); ?></span><span class="studio-docs-page-actions__option-description"><?php esc_html_e( 'Ask questions about this page', 'studio-docs' ); ?></span></span>
+				<?php else : ?>
+					<span><?php echo esc_html( $target[0] ); ?></span>
+				<?php endif; ?>
+				<?php echo icon( 'external-link', 14, 'studio-docs-page-actions__external' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</a>
 		<?php endforeach; ?>
 	</div>
