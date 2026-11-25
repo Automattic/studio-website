@@ -26,6 +26,10 @@ add_action( 'after_setup_theme', function () {
 	add_editor_style( 'style.css' );
 } );
 
+add_action( 'init', function () {
+	register_block_type( get_parent_theme_file_path( 'blocks/blueprint-button' ) );
+} );
+
 /**
  * One favicon set for every page, marketing and docs. WordPress's own site icon output is dropped
  * (it pointed at a different file than the docs used, and the root /favicon.ico and

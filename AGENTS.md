@@ -6,6 +6,18 @@ If this site has a `DESIGN.md`, follow it for any design or content work.
 
 > **Customising this file:** Feel free to edit, extend, or replace the contents below.
 
+## The pages
+
+Every page is a regular WordPress page, and its content lives in the database (`wp-content/database/.ht.sqlite`). To
+change a page, edit it in WordPress (the block editor, Studio Code, or WP-CLI) and commit the database with the change.
+
+- Don't add virtual pages: routes, rewrite rules or templates that serve a page WordPress doesn't have. Create a page
+  instead; hide it from search with `STUDIO_HIDDEN_PAGES` in the theme's `functions.php` if it shouldn't be listed.
+- Don't keep page content in files that a script or the build writes into the pages (HTML fragments, import scripts,
+  build steps). It becomes a second source of truth that drifts from the pages people edit in WordPress.
+- Before committing, check that the database diff is your change and discard what running the site added (transients,
+  edit locks, auto-drafts).
+
 ## The docs
 
 `/docs` is build output. The source of truth is the markdown in `docs/user/docs` on `trunk` of
@@ -27,4 +39,4 @@ Rules for an agent driving this:
   and `npm run deploy` (publishes). Never bypass the drift guard (`DOCS_ALLOW_DRIFT=1`) without being told to.
 - A new upstream page is on the site only once it is added to `PAGES` in `scripts/build-docs-manifest.mjs`; the
   staging reports unmapped files at every build.
-- Never commit `wp-content/database/.ht.sqlite`; the docs posts in it are build output.
+- Don't commit the database for a docs import alone; the docs posts in it are build output.

@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "studio/blueprint-button",
+	"version": "1.0.0",
+	"title": "Open in WordPress Studio Generator",
+	"category": "widgets",
+	"icon": "admin-links",
+	"description": "Turns a Blueprint URL, Base64 or JSON into an Open in WordPress Studio link, as Markdown, HTML or a URL.",
+	"textdomain": "studio",
+	"supports": {
+		"align": [ "wide" ],
+		"html": false,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"viewScript": "file:./view.js",
+	"render": "file:./render.php"
+}
