@@ -1,0 +1,1145 @@
+{
+	"source": {
+		"repository": "Automattic/studio",
+		"path": "blueprints",
+		"ref": "local",
+		"commit": "d448a76f131ab027dc021df339235f224df4e42f"
+	},
+	"blueprints": [
+		{
+			"slug": "apparel",
+			"title": "Apparel",
+			"excerpt": "",
+			"image": null,
+			"useCases": [
+				"store"
+			],
+			"demoUrl": null,
+			"bundle": null,
+			"bundleUrl": "https://blueprintlibrary.wordpress.com/?blueprint=1044",
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Apparel",
+					"description": "",
+					"categories": [
+						"Store",
+						"Studio",
+						"WooCommerce"
+					],
+					"author": "Automattic"
+				},
+				"landingPage": "/",
+				"preferredVersions": {
+					"php": "8.3",
+					"wp": "latest"
+				},
+				"login": true,
+				"steps": [
+					{
+						"step": "resetData"
+					},
+					{
+						"step": "setSiteOptions",
+						"options": {
+							"blogname": "Apparel",
+							"blogdescription": "Everyday knitwear and accessories in easy color.",
+							"permalink_structure": "/%postname%/",
+							"woocommerce_currency": "USD",
+							"woocommerce_allow_tracking": "no"
+						}
+					},
+					{
+						"step": "importWxr",
+						"file": {
+							"resource": "bundled",
+							"path": "/content/site-content.wxr"
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "woocommerce"
+						},
+						"options": {
+							"activate": true
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/woo-demo-store-setup.json",
+						"data": {
+							"resource": "bundled",
+							"path": "/content/store-setup.json"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/woo-demo-prepare-store.php",
+						"data": {
+							"resource": "bundled",
+							"path": "/content/prepare-store.php"
+						}
+					},
+					{
+						"step": "runPHP",
+						"code": "<?php require_once '/wordpress/wp-load.php'; require '/wordpress/wp-content/woo-demo-prepare-store.php';"
+					},
+					{
+						"step": "installTheme",
+						"themeData": {
+							"resource": "wordpress.org/themes",
+							"slug": "purple"
+						},
+						"options": {
+							"activate": true
+						}
+					},
+					{
+						"step": "importWxr",
+						"file": {
+							"resource": "bundled",
+							"path": "/content/products.wxr"
+						}
+					},
+					{
+						"step": "mkdir",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import"
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000946-Product_beanie_navy_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000946-Product_beanie_navy_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000947-Product_socks_green_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000947-Product_socks_green_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000948-Model_green_sweater_blue-1-scaled.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000948-Model_green_sweater_blue-1-scaled.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000949-Product_sweater2_navy_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000949-Product_sweater2_navy_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000950-Product_sweater3_navy_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000950-Product_sweater3_navy_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000951-Model_yellow_sweater-1-scaled.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000951-Model_yellow_sweater-1-scaled.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000952-Product_scarf_pile_purple_theme_1-1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000952-Product_scarf_pile_purple_theme_1-1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000962-Product_beanie_pink_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000962-Product_beanie_pink_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000963-Product_beanie_orange_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000963-Product_beanie_orange_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000964-Product_beanie_yellow_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000964-Product_beanie_yellow_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000965-Product_socks_blue_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000965-Product_socks_blue_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000966-Product_socks_yellow_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000966-Product_socks_yellow_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000967-Product_sweater_green_purple_theme-4.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000967-Product_sweater_green_purple_theme-4.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000968-Product_sweater_grey_purple_theme-1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000968-Product_sweater_grey_purple_theme-1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000969-Product_sweater_yellow_purple_theme-9.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000969-Product_sweater_yellow_purple_theme-9.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000973-Product_sweater2_grey_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000973-Product_sweater2_grey_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000974-Product_sweater2_orange_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000974-Product_sweater2_orange_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000975-Product_sweater3_pink_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000975-Product_sweater3_pink_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000976-Product_sweater3_orange_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000976-Product_sweater3_orange_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000977-Product_sweater4_green_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000977-Product_sweater4_green_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000978-Product_sweater4_grey_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000978-Product_sweater4_grey_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000979-Product_sweater4_orange_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000979-Product_sweater4_orange_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000980-Product_scarf_black_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000980-Product_scarf_black_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000981-Product_scarf_pink_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000981-Product_scarf_pink_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000982-Product_scarf_orange_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000982-Product_scarf_orange_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/uploads/woo-demo-import/000983-Product_scarf_yellow_purple_theme_1.jpg",
+						"data": {
+							"resource": "bundled",
+							"path": "/product-images/000983-Product_scarf_yellow_purple_theme_1.jpg"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/woo-demo-media-map.json",
+						"data": {
+							"resource": "bundled",
+							"path": "/content/media-map.json"
+						}
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/woo-demo-link-media.php",
+						"data": {
+							"resource": "bundled",
+							"path": "/content/link-media.php"
+						}
+					},
+					{
+						"step": "runPHP",
+						"code": "<?php require_once '/wordpress/wp-load.php'; require '/wordpress/wp-content/woo-demo-link-media.php';"
+					},
+					{
+						"step": "setSiteOptions",
+						"options": {
+							"woocommerce_coming_soon": "no",
+							"woocommerce_store_pages_only": "no"
+						}
+					}
+				]
+			}
+		},
+		{
+			"slug": "wedding-rsvp",
+			"title": "Wedding RSVP",
+			"excerpt": "An elegant wedding RSVP site using the Impressionist theme with Jetpack Forms.",
+			"image": "wedding-rsvp.webp",
+			"useCases": [
+				"events"
+			],
+			"demoUrl": null,
+			"bundle": "wedding-rsvp.zip",
+			"bundleUrl": null,
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Wedding RSVP",
+					"author": "Automattic",
+					"description": "An elegant wedding RSVP site using the Impressionist theme with a Jetpack Forms RSVP page."
+				},
+				"landingPage": "/",
+				"preferredVersions": {
+					"php": "8.3",
+					"wp": "latest"
+				},
+				"features": {
+					"networking": true
+				},
+				"steps": [
+					{
+						"step": "defineWpConfigConsts",
+						"consts": {
+							"WP_DEBUG": false,
+							"WP_DEBUG_DISPLAY": false,
+							"JETPACK_DEV_DEBUG": true
+						}
+					},
+					{
+						"step": "login",
+						"username": "admin",
+						"password": "password"
+					},
+					{
+						"step": "installTheme",
+						"themeData": {
+							"resource": "url",
+							"url": "https://public-api.wordpress.com/rest/v1/themes/download/impressionist.zip"
+						},
+						"options": {
+							"activate": true
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "jetpack"
+						},
+						"options": {
+							"activate": true,
+							"targetFolderName": "jetpack"
+						},
+						"ifAlreadyInstalled": "overwrite"
+					},
+					{
+						"step": "writeFile",
+						"path": "/wordpress/wp-content/setup-wedding-rsvp.php",
+						"data": {
+							"resource": "bundled",
+							"path": "/setup-wedding-rsvp.php"
+						}
+					},
+					{
+						"step": "runPHP",
+						"code": "<?php require '/wordpress/wp-load.php'; require '/wordpress/wp-content/setup-wedding-rsvp.php';"
+					},
+					{
+						"step": "rm",
+						"path": "/wordpress/wp-content/setup-wedding-rsvp.php"
+					}
+				]
+			}
+		},
+		{
+			"slug": "university-website-2",
+			"title": "University Website",
+			"excerpt": "A university website created with the Kentwood theme.",
+			"image": "university-website-2.jpg",
+			"useCases": [
+				"business"
+			],
+			"demoUrl": "https://kentwooddemo.wordpress.com/",
+			"bundle": null,
+			"bundleUrl": "https://blueprintlibrary.wordpress.com/?blueprint=843",
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "University Website",
+					"description": "A university website created with the Kentwood theme.",
+					"categories": [
+						"Gallery",
+						"Studio"
+					],
+					"author": "Automattic"
+				},
+				"login": true,
+				"siteOptions": {
+					"blogname": "Kentwood"
+				},
+				"steps": [
+					{
+						"step": "resetData"
+					},
+					{
+						"step": "installTheme",
+						"themeData": {
+							"resource": "bundled",
+							"path": "./kentwood.zip"
+						},
+						"options": {
+							"activate": true
+						}
+					},
+					{
+						"step": "importWxr",
+						"file": {
+							"resource": "bundled",
+							"path": "./content.xml"
+						}
+					}
+				]
+			}
+		},
+		{
+			"slug": "skincare-blog-2",
+			"title": "Skincare Blog",
+			"excerpt": "A skincare blog created with the Piel theme.",
+			"image": "skincare-blog-2.jpg",
+			"useCases": [
+				"blog"
+			],
+			"demoUrl": "https://goodskindemo.wordpress.com/",
+			"bundle": null,
+			"bundleUrl": "https://blueprintlibrary.wordpress.com/?blueprint=840",
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Skincare Blog",
+					"description": "A skincare blog created with the Piel theme.",
+					"categories": [
+						"Studio"
+					],
+					"author": "Automattic"
+				},
+				"login": true,
+				"siteOptions": {
+					"blogname": "Goodskin"
+				},
+				"steps": [
+					{
+						"step": "resetData"
+					},
+					{
+						"step": "installTheme",
+						"themeData": {
+							"resource": "bundled",
+							"path": "./piel.zip"
+						},
+						"options": {
+							"activate": true
+						}
+					},
+					{
+						"step": "importWxr",
+						"file": {
+							"resource": "bundled",
+							"path": "./content.xml"
+						}
+					}
+				]
+			}
+		},
+		{
+			"slug": "photography-portfolio",
+			"title": "Photography Portfolio",
+			"excerpt": "A photography portfolio created with the Grammer theme.",
+			"image": "photography-portfolio.jpg",
+			"useCases": [
+				"portfolio"
+			],
+			"demoUrl": "https://grammerthemedemo.wordpress.com/",
+			"bundle": null,
+			"bundleUrl": "https://blueprintlibrary.wordpress.com/?blueprint=837",
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Photography Portfolio",
+					"description": "A photography portfolio created with the Grammer theme.",
+					"categories": [
+						"Gallery",
+						"Studio"
+					],
+					"author": "Automattic"
+				},
+				"login": true,
+				"siteOptions": {
+					"blogname": "Grammer"
+				},
+				"steps": [
+					{
+						"step": "resetData"
+					},
+					{
+						"step": "installTheme",
+						"themeData": {
+							"resource": "bundled",
+							"path": "./grammer.zip"
+						},
+						"options": {
+							"activate": true
+						}
+					},
+					{
+						"step": "importWxr",
+						"file": {
+							"resource": "bundled",
+							"path": "./content.xml"
+						}
+					}
+				]
+			}
+		},
+		{
+			"slug": "personal-resume-2",
+			"title": "Personal Resume",
+			"excerpt": "A resume site created with the Readymade theme.",
+			"image": "personal-resume-2.jpg",
+			"useCases": [
+				"portfolio"
+			],
+			"demoUrl": "https://readymadedemo.wordpress.com/",
+			"bundle": null,
+			"bundleUrl": "https://blueprintlibrary.wordpress.com/?blueprint=834",
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Personal Resume",
+					"description": "A resume site created with the Readymade theme.",
+					"categories": [
+						"Gallery",
+						"Studio"
+					],
+					"author": "Automattic"
+				},
+				"login": true,
+				"siteOptions": {
+					"blogname": "Readymade"
+				},
+				"steps": [
+					{
+						"step": "resetData"
+					},
+					{
+						"step": "installTheme",
+						"themeData": {
+							"resource": "bundled",
+							"path": "./readymade.zip"
+						},
+						"options": {
+							"activate": true
+						}
+					},
+					{
+						"step": "importWxr",
+						"file": {
+							"resource": "bundled",
+							"path": "./content.xml"
+						}
+					},
+					{
+						"step": "runPHP",
+						"code": "<?php require_once '/wordpress/wp-load.php'; $attachments = get_posts( array(    'post_type'   => 'attachment',    'numberposts' => 1,    'post_status' => 'inherit',    's'           => 'rm-nappyco-dazyah', ) ); if ( ! empty( $attachments ) ) { $attachment_id = $attachments[0]->ID; set_theme_mod( 'custom_logo', $attachment_id ); }"
+					}
+				]
+			}
+		},
+		{
+			"slug": "non-profit-organization-2",
+			"title": "Non-profit Organization",
+			"excerpt": "A non-profit organization site created with the Koinonia theme.",
+			"image": "non-profit-organization-2.jpg",
+			"useCases": [
+				"business"
+			],
+			"demoUrl": "https://koinoniathemedemo.wordpress.com/",
+			"bundle": null,
+			"bundleUrl": "https://blueprintlibrary.wordpress.com/?blueprint=829",
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Non-profit Organization",
+					"description": "A non-profit organization site created with the Koinonia theme.",
+					"categories": [
+						"Gallery",
+						"Studio"
+					],
+					"author": "Automattic"
+				},
+				"login": true,
+				"siteOptions": {
+					"blogname": "Koinonia"
+				},
+				"steps": [
+					{
+						"step": "resetData"
+					},
+					{
+						"step": "installTheme",
+						"themeData": {
+							"resource": "bundled",
+							"path": "./koinonia.zip"
+						},
+						"options": {
+							"activate": true
+						}
+					},
+					{
+						"step": "importWxr",
+						"file": {
+							"resource": "bundled",
+							"path": "./content.xml"
+						}
+					}
+				]
+			}
+		},
+		{
+			"slug": "gaming-news-2",
+			"title": "Gaming News",
+			"excerpt": "A gaming news site created with the Spiel theme.",
+			"image": "gaming-news-2.jpg",
+			"useCases": [
+				"blog"
+			],
+			"demoUrl": "https://spieldemo.wordpress.com/",
+			"bundle": null,
+			"bundleUrl": "https://blueprintlibrary.wordpress.com/?blueprint=825",
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Gaming News",
+					"description": "A gaming news site created with the Spiel theme.",
+					"categories": [
+						"Gallery",
+						"Studio"
+					],
+					"author": "Automattic"
+				},
+				"login": true,
+				"siteOptions": {
+					"blogname": "Spiel"
+				},
+				"steps": [
+					{
+						"step": "resetData"
+					},
+					{
+						"step": "installTheme",
+						"themeData": {
+							"resource": "bundled",
+							"path": "./spiel.zip"
+						},
+						"options": {
+							"activate": true
+						}
+					},
+					{
+						"step": "importWxr",
+						"file": {
+							"resource": "bundled",
+							"path": "./content.xml"
+						}
+					}
+				]
+			}
+		},
+		{
+			"slug": "woo-shop",
+			"title": "Commerce",
+			"excerpt": "Create your next online store with WooCommerce and its companion plugins pre-installed and ready to go.",
+			"image": "woo-shop.png",
+			"useCases": [
+				"store"
+			],
+			"demoUrl": null,
+			"bundle": null,
+			"bundleUrl": null,
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Commerce",
+					"description": "Create your next online store with WooCommerce and its companion plugins pre-installed and ready to go.",
+					"categories": [
+						"Jetpack",
+						"Store",
+						"Studio",
+						"WooCommerce"
+					],
+					"author": "Automattic"
+				},
+				"landingPage": "/",
+				"login": true,
+				"plugins": [
+					"blaze-ads",
+					"gravatar-enhanced",
+					"gutenberg",
+					"woocommerce",
+					"woocommerce-payments",
+					"woocommerce-services"
+				],
+				"preferredVersions": {
+					"php": "8.3",
+					"wp": "latest"
+				},
+				"steps": [
+					{
+						"step": "setSiteOptions",
+						"options": {
+							"woocommerce_onboarding_profile": {
+								"skipped": true
+							},
+							"woocommerce_allow_tracking": "no",
+							"woocommerce_coming_soon": "no"
+						}
+					},
+					{
+						"step": "installPlugin",
+						"options": {
+							"activate": false,
+							"targetFolderName": "wc-smooth-generator"
+						},
+						"pluginData": {
+							"resource": "git:directory",
+							"url": "https://github.com/woocommerce/wc-smooth-generator.git",
+							"ref": "HEAD",
+							"path": "/"
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "akismet"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "classic-editor"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "crowdsignal-forms"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "polldaddy"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "facebook-for-woocommerce"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "google-listings-and-ads"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "jetpack"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "layout-grid"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "mailpoet"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "page-optimize"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "pinterest-for-woocommerce"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "taxjar-simplified-taxes-for-woocommerce"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "runPHP",
+						"code": "<?php require_once '/wordpress/wp-load.php'; $wp_rewrite->set_permalink_structure( '/%postname%/' ); include_once( ABSPATH . 'wp-admin/includes/plugin.php' ); deactivate_plugins( 'hello.php', 'hello-dolly' ); include_once( ABSPATH . 'wp-admin/includes/file.php' ); delete_plugins( [ 'hello.php', 'hello-dolly' ] );"
+					},
+					{
+						"step": "updateUserMeta",
+						"meta": {
+							"admin_color": "modern",
+							"show_welcome_panel": 0
+						},
+						"userId": 1
+					}
+				]
+			}
+		},
+		{
+			"slug": "development",
+			"title": "Development",
+			"excerpt": "Building a WordPress theme or plugin? Use this blueprint to streamline your development workflow and ship with confidence.",
+			"image": "development.png",
+			"useCases": [
+				"development"
+			],
+			"demoUrl": null,
+			"bundle": null,
+			"bundleUrl": null,
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Development",
+					"description": "Building a WordPress theme or plugin? Use this blueprint to streamline your development workflow and ship with confidence.",
+					"categories": [
+						"Studio"
+					],
+					"author": "Automattic"
+				},
+				"landingPage": "/",
+				"login": true,
+				"plugins": [
+					"gutenberg"
+				],
+				"preferredVersions": {
+					"php": "8.3",
+					"wp": "latest"
+				},
+				"steps": [
+					{
+						"step": "defineWpConfigConsts",
+						"consts": {
+							"WP_DEBUG": true,
+							"WP_DEBUG_DISPLAY": false,
+							"WP_DEBUG_LOG": true,
+							"WP_DEVELOPMENT_MODE": true
+						},
+						"method": "rewrite-wp-config"
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "create-block-theme"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "plugin-check"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "query-monitor"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "theme-check"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "runPHP",
+						"code": "<?php require_once '/wordpress/wp-load.php'; $wp_rewrite->set_permalink_structure( '/%postname%/' ); include_once( ABSPATH . 'wp-admin/includes/plugin.php' ); deactivate_plugins( 'hello.php', 'hello-dolly', 'akismet/akismet.php' ); include_once( ABSPATH . 'wp-admin/includes/file.php' ); delete_plugins( [ 'hello.php', 'hello-dolly', 'akismet/akismet.php' ] );"
+					},
+					{
+						"step": "updateUserMeta",
+						"meta": {
+							"admin_color": "modern",
+							"show_welcome_panel": 0
+						},
+						"userId": 1
+					}
+				]
+			}
+		},
+		{
+			"slug": "quick-start",
+			"title": "Quick Start",
+			"excerpt": "Start quickly with a WordPress.com-like environment, which includes all plugins and themes that come pre-installed on a Business plan.",
+			"image": "quick-start.png",
+			"useCases": [
+				"business"
+			],
+			"demoUrl": null,
+			"bundle": null,
+			"bundleUrl": null,
+			"blueprint": {
+				"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+				"meta": {
+					"title": "Quick Start",
+					"description": "Start quickly with a WordPress.com-like environment, which includes all plugins and themes that come pre-installed on a Business plan.",
+					"categories": [
+						"Jetpack",
+						"Studio",
+						"WordPress.com"
+					],
+					"author": "Automattic"
+				},
+				"landingPage": "/",
+				"login": true,
+				"plugins": [
+					"gravatar-enhanced",
+					"gutenberg"
+				],
+				"preferredVersions": {
+					"php": "8.3",
+					"wp": "latest"
+				},
+				"steps": [
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "akismet"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "classic-editor"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "crowdsignal-forms"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "jetpack"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "page-optimize"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "polldaddy"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "installPlugin",
+						"pluginData": {
+							"resource": "wordpress.org/plugins",
+							"slug": "layout-grid"
+						},
+						"options": {
+							"activate": false
+						}
+					},
+					{
+						"step": "runPHP",
+						"code": "<?php require_once '/wordpress/wp-load.php'; $wp_rewrite->set_permalink_structure( '/%postname%/' ); include_once( ABSPATH . 'wp-admin/includes/plugin.php' ); deactivate_plugins( 'hello.php', 'hello-dolly' ); include_once( ABSPATH . 'wp-admin/includes/file.php' ); delete_plugins( [ 'hello.php', 'hello-dolly' ] );"
+					},
+					{
+						"step": "updateUserMeta",
+						"meta": {
+							"admin_color": "modern",
+							"show_welcome_panel": 0
+						},
+						"userId": 1
+					}
+				]
+			}
+		}
+	]
+}
