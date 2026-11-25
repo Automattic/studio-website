@@ -22,6 +22,7 @@
 
 - [Liberate](https://wordpress.studio/liberate/): Bring a backup, a live WordPress site or any URL into a local WordPress site.
 - [Ship](https://wordpress.studio/ship/): Share a preview, publish to WordPress.com, Pressable or Spacefast, and pull live changes back down.
+- [Open in WordPress Studio button](https://wordpress.studio/blueprint-button/): Turn a Blueprint URL or JSON into a link or button that opens WordPress Studio ready to create a site from it.
 
 ## Decide
 

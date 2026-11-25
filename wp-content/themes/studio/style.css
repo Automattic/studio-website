@@ -52,6 +52,7 @@ main.is-flush .wp-block-post-content > .alignfull + * {
 	--c-rule: var(--wp--preset--color--rule);
 	--c-surface: var(--wp--preset--color--surface);
 	--c-rule-strong: color-mix(in srgb, var(--c-rule), var(--c-text) 12%);
+	--c-error: #cc1818;
 	--f-mono: var(--wp--preset--font-family--jetbrains-mono);
 	--r-sm: 8px;
 	--r-md: 14px;
@@ -249,7 +250,7 @@ pre.wp-block-code { position: relative; overflow-x: auto; white-space: pre; marg
 pre.wp-block-code code { font: inherit; white-space: inherit; }
 pre.wp-block-code.has-copy { padding-right: 92px; }
 .is-style-command code::before { content: "$ "; color: var(--c-muted); user-select: none; }
-pre.wp-block-code.is-style-command { white-space: pre-wrap; overflow-wrap: anywhere; }
+pre.wp-block-code:is(.is-style-command, .is-wrapped) { white-space: pre-wrap; overflow-wrap: anywhere; }
 .studio-copy {
 	position: absolute;
 	top: 12px;
@@ -607,6 +608,22 @@ pre.wp-block-code.agent-prompt { white-space: pre-wrap; overflow-wrap: anywhere;
 	text-decoration-color: var(--c-primary);
 	text-decoration-thickness: 2px;
 }
+
+/* Open in WordPress Studio generator (blocks/blueprint-button) */
+.blueprint-button { display: flex; flex-direction: column; gap: 12px; padding: 28px; box-sizing: border-box; background: var(--c-bg); border: 1px solid var(--c-rule); border-radius: 14px; }
+.blueprint-button > * { margin: 0; }
+.blueprint-button__label { font-weight: 500; }
+.blueprint-button__input { width: 100%; box-sizing: border-box; min-height: 148px; padding: 14px 16px; border: 1px solid var(--c-rule-strong); border-radius: 14px; background: var(--c-bg); color: var(--c-text); font: 0.875rem/1.6 var(--f-mono); resize: vertical; }
+.blueprint-button__input:focus-visible { outline: 2px solid var(--c-primary); outline-offset: 1px; border-color: transparent; }
+.blueprint-button__input[aria-invalid="true"] { border-color: var(--c-error); }
+.blueprint-button__error { font-size: 0.875rem; color: var(--c-error); }
+.blueprint-button > .blueprint-button__tabs { align-self: flex-start; margin-top: 12px; }
+.blueprint-button__output code:empty::before { content: "Paste a Blueprint to get your link."; opacity: 0.6; }
+.blueprint-button:not(.has-link) .studio-copy { display: none; }
+.js .blueprint-button:not(.is-tabbed) .blueprint-button__output ~ .blueprint-button__output { display: none; }
+.blueprint-button__try a { color: var(--c-primary); font-weight: 500; text-decoration: none; }
+.blueprint-button__try a::after { content: " \2192"; }
+@media (max-width: 781px) { .blueprint-button { padding: 20px; } }
 
 /* Search template */
 .site-search { max-width: 560px; margin-top: 28px !important; }
