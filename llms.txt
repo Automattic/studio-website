@@ -1,6 +1,6 @@
 # WordPress Studio
 
-> WordPress Studio is a free, open source AI website builder and local WordPress development environment, as an app and a CLI. It runs real WordPress on macOS, Windows and Linux with native PHP and SQLite, with no Docker. AI agents build and edit sites through Studio Code, the built-in agent, or through plugins and an MCP server for Claude Code, Codex, ChatGPT, Cursor and Grok Build. Studio Code runs on a ChatGPT, Claude or GitHub Copilot plan, an API key from OpenAI, Anthropic, Google Gemini or Meta, or WordPress.com AI credits.
+> WordPress Studio is a free, open source AI website builder and local WordPress development environment, as an app and a CLI. It runs real WordPress on macOS, Windows and Linux with native PHP and SQLite, with no Docker. AI agents build and edit sites through Studio Code, the built-in agent, or through plugins and an MCP server for Claude Code, Codex, ChatGPT, Cursor and Grok Build. Studio Code runs on a ChatGPT, Claude, Grok or GitHub Copilot plan, OpenRouter, an API key from OpenAI, Anthropic, Google Gemini, Meta, xAI or OpenRouter, a local model through Ollama or LM Studio, or WordPress.com AI credits.
 
 ## Get started
 
@@ -16,7 +16,7 @@
 - [WordPress Studio in the Codex plugin directory](https://chatgpt.com/plugins/plugins_6ad3ad9e33f48191b7ee5f08bf3b6e7e): The plugin's page, for Codex and the ChatGPT app.
 - [Cursor](https://wordpress.studio/agents/cursor/): Install the Studio plugin for Cursor, or add Studio to Cursor's MCP servers.
 - [Grok Build](https://wordpress.studio/agents/#grok-build): Install the Studio plugin for Grok Build.
-- [AI providers](https://wordpress.studio/docs/providers/): Run Studio Code on a ChatGPT, Claude or Copilot plan, your own API key, or WordPress.com AI credits.
+- [AI providers](https://wordpress.studio/docs/providers/): Run Studio Code on the AI plan or API key you already have, a local model such as Ollama or LM Studio, or WordPress.com AI credits.
 
 ## Moving and publishing sites
 
